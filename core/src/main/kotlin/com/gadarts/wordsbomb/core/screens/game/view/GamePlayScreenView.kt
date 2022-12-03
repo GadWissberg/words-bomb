@@ -1,6 +1,7 @@
 package com.gadarts.wordsbomb.core.screens.game.view
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.math.Vector2
@@ -14,33 +15,45 @@ import com.gadarts.wordsbomb.core.model.GameModel.Companion.MAX_OPTIONS
 import com.gadarts.wordsbomb.core.model.assets.FontsDefinitions
 import com.gadarts.wordsbomb.core.model.assets.GameAssetManager
 import com.gadarts.wordsbomb.core.model.assets.TexturesDefinitions
+import com.gadarts.wordsbomb.core.model.view.BrickCell
 import com.gadarts.wordsbomb.core.model.view.Brick
 import com.gadarts.wordsbomb.core.screens.menu.view.stage.GameStage
+
+private const val fl = 40F
 
 class GamePlayScreenView(private val assetsManager: GameAssetManager) : Disposable,
     Notifier<GamePlayScreenViewEventsSubscriber> {
 
 
+    private lateinit var targetWordTable: Table
     private lateinit var lettersOptionsTable: Table
-    private lateinit var glyphLayout: GlyphLayout
+    private lateinit var letterGlyphLayout: GlyphLayout
     private lateinit var uiTable: Table
-    lateinit var stage: GameStage
+    private lateinit var stage: GameStage
     override val subscribers = HashSet<GamePlayScreenViewEventsSubscriber>()
     private var font80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
+    private lateinit var letterSize: Vector2
 
     fun onShow(gameModel: GameModel) {
+        letterGlyphLayout = GlyphLayout(font80, "א")
+        letterSize = Vector2(letterGlyphLayout.width, letterGlyphLayout.height)
         createStage()
         addUiTable()
+        addTargetWordTable(gameModel)
+        addLettersOptionsTable(gameModel)
+    }
+
+    private fun addLettersOptionsTable(gameModel: GameModel) {
         lettersOptionsTable = Table()
         lettersOptionsTable.setSize(uiTable.width, uiTable.prefHeight)
         uiTable.add(lettersOptionsTable)
-        glyphLayout = GlyphLayout(font80, "א")
+        val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
         gameModel.options.forEach {
             lettersOptionsTable.add(
                 Brick(
                     it.toString(),
-                    assetsManager.getTexture(TexturesDefinitions.BRICK),
-                    Vector2(glyphLayout.width, glyphLayout.height),
+                    brickTexture,
+                    letterSize,
                     font80,
                 )
             ).pad(10F)
@@ -48,6 +61,47 @@ class GamePlayScreenView(private val assetsManager: GameAssetManager) : Disposab
                 lettersOptionsTable.row()
             }
         }
+    }
+
+    private fun addTargetWordTable(gameModel: GameModel) {
+        val cellTexture = assetsManager.getTexture(TexturesDefinitions.CELL)
+        val flatBrickTexture = assetsManager.getTexture(TexturesDefinitions.FLAT_BRICK)
+        targetWordTable = Table()
+        uiTable.debug = DebugSettings.SHOW_UI_BORDERS
+        uiTable.add(targetWordTable)
+            .pad(TARGET_WORD_TABLE_VERTICAL_PADDING, 0F, TARGET_WORD_TABLE_VERTICAL_PADDING, 0F)
+            .row()
+        for (i in 0 until gameModel.currentWord.length) {
+            addLetterToTargetWord(gameModel, i, cellTexture, flatBrickTexture)
+        }
+    }
+
+    private fun addLetterToTargetWord(
+        gameModel: GameModel,
+        i: Int,
+        cellTexture: Texture,
+        texture: Texture
+    ) {
+        if (gameModel.hiddenLettersIndices.contains(i)) {
+            targetWordTable.add(BrickCell(cellTexture)).pad(TARGET_LETTER_PADDING)
+        } else {
+            addGivenLetter(gameModel, i, texture)
+        }
+    }
+
+    private fun addGivenLetter(
+        gameModel: GameModel,
+        i: Int,
+        texture: Texture
+    ) {
+        targetWordTable.add(
+            Brick(
+                gameModel.currentWord[i].toString(),
+                texture,
+                letterSize,
+                font80
+            )
+        ).pad(TARGET_LETTER_PADDING)
     }
 
     private fun addUiTable() {
@@ -79,5 +133,7 @@ class GamePlayScreenView(private val assetsManager: GameAssetManager) : Disposab
 
     companion object {
         private const val MAX_OPTIONS_IN_ROW = MAX_OPTIONS / 3
+        private const val TARGET_WORD_TABLE_VERTICAL_PADDING = 160F
+        private const val TARGET_LETTER_PADDING = 10F
     }
 }

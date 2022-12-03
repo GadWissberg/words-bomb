@@ -10,6 +10,7 @@ enum class TexturesDefinitions(ninepatch: Boolean) : AssetDefinition<Texture> {
     BUTTON_DOWN(false),
     CELL(false),
     BRICK(false),
+    FLAT_BRICK(false),
     LIST(true),
     POPUP(true),
     POPUP_BUTTON_UP(true),
