@@ -28,7 +28,7 @@ class GamePlayScreen(
     }
 
     override fun render(delta: Float) {
-        gamePlayScreenView.render()
+        gamePlayScreenView.render(delta)
     }
 
     override fun resize(width: Int, height: Int) {

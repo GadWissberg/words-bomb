@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table.Debug
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
-import com.gadarts.wordsbomb.core.DefaultGameSettings
+import com.gadarts.wordsbomb.core.DebugSettings
 import com.gadarts.wordsbomb.core.model.assets.FontsDefinitions
 import com.gadarts.wordsbomb.core.model.assets.GameAssetManager
 import com.gadarts.wordsbomb.core.model.assets.TexturesDefinitions
@@ -41,7 +41,7 @@ class MenuScreenViewComponentsHandler(private val assetsManager: GameAssetManage
 
     private fun addUserInterface(beginGameAction: ClickListener) {
         uiTable = Table()
-        uiTable!!.debug = DefaultGameSettings.SHOW_UI_BORDERS
+        uiTable!!.debug = DebugSettings.SHOW_UI_BORDERS
         uiTable!!.setFillParent(true)
         addLogo()
         addButtons(uiTable!!, beginGameAction)
@@ -59,7 +59,7 @@ class MenuScreenViewComponentsHandler(private val assetsManager: GameAssetManage
 
     private fun addLogoTable(): Table {
         val logoTable = Table()
-        logoTable.debug(if (DefaultGameSettings.SHOW_UI_BORDERS) Debug.all else Debug.none)
+        logoTable.debug(if (DebugSettings.SHOW_UI_BORDERS) Debug.all else Debug.none)
         uiTable!!.add(logoTable).pad(LOGO_PADDING_TOP, 0F, LOGO_PADDING_BOTTOM, 0F).colspan(2).row()
         return logoTable
     }

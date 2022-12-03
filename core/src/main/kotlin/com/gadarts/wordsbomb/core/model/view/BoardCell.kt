@@ -1,4 +1,4 @@
-package com.gadarts.wordsbomb.core.view.board
+package com.gadarts.wordsbomb.core.model.view
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.scenes.scene2d.ui.Image

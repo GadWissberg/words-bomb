@@ -4,7 +4,6 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
-import com.gadarts.wordsbomb.core.controller.network.NetworkHandler
 import com.gadarts.wordsbomb.core.model.assets.GameAssetManager
 import com.gadarts.wordsbomb.core.screens.game.GamePlayScreen
 import com.gadarts.wordsbomb.core.screens.game.GamePlayScreenEventsSubscriber
@@ -15,7 +14,6 @@ import com.gadarts.wordsbomb.core.screens.menu.MenuScreenEventsSubscriber
 class WordsBombGame(private val androidInterface: AndroidInterface) : Game(),
     MenuScreenEventsSubscriber, GamePlayScreenEventsSubscriber {
 
-    private lateinit var networkHandler: NetworkHandler
     private lateinit var assetsManager: GameAssetManager
 
     override fun create() {
@@ -31,12 +29,6 @@ class WordsBombGame(private val androidInterface: AndroidInterface) : Game(),
         super.setScreen(screen)
         currentScreen?.dispose()
     }
-
-    override fun dispose() {
-        super.dispose()
-        networkHandler.close()
-    }
-
 
     private fun loadAssets() {
         assetsManager = GameAssetManager()

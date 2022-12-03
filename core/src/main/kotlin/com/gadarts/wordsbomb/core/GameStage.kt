@@ -22,7 +22,6 @@ import com.gadarts.wordsbomb.core.model.assets.GameAssetManager
 import com.gadarts.wordsbomb.core.model.assets.TexturesDefinitions
 import com.gadarts.wordsbomb.core.model.assets.TexturesDefinitions.*
 import com.gadarts.wordsbomb.core.screens.menu.view.MenuScreenView
-import com.gadarts.wordsbomb.core.view.hud.EventsSubscriber
 
 /**
  * Common code for the stages.
@@ -186,7 +185,7 @@ abstract class GameStage<T>(
 
     private fun createDialog() {
         currentDialog = Table()
-        currentDialog!!.debug = DefaultGameSettings.SHOW_UI_BORDERS
+        currentDialog!!.debug = DebugSettings.SHOW_UI_BORDERS
         currentDialog!!.setSize(DIALOG_WIDTH, DIALOG_MIN_HEIGHT)
         currentDialog!!.background(dialogBackground)
         addActor(currentDialog)

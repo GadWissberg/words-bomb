@@ -1,7 +1,7 @@
 package com.gadarts.wordsbomb.core
 
 import com.gadarts.wordsbomb.core.model.GameModel
-import com.gadarts.wordsbomb.core.model.Player.Companion.LETTERS
+import com.gadarts.wordsbomb.core.model.GameModel.Companion.MAX_OPTIONS
 
 class GameLogicHandler {
 
@@ -14,8 +14,5 @@ class GameLogicHandler {
         gameModel.options = toMutableList
     }
 
-    companion object {
-        const val MAX_OPTIONS = 22
-    }
 
 }

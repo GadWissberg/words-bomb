@@ -1,4 +1,4 @@
-package com.gadarts.wordsbomb.core.view
+package com.gadarts.wordsbomb.core.model.view
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.gadarts.wordsbomb.core.view.board.BoardCell
 
 /**
  * Represents a letter brick that can be placed in the deck and in the board.

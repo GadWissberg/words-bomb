@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.FitViewport
-import com.gadarts.wordsbomb.core.view.Brick
+import com.gadarts.wordsbomb.core.model.view.Brick
 import com.gadarts.wordsbomb.core.model.assets.GameAssetManager
 import com.gadarts.wordsbomb.core.view.StagesCommon
 import com.gadarts.wordsbomb.core.controller.TurnsManager

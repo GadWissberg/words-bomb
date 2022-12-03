@@ -2,7 +2,7 @@ package com.gadarts.wordsbomb.core.screens
 
 import com.badlogic.gdx.net.Socket
 import com.gadarts.wordsbomb.core.AndroidInterface
-import com.gadarts.wordsbomb.core.view.Brick
+import com.gadarts.wordsbomb.core.model.view.Brick
 import com.gadarts.wordsbomb.core.controller.GameController
 import com.gadarts.wordsbomb.core.controller.network.NetworkConstants
 import com.gadarts.wordsbomb.core.controller.network.NetworkHandler
