@@ -43,7 +43,7 @@ class GamePlayScreenView(private val assetsManager: GameAssetManager) : Disposab
                     Vector2(glyphLayout.width, glyphLayout.height),
                     font80,
                 )
-            )
+            ).pad(10F)
             if (lettersOptionsTable.children.size % MAX_OPTIONS_IN_ROW == 0) {
                 lettersOptionsTable.row()
             }
