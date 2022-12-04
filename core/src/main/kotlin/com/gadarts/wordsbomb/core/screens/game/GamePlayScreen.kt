@@ -2,8 +2,9 @@ package com.gadarts.wordsbomb.core.screens.game
 
 import com.badlogic.gdx.Screen
 import com.gadarts.wordsbomb.core.AndroidInterface
-import com.gadarts.wordsbomb.core.GameLogicHandler
+import com.gadarts.wordsbomb.core.business.BusinessLogicHandler
 import com.gadarts.wordsbomb.core.Notifier
+import com.gadarts.wordsbomb.core.business.BusinessLogicHandlerEventsSubscriber
 import com.gadarts.wordsbomb.core.model.GameModel
 import com.gadarts.wordsbomb.core.model.assets.GameAssetManager
 import com.gadarts.wordsbomb.core.screens.game.view.GamePlayScreenView
@@ -13,16 +14,18 @@ class GamePlayScreen(
     private val assetsManager: GameAssetManager,
     private val androidInterface: AndroidInterface,
 ) :
-    Screen, Notifier<GamePlayScreenEventsSubscriber>, GamePlayScreenViewEventsSubscriber {
+    Screen, Notifier<GamePlayScreenEventsSubscriber>, GamePlayScreenViewEventsSubscriber,
+    BusinessLogicHandlerEventsSubscriber {
 
 
     private val gameModel = GameModel()
-    private val gameLogicHandler = GameLogicHandler()
+    private val businessLogicHandler = BusinessLogicHandler()
     private lateinit var gamePlayScreenView: GamePlayScreenView
     override val subscribers = HashSet<GamePlayScreenEventsSubscriber>()
 
     override fun show() {
-        gameLogicHandler.beginGame(gameModel)
+        businessLogicHandler.beginGame(gameModel)
+        businessLogicHandler.subscribeForEvents(this)
         gamePlayScreenView = GamePlayScreenView(assetsManager, gameModel)
         gamePlayScreenView.subscribeForEvents(this)
         gamePlayScreenView.onShow()
@@ -51,6 +54,18 @@ class GamePlayScreen(
 
     override fun subscribeForEvents(subscriber: GamePlayScreenEventsSubscriber) {
         subscribers.add(subscriber)
+    }
+
+    override fun onBrickClicked(letter: Char) {
+        businessLogicHandler.onBrickClicked(letter, gameModel)
+    }
+
+    override fun onHiddenLetterIndexRemoved(index: Int) {
+        gamePlayScreenView.onHiddenLetterIndexRemoved(index)
+    }
+
+    override fun onHiddenLetterIndexFailedToRemove() {
+        gamePlayScreenView.onHiddenLetterIndexFailedToRemove()
     }
 
 }

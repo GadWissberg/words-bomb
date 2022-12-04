@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
  * Represents a letter brick that can be placed in the deck and in the board.
  */
 open class Brick(
-    private val letter: String,
+    val letter: String,
     brickTexture: Texture,
     private val letterSize: Vector2,
     private val font80: BitmapFont,

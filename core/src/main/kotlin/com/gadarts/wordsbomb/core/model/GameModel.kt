@@ -2,7 +2,7 @@ package com.gadarts.wordsbomb.core.model
 
 class GameModel {
     lateinit var currentWord: String
-    lateinit var hiddenLettersIndices: List<Int>
+    lateinit var hiddenLettersIndices: MutableList<Int>
     lateinit var options: List<Char>
 
     companion object {
