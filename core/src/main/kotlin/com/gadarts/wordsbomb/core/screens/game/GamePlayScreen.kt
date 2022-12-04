@@ -10,7 +10,7 @@ import com.gadarts.wordsbomb.core.screens.game.view.GamePlayScreenView
 import com.gadarts.wordsbomb.core.screens.game.view.GamePlayScreenViewEventsSubscriber
 
 class GamePlayScreen(
-    assetsManager: GameAssetManager,
+    private val assetsManager: GameAssetManager,
     private val androidInterface: AndroidInterface,
 ) :
     Screen, Notifier<GamePlayScreenEventsSubscriber>, GamePlayScreenViewEventsSubscriber {
@@ -18,13 +18,14 @@ class GamePlayScreen(
 
     private val gameModel = GameModel()
     private val gameLogicHandler = GameLogicHandler()
-    private val gamePlayScreenView = GamePlayScreenView(assetsManager)
+    private lateinit var gamePlayScreenView: GamePlayScreenView
     override val subscribers = HashSet<GamePlayScreenEventsSubscriber>()
 
     override fun show() {
         gameLogicHandler.beginGame(gameModel)
+        gamePlayScreenView = GamePlayScreenView(assetsManager, gameModel)
         gamePlayScreenView.subscribeForEvents(this)
-        gamePlayScreenView.onShow(gameModel)
+        gamePlayScreenView.onShow()
     }
 
     override fun render(delta: Float) {

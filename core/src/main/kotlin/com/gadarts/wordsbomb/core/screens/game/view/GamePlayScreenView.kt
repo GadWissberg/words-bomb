@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
@@ -15,13 +16,16 @@ import com.gadarts.wordsbomb.core.model.GameModel.Companion.MAX_OPTIONS
 import com.gadarts.wordsbomb.core.model.assets.FontsDefinitions
 import com.gadarts.wordsbomb.core.model.assets.GameAssetManager
 import com.gadarts.wordsbomb.core.model.assets.TexturesDefinitions
-import com.gadarts.wordsbomb.core.model.view.BrickCell
 import com.gadarts.wordsbomb.core.model.view.Brick
+import com.gadarts.wordsbomb.core.model.view.BrickCell
 import com.gadarts.wordsbomb.core.screens.menu.view.stage.GameStage
 
-private const val fl = 40F
 
-class GamePlayScreenView(private val assetsManager: GameAssetManager) : Disposable,
+class GamePlayScreenView(
+    private val assetsManager: GameAssetManager,
+    private val gameModel: GameModel
+) :
+    Disposable,
     Notifier<GamePlayScreenViewEventsSubscriber> {
 
 
@@ -34,16 +38,16 @@ class GamePlayScreenView(private val assetsManager: GameAssetManager) : Disposab
     private var font80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
     private lateinit var letterSize: Vector2
 
-    fun onShow(gameModel: GameModel) {
+    fun onShow() {
         letterGlyphLayout = GlyphLayout(font80, "א")
         letterSize = Vector2(letterGlyphLayout.width, letterGlyphLayout.height)
         createStage()
         addUiTable()
-        addTargetWordTable(gameModel)
-        addLettersOptionsTable(gameModel)
+        addTargetWordTable()
+        addLettersOptionsTable()
     }
 
-    private fun addLettersOptionsTable(gameModel: GameModel) {
+    private fun addLettersOptionsTable() {
         lettersOptionsTable = Table()
         lettersOptionsTable.setSize(uiTable.width, uiTable.prefHeight)
         uiTable.add(lettersOptionsTable)
@@ -63,7 +67,7 @@ class GamePlayScreenView(private val assetsManager: GameAssetManager) : Disposab
         }
     }
 
-    private fun addTargetWordTable(gameModel: GameModel) {
+    private fun addTargetWordTable() {
         val cellTexture = assetsManager.getTexture(TexturesDefinitions.CELL)
         val flatBrickTexture = assetsManager.getTexture(TexturesDefinitions.FLAT_BRICK)
         targetWordTable = Table()
@@ -71,22 +75,28 @@ class GamePlayScreenView(private val assetsManager: GameAssetManager) : Disposab
         uiTable.add(targetWordTable)
             .pad(TARGET_WORD_TABLE_VERTICAL_PADDING, 0F, TARGET_WORD_TABLE_VERTICAL_PADDING, 0F)
             .row()
+
         for (i in 0 until gameModel.currentWord.length) {
-            addLetterToTargetWord(gameModel, i, cellTexture, flatBrickTexture)
+            addLetterToTargetWord(i, cellTexture, flatBrickTexture)
         }
     }
 
     private fun addLetterToTargetWord(
-        gameModel: GameModel,
         i: Int,
-        cellTexture: Texture,
-        texture: Texture
+        texture: Texture,
+        flatBrickTexture: Texture,
     ) {
         if (gameModel.hiddenLettersIndices.contains(i)) {
-            targetWordTable.add(BrickCell(cellTexture)).pad(TARGET_LETTER_PADDING)
+            addBrickCell(texture)
         } else {
-            addGivenLetter(gameModel, i, texture)
+            addGivenLetter(gameModel, i, flatBrickTexture)
         }
+    }
+
+    private fun addBrickCell(texture: Texture) {
+        val brickCell = BrickCell(texture)
+        targetWordTable.add(brickCell).pad(TARGET_LETTER_PADDING)
+        brickCell.touchable = Touchable.enabled
     }
 
     private fun addGivenLetter(
@@ -117,6 +127,7 @@ class GamePlayScreenView(private val assetsManager: GameAssetManager) : Disposab
             assetsManager
         )
         stage.setDebugInvisible(DebugSettings.SHOW_UI_BORDERS)
+        Gdx.input.inputProcessor = stage
     }
 
     fun render(delta: Float) {

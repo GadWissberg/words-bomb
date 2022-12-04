@@ -19,7 +19,6 @@ enum class TexturesDefinitions(ninepatch: Boolean) : AssetDefinition<Texture> {
     CLOUD_2(false),
     CLOUD_3(false),
     CLOUD_4(false),
-    REFRESH_ICON(false),
     GO_BUTTON_UP(false),
     GO_BUTTON_DOWN(false),
     GO_BUTTON_DISABLED(false),

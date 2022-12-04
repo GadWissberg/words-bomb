@@ -4,6 +4,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 
 /**
- * The stage actor that represents the board cell.
+ * The stage actor that represents a missing letter.
  */
-open class BrickCell(cellTexture: Texture) : Image(cellTexture)
+open class BrickCell(texture: Texture) : Image(texture)
