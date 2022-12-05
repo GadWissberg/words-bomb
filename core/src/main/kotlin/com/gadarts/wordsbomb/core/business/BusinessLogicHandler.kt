@@ -32,9 +32,11 @@ class BusinessLogicHandler : Notifier<BusinessLogicHandlerEventsSubscriber> {
         val index = gameModel.hiddenLettersIndices.find { gameModel.currentWord[it] == letter }
         if (index != null) {
             gameModel.hiddenLettersIndices.remove(index)
-            subscribers.forEach { it.onHiddenLetterIndexRemoved(index) }
+            val gameWin = gameModel.hiddenLettersIndices.isEmpty()
+            subscribers.forEach { it.onGuessSuccess(index, gameWin) }
         } else {
-            subscribers.forEach { it.onHiddenLetterIndexFailedToRemove() }
+            gameModel.numberOfMisses++
+            subscribers.forEach { it.onGuessFail(gameModel.numberOfMisses >= 5) }
         }
     }
 

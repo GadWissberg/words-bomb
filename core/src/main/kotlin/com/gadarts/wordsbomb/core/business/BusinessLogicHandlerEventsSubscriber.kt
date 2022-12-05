@@ -1,7 +1,7 @@
 package com.gadarts.wordsbomb.core.business
 
 interface BusinessLogicHandlerEventsSubscriber {
-    fun onHiddenLetterIndexRemoved(index: Int)
-    fun onHiddenLetterIndexFailedToRemove()
+    fun onGuessSuccess(index: Int, gameWin: Boolean)
+    fun onGuessFail(gameOver: Boolean)
 
 }

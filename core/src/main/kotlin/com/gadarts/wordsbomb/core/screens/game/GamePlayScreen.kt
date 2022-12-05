@@ -60,12 +60,13 @@ class GamePlayScreen(
         businessLogicHandler.onBrickClicked(letter, gameModel)
     }
 
-    override fun onHiddenLetterIndexRemoved(index: Int) {
-        gamePlayScreenView.onHiddenLetterIndexRemoved(index)
+    override fun onGuessSuccess(index: Int, gameWin: Boolean) {
+        gamePlayScreenView.onGuessSuccess(index, gameWin)
     }
 
-    override fun onHiddenLetterIndexFailedToRemove() {
-        gamePlayScreenView.onHiddenLetterIndexFailedToRemove()
+    override fun onGuessFail(gameOver: Boolean) {
+        gamePlayScreenView.onGuessFail(gameOver)
     }
+
 
 }

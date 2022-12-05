@@ -152,20 +152,20 @@ class GamePlayScreenView(
     fun onHide() {
     }
 
-    fun onHiddenLetterIndexRemoved(index: Int) {
+    fun onGuessSuccess(index: Int, gameWin: Boolean) {
         if (selectedBrick != null) {
-            selectionSuccessful(index)
+            selectionSuccessful(index, gameWin)
         }
     }
 
-    private fun selectionSuccessful(index: Int) {
+    private fun selectionSuccessful(index: Int, gameWin: Boolean) {
         switchSelectedBrickToStage()
         val cell = targetWordTable.cells[index].actor
         selectedBrick!!.setPosition(
             lettersOptionsTable.x + selectedBrick!!.x,
             lettersOptionsTable.y + selectedBrick!!.y
         )
-        animateBrickSuccess(cell)
+        animateBrickSuccess(cell, index, gameWin)
         selectedBrick!!.listeners.clear()
         selectedBrick = null
     }
@@ -175,36 +175,69 @@ class GamePlayScreenView(
         stage.addActor(selectedBrick)
     }
 
-    private fun animateBrickSuccess(cell: Actor) {
-        selectedBrick!!.addAction(
+    private fun animateBrickSuccess(cell: Actor, index: Int, gameWin: Boolean) {
+        val sequence = Actions.sequence(
             Actions.moveTo(
                 targetWordTable.x + cell.x,
                 targetWordTable.y + cell.y,
                 BRICK_SUCCESS_ANIMATION_DURATION,
                 Interpolation.circle
-            )
+            ),
+            ReplaceCellWithBrickAction(targetWordTable, selectedBrick!!, index)
         )
+
+        if (gameWin) {
+            sequence.addAction(WordRevealedAction(Runnable { animateGameSuccess() }))
+        }
+        selectedBrick!!.addAction(sequence)
     }
 
-    fun onHiddenLetterIndexFailedToRemove() {
-        if (selectedBrick != null) {
-            switchSelectedBrickToStage()
-            selectedBrick!!.setPosition(
-                lettersOptionsTable.x + selectedBrick!!.x,
-                lettersOptionsTable.y + selectedBrick!!.y
+    private fun animateGameSuccess() {
+        for (i in 0 until targetWordTable.cells.size) {
+            targetWordTable.cells[i].actor.addAction(
+                Actions.sequence(
+                    Actions.delay(i / 10F),
+                    Actions.moveBy(
+                        0F,
+                        GAME_SUCCESS_ANIMATION_DISTANCE,
+                        GAME_SUCCESS_ANIMATION_DURATION
+                    ),
+                    Actions.moveBy(
+                        0F,
+                        -2 * GAME_SUCCESS_ANIMATION_DISTANCE,
+                        GAME_SUCCESS_ANIMATION_DURATION
+                    ), Actions.moveBy(
+                        0F,
+                        GAME_SUCCESS_ANIMATION_DISTANCE,
+                        GAME_SUCCESS_ANIMATION_DURATION
+                    )
+                )
             )
-            animateBrickFail()
+        }
+    }
+
+    fun onGuessFail(gameOver: Boolean) {
+        if (gameOver) {
+            lettersOptionsTable.cells.forEach { if (it.actor != null) animateBrickFail(it.actor as Brick) }
+        } else if (selectedBrick != null) {
+            animateBrickFail(selectedBrick!!)
             selectedBrick!!.listeners.clear()
             selectedBrick = null
         }
     }
 
-    private fun animateBrickFail() {
-        selectedBrick!!.addAction(
+    private fun animateBrickFail(brick: Brick) {
+        switchSelectedBrickToStage()
+        brick.setPosition(
+            lettersOptionsTable.x + brick.x,
+            lettersOptionsTable.y + brick.y
+        )
+
+        brick.addAction(
             Actions.sequence(
                 Actions.moveTo(
-                    selectedBrick!!.x,
-                    -selectedBrick!!.height,
+                    brick.x,
+                    -brick.height,
                     BRICK_FAIL_ANIMATION_DURATION,
                     Interpolation.exp10
                 ), Actions.removeActor()
@@ -218,5 +251,7 @@ class GamePlayScreenView(
         private const val TARGET_LETTER_PADDING = 10F
         private const val BRICK_SUCCESS_ANIMATION_DURATION = 1F
         private const val BRICK_FAIL_ANIMATION_DURATION = 1F
+        private const val GAME_SUCCESS_ANIMATION_DISTANCE = 50F
+        private const val GAME_SUCCESS_ANIMATION_DURATION = 0.5F
     }
 }
