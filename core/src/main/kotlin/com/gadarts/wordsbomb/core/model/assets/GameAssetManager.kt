@@ -6,6 +6,8 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.ParticleEffect
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter.Particle
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
@@ -55,6 +57,10 @@ open class GameAssetManager : AssetManager() {
 
     fun getTexture(definition: TexturesDefinitions): Texture {
         return get(definition.getPath(), Texture::class.java)
+    }
+
+    fun getParticleEffect(definition: ParticleEffectsDefinitions): ParticleEffect {
+        return get(definition.getPath(), ParticleEffect::class.java)
     }
 
     fun getFont(font: FontsDefinitions): BitmapFont {

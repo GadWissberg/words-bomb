@@ -36,6 +36,11 @@ class WordsBombGame(private val androidInterface: AndroidInterface) : Game(),
         assetsManager.finishLoading()
     }
 
+    override fun dispose() {
+        super.dispose()
+        assetsManager.dispose()
+    }
+
     override fun onBeginGame() {
         val gameplayScreen = GamePlayScreen(assetsManager, androidInterface)
         gameplayScreen.subscribeForEvents(this)

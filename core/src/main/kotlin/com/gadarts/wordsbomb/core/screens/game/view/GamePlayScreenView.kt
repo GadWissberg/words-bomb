@@ -20,6 +20,7 @@ import com.gadarts.wordsbomb.core.model.GameModel
 import com.gadarts.wordsbomb.core.model.GameModel.Companion.MAX_OPTIONS
 import com.gadarts.wordsbomb.core.model.assets.FontsDefinitions
 import com.gadarts.wordsbomb.core.model.assets.GameAssetManager
+import com.gadarts.wordsbomb.core.model.assets.ParticleEffectsDefinitions
 import com.gadarts.wordsbomb.core.model.assets.TexturesDefinitions
 import com.gadarts.wordsbomb.core.model.view.Brick
 import com.gadarts.wordsbomb.core.model.view.BrickCell
@@ -34,6 +35,8 @@ class GamePlayScreenView(
     Notifier<GamePlayScreenViewEventsSubscriber> {
 
 
+    private lateinit var bomb: Bomb
+    private lateinit var fireParticleEffectActor: FireParticleEffectActor
     private var selectedBrick: Brick? = null
     private lateinit var targetWordTable: Table
     private lateinit var lettersOptionsTable: Table
@@ -49,8 +52,20 @@ class GamePlayScreenView(
         letterSize = Vector2(letterGlyphLayout.width, letterGlyphLayout.height)
         createStage()
         addUiTable()
+        addBomb()
         addTargetWordTable()
         addLettersOptionsTable()
+    }
+
+    private fun addBomb() {
+        val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.FIRE)
+        fireParticleEffectActor = FireParticleEffectActor(particleEffect)
+        bomb = Bomb(
+            assetsManager.getTexture(TexturesDefinitions.BOMB),
+            fireParticleEffectActor
+        )
+        stage.addActor(fireParticleEffectActor)
+        uiTable.add(bomb).pad(BOMB_PADDING).row()
     }
 
     private fun addLettersOptionsTable() {
@@ -187,12 +202,13 @@ class GamePlayScreenView(
         )
 
         if (gameWin) {
-            sequence.addAction(WordRevealedAction(Runnable { animateGameSuccess() }))
+            sequence.addAction(WordRevealedAction { animateGameWin() })
         }
         selectedBrick!!.addAction(sequence)
     }
 
-    private fun animateGameSuccess() {
+    private fun animateGameWin() {
+        fireParticleEffectActor.stop()
         for (i in 0 until targetWordTable.cells.size) {
             targetWordTable.cells[i].actor.addAction(
                 Actions.sequence(
@@ -218,11 +234,22 @@ class GamePlayScreenView(
 
     fun onGuessFail(gameOver: Boolean) {
         if (gameOver) {
-            lettersOptionsTable.cells.forEach { if (it.actor != null) animateBrickFail(it.actor as Brick) }
+            animateGameOver()
         } else if (selectedBrick != null) {
+            if (!fireParticleEffectActor.started) {
+                bomb.startFire()
+            }
             animateBrickFail(selectedBrick!!)
             selectedBrick!!.listeners.clear()
             selectedBrick = null
+        }
+    }
+
+    private fun animateGameOver() {
+        lettersOptionsTable.cells.forEach {
+            if (it.actor != null) {
+                animateBrickFail(it.actor as Brick)
+            }
         }
     }
 
@@ -253,5 +280,6 @@ class GamePlayScreenView(
         private const val BRICK_FAIL_ANIMATION_DURATION = 1F
         private const val GAME_SUCCESS_ANIMATION_DISTANCE = 50F
         private const val GAME_SUCCESS_ANIMATION_DURATION = 0.5F
+        private const val BOMB_PADDING = 20F
     }
 }

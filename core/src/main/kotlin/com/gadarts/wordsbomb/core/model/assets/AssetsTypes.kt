@@ -6,7 +6,8 @@ enum class AssetsTypes(
 ) {
     TEXTURES(TexturesDefinitions.values(), true),
     SHADERS(ShaderDefinitions.values(), false),
-    FONTS(FontsDefinitions.values(), true);
+    FONTS(FontsDefinitions.values(), true),
+    PARTICLES(ParticleEffectsDefinitions.values(), true);
 
     fun isLoadedUsingLoader(): Boolean {
         return loadedUsingLoader
