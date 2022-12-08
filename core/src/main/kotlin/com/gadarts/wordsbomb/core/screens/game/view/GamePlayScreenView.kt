@@ -234,6 +234,7 @@ class GamePlayScreenView(
     }
 
     fun onGuessFail(gameOver: Boolean) {
+        bomb.updateLabel(gameModel.triesLeft)
         if (gameOver) {
             animateGameOver()
         } else if (selectedBrick != null) {

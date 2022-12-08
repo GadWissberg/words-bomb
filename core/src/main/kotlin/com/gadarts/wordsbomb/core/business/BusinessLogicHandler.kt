@@ -36,7 +36,7 @@ class BusinessLogicHandler : Notifier<BusinessLogicHandlerEventsSubscriber> {
             subscribers.forEach { it.onGuessSuccess(index, gameWin) }
         } else {
             gameModel.triesLeft--
-            subscribers.forEach { it.onGuessFail(gameModel.triesLeft <= 6) }
+            subscribers.forEach { it.onGuessFail(gameModel.triesLeft <= 0) }
         }
     }
 

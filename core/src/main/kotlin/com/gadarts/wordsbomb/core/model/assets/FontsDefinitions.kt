@@ -10,7 +10,7 @@ import java.util.*
 enum class FontsDefinitions : AssetDefinition<BitmapFont> {
     VARELA_320 {
         override fun getParameters(): AssetLoaderParameters<BitmapFont> {
-            return createFontParameters(320, 32f)
+            return createFontParameters(160, 16f)
         }
 
     },

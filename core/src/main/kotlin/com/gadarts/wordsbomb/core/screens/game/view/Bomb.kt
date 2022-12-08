@@ -17,16 +17,23 @@ class Bomb(
 ) :
     Table() {
 
+    private var label: Label
+
     init {
         background = TextureRegionDrawable(texture)
         val labelStyle = LabelStyle(font, Color.WHITE)
-        add(Label("$triesLeft", labelStyle)).padTop(NUMBER_PADDING_TOP)
+        label = Label("$triesLeft", labelStyle)
+        add(label).padTop(NUMBER_PADDING_TOP)
         debug = DebugSettings.SHOW_UI_BORDERS
     }
 
     fun startFire() {
         particleEffectActor.setPosition(x + FIRE_RELATIVE_X, y + FIRE_RELATIVE_Y)
         particleEffectActor.start()
+    }
+
+    fun updateLabel(triesLeft: Int) {
+        label.setText(triesLeft.toString())
     }
 
     companion object {
