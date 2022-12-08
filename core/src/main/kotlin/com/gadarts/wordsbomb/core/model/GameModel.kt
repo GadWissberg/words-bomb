@@ -1,7 +1,7 @@
 package com.gadarts.wordsbomb.core.model
 
 class GameModel {
-    var numberOfMisses = 0
+    var triesLeft = 6
     lateinit var currentWord: String
     lateinit var hiddenLettersIndices: MutableList<Int>
     lateinit var options: List<Char>

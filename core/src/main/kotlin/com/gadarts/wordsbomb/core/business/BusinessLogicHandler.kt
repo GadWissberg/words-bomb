@@ -35,8 +35,8 @@ class BusinessLogicHandler : Notifier<BusinessLogicHandlerEventsSubscriber> {
             val gameWin = gameModel.hiddenLettersIndices.isEmpty()
             subscribers.forEach { it.onGuessSuccess(index, gameWin) }
         } else {
-            gameModel.numberOfMisses++
-            subscribers.forEach { it.onGuessFail(gameModel.numberOfMisses >= 5) }
+            gameModel.triesLeft--
+            subscribers.forEach { it.onGuessFail(gameModel.triesLeft <= 6) }
         }
     }
 

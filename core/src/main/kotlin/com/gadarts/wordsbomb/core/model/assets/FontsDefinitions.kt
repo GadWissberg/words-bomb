@@ -8,6 +8,12 @@ import com.gadarts.wordsbomb.core.model.Player
 import java.util.*
 
 enum class FontsDefinitions : AssetDefinition<BitmapFont> {
+    VARELA_320 {
+        override fun getParameters(): AssetLoaderParameters<BitmapFont> {
+            return createFontParameters(320, 32f)
+        }
+
+    },
     VARELA_80 {
         override fun getParameters(): AssetLoaderParameters<BitmapFont> {
             return createFontParameters(80, 8f)

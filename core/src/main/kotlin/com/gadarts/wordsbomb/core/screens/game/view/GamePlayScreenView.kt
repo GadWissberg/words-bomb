@@ -20,7 +20,7 @@ import com.gadarts.wordsbomb.core.model.GameModel
 import com.gadarts.wordsbomb.core.model.GameModel.Companion.MAX_OPTIONS
 import com.gadarts.wordsbomb.core.model.assets.FontsDefinitions
 import com.gadarts.wordsbomb.core.model.assets.GameAssetManager
-import com.gadarts.wordsbomb.core.model.assets.ParticleEffectsDefinitions
+import com.gadarts.wordsbomb.core.model.assets.ParticleEffectsDefinitions.*
 import com.gadarts.wordsbomb.core.model.assets.TexturesDefinitions
 import com.gadarts.wordsbomb.core.model.view.Brick
 import com.gadarts.wordsbomb.core.model.view.BrickCell
@@ -58,11 +58,12 @@ class GamePlayScreenView(
     }
 
     private fun addBomb() {
-        val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.FIRE)
-        fireParticleEffectActor = FireParticleEffectActor(particleEffect)
+        fireParticleEffectActor = FireParticleEffectActor(assetsManager.getParticleEffect(FIRE))
         bomb = Bomb(
             assetsManager.getTexture(TexturesDefinitions.BOMB),
-            fireParticleEffectActor
+            fireParticleEffectActor,
+            assetsManager.getFont(FontsDefinitions.VARELA_320),
+            gameModel.triesLeft
         )
         stage.addActor(fireParticleEffectActor)
         uiTable.add(bomb).pad(BOMB_PADDING).row()
