@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -20,7 +21,7 @@ import com.gadarts.wordsbomb.core.model.GameModel
 import com.gadarts.wordsbomb.core.model.GameModel.Companion.MAX_OPTIONS
 import com.gadarts.wordsbomb.core.model.assets.FontsDefinitions
 import com.gadarts.wordsbomb.core.model.assets.GameAssetManager
-import com.gadarts.wordsbomb.core.model.assets.ParticleEffectsDefinitions.*
+import com.gadarts.wordsbomb.core.model.assets.ParticleEffectsDefinitions.FIRE
 import com.gadarts.wordsbomb.core.model.assets.TexturesDefinitions
 import com.gadarts.wordsbomb.core.model.view.Brick
 import com.gadarts.wordsbomb.core.model.view.BrickCell
@@ -52,6 +53,10 @@ class GamePlayScreenView(
         letterSize = Vector2(letterGlyphLayout.width, letterGlyphLayout.height)
         createStage()
         addUiTable()
+        onGameBegin()
+    }
+
+    fun onGameBegin() {
         addBomb()
         addTargetWordTable()
         addLettersOptionsTable()
@@ -175,7 +180,7 @@ class GamePlayScreenView(
     }
 
     private fun selectionSuccessful(index: Int, gameWin: Boolean) {
-        switchSelectedBrickToStage()
+        switchBrickToStage(selectedBrick!!)
         val cell = targetWordTable.cells[index].actor
         selectedBrick!!.setPosition(
             lettersOptionsTable.x + selectedBrick!!.x,
@@ -186,9 +191,9 @@ class GamePlayScreenView(
         selectedBrick = null
     }
 
-    private fun switchSelectedBrickToStage() {
-        selectedBrick!!.remove()
-        stage.addActor(selectedBrick)
+    private fun switchBrickToStage(brick: Brick) {
+        brick.remove()
+        stage.addActor(brick)
     }
 
     private fun animateBrickSuccess(cell: Actor, index: Int, gameWin: Boolean) {
@@ -211,7 +216,8 @@ class GamePlayScreenView(
     private fun animateGameWin() {
         fireParticleEffectActor.stop()
         for (i in 0 until targetWordTable.cells.size) {
-            targetWordTable.cells[i].actor.addAction(
+            val actor = targetWordTable.cells[i].actor
+            actor.addAction(
                 Actions.sequence(
                     Actions.delay(i / 10F),
                     Actions.moveBy(
@@ -223,14 +229,59 @@ class GamePlayScreenView(
                         0F,
                         -2 * GAME_SUCCESS_ANIMATION_DISTANCE,
                         GAME_SUCCESS_ANIMATION_DURATION
-                    ), Actions.moveBy(
+                    ),
+                    Actions.moveBy(
                         0F,
                         GAME_SUCCESS_ANIMATION_DISTANCE,
                         GAME_SUCCESS_ANIMATION_DURATION
-                    )
+                    ),
                 )
             )
+            if (i == targetWordTable.cells.size - 1) {
+                actor.addAction(
+                    Actions.sequence(
+                        Actions.delay(WIN_DELAY),
+                        Actions.run { clearScreen() }
+                    ))
+            }
         }
+    }
+
+    private fun test() {
+        subscribers.forEach { sub -> sub.onScreenEmpty() }
+    }
+
+    private fun clearScreen() {
+
+        bomb.addAction(
+            Actions.sequence(
+                Actions.sizeTo(0F, 0F, 1F, Interpolation.exp10),
+                Actions.removeActor()
+            )
+        )
+
+        clearAllOptions()
+
+        lettersOptionsTable.cells.forEach {
+            if (it.actor != null) {
+                it.actor.addAction(
+                    Actions.sequence(
+                        Actions.delay(MathUtils.random(OPTIONS_BRICK_FALL_MAX_DELAY)),
+                        Actions.sizeTo(0F, 0F, 1F, Interpolation.circle),
+                        Actions.removeActor()
+                    )
+                )
+            }
+        }
+
+        targetWordTable.remove()
+        lettersOptionsTable.remove()
+        uiTable.clear()
+        uiTable.addAction(
+            Actions.delay(
+                NOTIFY_SCREEN_EMPTY_DELAY,
+                Actions.run { subscribers.forEach { sub -> sub.onScreenEmpty() } })
+        )
     }
 
     fun onGuessFail(gameOver: Boolean) {
@@ -248,6 +299,10 @@ class GamePlayScreenView(
     }
 
     private fun animateGameOver() {
+        clearAllOptions()
+    }
+
+    private fun clearAllOptions() {
         lettersOptionsTable.cells.forEach {
             if (it.actor != null) {
                 animateBrickFail(it.actor as Brick)
@@ -256,7 +311,7 @@ class GamePlayScreenView(
     }
 
     private fun animateBrickFail(brick: Brick) {
-        switchSelectedBrickToStage()
+        switchBrickToStage(brick)
         brick.setPosition(
             lettersOptionsTable.x + brick.x,
             lettersOptionsTable.y + brick.y
@@ -283,5 +338,8 @@ class GamePlayScreenView(
         private const val GAME_SUCCESS_ANIMATION_DISTANCE = 50F
         private const val GAME_SUCCESS_ANIMATION_DURATION = 0.5F
         private const val BOMB_PADDING = 20F
+        private const val WIN_DELAY = 3F
+        private const val OPTIONS_BRICK_FALL_MAX_DELAY = 1000F
+        private const val NOTIFY_SCREEN_EMPTY_DELAY = 2F
     }
 }

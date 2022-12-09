@@ -3,6 +3,7 @@ package com.gadarts.wordsbomb.core.screens.game.view
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -16,10 +17,11 @@ class Bomb(
     triesLeft: Int
 ) :
     Table() {
-
     private var label: Label
 
     init {
+        isTransform = true
+        setOrigin(texture.width / 2F, texture.height / 2F)
         background = TextureRegionDrawable(texture)
         val labelStyle = LabelStyle(font, Color.WHITE)
         label = Label("$triesLeft", labelStyle)
@@ -34,6 +36,11 @@ class Bomb(
 
     fun updateLabel(triesLeft: Int) {
         label.setText(triesLeft.toString())
+    }
+
+    override fun addAction(action: Action?) {
+        label.isVisible = false
+        super.addAction(action)
     }
 
     companion object {

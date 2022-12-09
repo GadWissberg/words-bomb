@@ -2,5 +2,6 @@ package com.gadarts.wordsbomb.core.screens.game.view
 
 interface GamePlayScreenViewEventsSubscriber {
     fun onBrickClicked(letter: Char)
+    fun onScreenEmpty()
 
 }

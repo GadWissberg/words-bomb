@@ -60,6 +60,11 @@ class GamePlayScreen(
         businessLogicHandler.onBrickClicked(letter, gameModel)
     }
 
+    override fun onScreenEmpty() {
+        businessLogicHandler.beginGame(gameModel)
+        gamePlayScreenView.onGameBegin()
+    }
+
     override fun onGuessSuccess(index: Int, gameWin: Boolean) {
         gamePlayScreenView.onGuessSuccess(index, gameWin)
     }
