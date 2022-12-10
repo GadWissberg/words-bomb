@@ -5,7 +5,7 @@ plugins {
 
 android {
     buildToolsVersion = "30.0.3"
-    compileSdk = 30
+    compileSdk = 32
     sourceSets {
         named("main") {
             res.srcDir("res")
@@ -15,7 +15,7 @@ android {
     }
     defaultConfig {
         val appVersion: String by project
-        applicationId = "com.gadarts.wordsbomb"
+        applicationId = "com.gadarts.shubutz"
         minSdk = 22
         targetSdk = 32
         versionCode = appVersion.split('.').joinToString("") { it.padStart(2, '0') }.toInt()
