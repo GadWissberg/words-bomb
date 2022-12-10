@@ -1,6 +1,6 @@
 package com.gadarts.wordsbomb.core.model
 
-class GameModel {
+class GameModel() {
     var triesLeft = 6
     lateinit var currentWord: String
     lateinit var hiddenLettersIndices: MutableList<Int>

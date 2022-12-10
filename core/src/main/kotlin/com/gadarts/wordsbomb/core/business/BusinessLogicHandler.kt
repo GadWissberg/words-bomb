@@ -2,13 +2,16 @@ package com.gadarts.wordsbomb.core.business
 
 import com.gadarts.wordsbomb.core.Notifier
 import com.gadarts.wordsbomb.core.model.GameModel
+import com.gadarts.wordsbomb.core.model.WordObject
+import java.util.HashMap
 
 class BusinessLogicHandler : Notifier<BusinessLogicHandlerEventsSubscriber> {
 
     override val subscribers = HashSet<BusinessLogicHandlerEventsSubscriber>()
 
-    fun beginGame(gameModel: GameModel) {
-        gameModel.currentWord = "דוגמא".reversed()
+    fun beginGame(gameModel: GameModel, words: HashMap<String, List<WordObject>>) {
+        val category = words[words.keys.random()]
+        gameModel.currentWord = category!!.random().word.reversed()
         decideHiddenLetters(gameModel)
         val ops = gameModel.hiddenLettersIndices.map { gameModel.currentWord[it] }.toMutableList()
         for (i in 0 until GameModel.MAX_OPTIONS - gameModel.currentWord.length) {

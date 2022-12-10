@@ -24,7 +24,7 @@ class GamePlayScreen(
     override val subscribers = HashSet<GamePlayScreenEventsSubscriber>()
 
     override fun show() {
-        businessLogicHandler.beginGame(gameModel)
+        businessLogicHandler.beginGame(gameModel, assetsManager.words)
         businessLogicHandler.subscribeForEvents(this)
         gamePlayScreenView = GamePlayScreenView(assetsManager, gameModel)
         gamePlayScreenView.subscribeForEvents(this)
@@ -61,7 +61,7 @@ class GamePlayScreen(
     }
 
     override fun onScreenEmpty() {
-        businessLogicHandler.beginGame(gameModel)
+        businessLogicHandler.beginGame(gameModel, assetsManager.words)
         gamePlayScreenView.onGameBegin()
     }
 

@@ -1,90 +1,98 @@
 {
-  "סרטים": [
+  "words_by_category": [
     {
-      "word": "חלף עם הרוח",
-      "appeared": false
+      "category": "סרטים",
+      "words": [
+        {
+          "word": "חלף עם הרוח",
+          "appeared": false
+        },
+        {
+          "word": "הסדנק",
+          "appeared": false
+        },
+        {
+          "word": "טיטאניק",
+          "appeared": false
+        },
+        {
+          "word": "נער החידות ממומביי",
+          "appeared": false
+        },
+        {
+          "word": "ברוס וויליס",
+          "appeared": false
+        },
+        {
+          "word": "דמי מור",
+          "appeared": false
+        },
+        {
+          "word": "האלי ברי",
+          "appeared": false
+        },
+        {
+          "word": "זאב רווח",
+          "appeared": false
+        },
+        {
+          "word": "רוברט דה נירו",
+          "appeared": false
+        },
+        {
+          "word": "לאונרדו דיקפריו",
+          "appeared": false
+        }
+      ]
     },
     {
-      "word": "הסדנק",
-      "appeared": false
-    },
-    {
-      "word": "טיטאניק",
-      "appeared": false
-    },
-    {
-      "word": "נער החידות ממומביי",
-      "appeared": false
-    },
-    {
-      "word": "ברוס וויליס",
-      "appeared": false
-    },
-    {
-      "word": "דמי מור",
-      "appeared": false
-    },
-    {
-      "word": "האלי ברי",
-      "appeared": false
-    },
-    {
-      "word": "זאב רווח",
-      "appeared": false
-    },
-    {
-      "word": "רוברט דה נירו",
-      "appeared": false
-    },
-    {
-      "word": "לאונרדו דיקפריו",
-      "appeared": false
-    }
-  ],
-  "טלוויזיה": [
-    {
-      "word": "רחוב סומסום",
-      "appeared": false
-    },
-    {
-      "word": "בטיפול",
-      "appeared": false
-    },
-    {
-      "word": "דודו טופז",
-      "appeared": false
-    },
-    {
-      "word": "קשת",
-      "appeared": false
-    },
-    {
-      "word": "קרובים קרובים",
-      "appeared": false
-    },
-    {
-      "word": "בובספוג",
-      "appeared": false
-    },
-    {
-      "word": "נשואים פלוס",
-      "appeared": false
-    },
-    {
-      "word": "סיינפלד",
-      "appeared": false
-    },
-    {
-      "word": "כולם אוהבים את ריימונד",
-      "appeared": false
-    },
-    {
-      "word": "חברים",
-      "appeared": false
-    },
-    {
-      "word": "דני קושמרו",
-      "appeared": false
+      "category": "טלוויזיה",
+      "words": [
+        {
+          "word": "רחוב סומסום",
+          "appeared": false
+        },
+        {
+          "word": "בטיפול",
+          "appeared": false
+        },
+        {
+          "word": "דודו טופז",
+          "appeared": false
+        },
+        {
+          "word": "קשת",
+          "appeared": false
+        },
+        {
+          "word": "קרובים קרובים",
+          "appeared": false
+        },
+        {
+          "word": "בובספוג",
+          "appeared": false
+        },
+        {
+          "word": "נשואים פלוס",
+          "appeared": false
+        },
+        {
+          "word": "סיינפלד",
+          "appeared": false
+        },
+        {
+          "word": "כולם אוהבים את ריימונד",
+          "appeared": false
+        },
+        {
+          "word": "חברים",
+          "appeared": false
+        },
+        {
+          "word": "דני קושמרו",
+          "appeared": false
+        }
+      ]
     }
   ]
 }

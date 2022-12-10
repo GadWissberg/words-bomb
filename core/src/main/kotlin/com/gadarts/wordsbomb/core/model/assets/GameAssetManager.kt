@@ -11,16 +11,22 @@ import com.badlogic.gdx.graphics.g2d.ParticleEmitter.Particle
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
+import com.gadarts.wordsbomb.core.WordsLoader
+import com.gadarts.wordsbomb.core.model.WordObject
+import java.util.HashMap
 
 /**
  * Responsible to load the assets.
  */
 open class GameAssetManager : AssetManager() {
+    lateinit var words: HashMap<String, List<WordObject>>
+    private val wordsLoader = WordsLoader()
 
     /**
      * Loads all assets sync.
      */
     fun loadAssets() {
+        words = wordsLoader.load()
         initializeFontLoaders()
         AssetsTypes.values().forEach { type ->
             if (type.isLoadedUsingLoader()) {
