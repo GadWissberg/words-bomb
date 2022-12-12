@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Disposable
@@ -36,6 +37,7 @@ class GamePlayScreenView(
     Notifier<GamePlayScreenViewEventsSubscriber> {
 
 
+    private val wordsTables = ArrayList<Table>()
     private lateinit var targetTable: Table
     private var maxBricksPerLine: Int = 0
     private lateinit var bomb: Bomb
@@ -114,9 +116,31 @@ class GamePlayScreenView(
     private fun addTargetWordLines() {
         val cellTexture = assetsManager.getTexture(TexturesDefinitions.CELL)
         val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-        createLineToTargetWordTable()
-        for (i in 0 until gameModel.currentWord.length) {
-            addLetterToTargetWord(i, cellTexture, brickTexture)
+        val words = gameModel.currentTarget.split(' ')
+        var letterIndexInCurrentLine = 0
+        var globalIndex = 0
+        addLineToTargetTable()
+        words.indices.forEach {
+            val wordTable = Table()
+            val currentWord = words[it]
+            if (currentWord.length + 1 > maxBricksPerLine - letterIndexInCurrentLine) {
+                if (letterIndexInCurrentLine > 0) {
+                    globalIndex++
+                    addLineToTargetTable()
+                    letterIndexInCurrentLine = 0
+                }
+            }
+            if (letterIndexInCurrentLine > 0) {
+                addGivenLetter(gameModel, -1, brickTexture, targetWordLines.last())
+                globalIndex++
+            }
+            targetWordLines.last().add(wordTable)
+            currentWord.indices.forEach { _ ->
+                addLetterToTarget(globalIndex, cellTexture, brickTexture, wordTable)
+                letterIndexInCurrentLine++
+                globalIndex++
+            }
+            wordsTables.add(wordTable)
         }
         targetWordLines.reversed().forEach {
             targetTable.add(it)
@@ -125,24 +149,22 @@ class GamePlayScreenView(
         }
     }
 
-    private fun addLetterToTargetWord(
-        i: Int,
+    private fun addLetterToTarget(
+        index: Int,
         texture: Texture,
         brickTexture: Texture,
+        wordTable: Table,
     ) {
-        if (i > 0 && i % maxBricksPerLine == 0) {
-            createLineToTargetWordTable()
-        }
-        if (gameModel.hiddenLettersIndices.contains(i)) {
-            addBrickCell(texture)
+        if (gameModel.hiddenLettersIndices.contains(index)) {
+            addBrickCell(texture, wordTable)
         } else {
-            addGivenLetter(gameModel, i, brickTexture)
+            addGivenLetter(gameModel, index, brickTexture, wordTable)
         }
     }
 
-    private fun addBrickCell(texture: Texture) {
+    private fun addBrickCell(texture: Texture, wordTable: Table) {
         val brickCell = BrickCell(texture)
-        targetWordLines[targetWordLines.size - 1].add(brickCell).pad(TARGET_LETTER_PADDING)
+        wordTable.add(brickCell).pad(TARGET_LETTER_PADDING)
         brickCell.touchable = Touchable.enabled
     }
 
@@ -150,15 +172,17 @@ class GamePlayScreenView(
         gameModel: GameModel,
         i: Int,
         texture: Texture,
+        wordTable: Table,
     ) {
+        val isLetter = i >= 0 && i < gameModel.currentTarget.length
         val brick = Brick(
-            gameModel.currentWord[i].toString(),
+            if (isLetter) gameModel.currentTarget[i].toString() else " ",
             texture,
             letterSize,
             font80
         )
-        brick.isVisible = gameModel.currentWord[i] != ' '
-        targetWordLines.last().add(brick).pad(TARGET_LETTER_PADDING)
+        brick.isVisible = isLetter
+        wordTable.add(brick).pad(TARGET_LETTER_PADDING)
     }
 
     private fun addUiTable() {
@@ -173,7 +197,7 @@ class GamePlayScreenView(
         return table
     }
 
-    private fun createLineToTargetWordTable() {
+    private fun addLineToTargetTable() {
         val line = Table()
         targetWordLines.add(line)
         line.debug = DebugSettings.SHOW_UI_BORDERS
@@ -207,13 +231,25 @@ class GamePlayScreenView(
     }
 
     private fun selectionSuccessful(index: Int, gameWin: Boolean) {
+        var wordCount = 0
+        var letterIndexInWord = 0
+        for (i in 0 until index) {
+            if (gameModel.currentTarget[i] == ' ') {
+                wordCount++
+                letterIndexInWord = 0
+            } else {
+                letterIndexInWord++
+            }
+        }
+        val wordTable = wordsTables[wordCount]
+        val cell = wordTable.cells[letterIndexInWord]
+        val localToScreenCoordinates = selectedBrick!!.localToStageCoordinates(auxVector.setZero())
         switchBrickToStage(selectedBrick!!)
-        val cell = targetWordLines[index / maxBricksPerLine].cells[index].actor
         selectedBrick!!.setPosition(
-            lettersOptionsTable.x + selectedBrick!!.x,
-            lettersOptionsTable.y + selectedBrick!!.y
+            localToScreenCoordinates.x,
+            localToScreenCoordinates.y,
         )
-        animateBrickSuccess(cell, index, gameWin)
+        animateBrickSuccess(cell, gameWin)
         selectedBrick!!.listeners.clear()
         selectedBrick = null
     }
@@ -223,16 +259,16 @@ class GamePlayScreenView(
         stage.addActor(brick)
     }
 
-    private fun animateBrickSuccess(cell: Actor, index: Int, gameWin: Boolean) {
-        val lineTable = targetWordLines[index / maxBricksPerLine]
+    private fun animateBrickSuccess(cell: Cell<Actor>, gameWin: Boolean) {
+        val localToScreenCoordinates = cell.actor.localToStageCoordinates(auxVector.setZero())
         val sequence = Actions.sequence(
             Actions.moveTo(
-                targetTable.x + lineTable.x + cell.x,
-                targetTable.y + lineTable.y + cell.y,
+                localToScreenCoordinates.x,
+                localToScreenCoordinates.y,
                 BRICK_SUCCESS_ANIMATION_DURATION,
                 Interpolation.circle
             ),
-            ReplaceCellWithBrickAction(lineTable, selectedBrick!!, index, maxBricksPerLine)
+            ReplaceCellWithBrickAction(cell, selectedBrick!!)
         )
 
         if (gameWin) {
@@ -302,6 +338,11 @@ class GamePlayScreenView(
         targetWordLines.forEach { it.remove() }
         targetWordLines.clear()
         lettersOptionsTable.remove()
+        wordsTables.forEach {
+            it.clear()
+            it.remove()
+        }
+        wordsTables.clear()
         targetTable.clear()
         targetTable.remove()
         uiTable.clear()
@@ -370,5 +411,6 @@ class GamePlayScreenView(
         private const val WIN_DELAY = 3F
         private const val OPTIONS_BRICK_FALL_MAX_DELAY = 1000F
         private const val NOTIFY_SCREEN_EMPTY_DELAY = 2F
+        private val auxVector = Vector2()
     }
 }

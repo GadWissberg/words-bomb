@@ -8,12 +8,12 @@ object DebugSettings {
     /**
      * Force the given word to be played.
      */
-    const val FORCE_TEST_WORD = true
+    const val FORCE_TEST_WORD = false
 
     /**
      * The given word to be forced.
      */
-    const val TEST_WORD = "כולם אוהבים את ריימונד"
+    const val TEST_WORD = "קשת"
 
     /**
      * Whether to display the UI components borders.

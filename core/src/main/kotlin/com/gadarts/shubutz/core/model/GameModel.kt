@@ -2,7 +2,7 @@ package com.gadarts.shubutz.core.model
 
 class GameModel() {
     var triesLeft = 6
-    lateinit var currentWord: String
+    lateinit var currentTarget: String
     lateinit var hiddenLettersIndices: MutableList<Int>
     lateinit var options: List<Char>
 
