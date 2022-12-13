@@ -1,4 +1,4 @@
-package com.gadarts.shubutz.core.model.view
+package com.gadarts.shubutz.core.screens.game.view.actors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture

@@ -1,7 +1,9 @@
 package com.gadarts.shubutz.core.model
 
+import com.gadarts.shubutz.core.DebugSettings
+
 class GameModel() {
-    var triesLeft = 6
+    var triesLeft = DebugSettings.NUMBER_OF_TRIES
     lateinit var currentTarget: String
     lateinit var hiddenLettersIndices: MutableList<Int>
     lateinit var options: List<Char>

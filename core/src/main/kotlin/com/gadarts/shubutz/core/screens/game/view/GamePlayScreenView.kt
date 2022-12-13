@@ -22,10 +22,11 @@ import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.GameModel.Companion.MAX_OPTIONS
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions.FIRE
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
-import com.gadarts.shubutz.core.model.view.Brick
-import com.gadarts.shubutz.core.model.view.BrickCell
+import com.gadarts.shubutz.core.screens.game.view.actors.Brick
+import com.gadarts.shubutz.core.screens.game.view.actors.BrickCell
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 
@@ -41,7 +42,8 @@ class GamePlayScreenView(
     private lateinit var targetTable: Table
     private var maxBricksPerLine: Int = 0
     private lateinit var bomb: Bomb
-    private lateinit var fireParticleEffectActor: FireParticleEffectActor
+    private lateinit var fireParticleEffectActor: ParticleEffectActor
+    private lateinit var explosionParticleEffectActor: ParticleEffectActor
     private var selectedBrick: Brick? = null
     private var targetWordLines = ArrayList<Table>()
     private lateinit var lettersOptionsTable: Table
@@ -81,15 +83,24 @@ class GamePlayScreenView(
     }
 
     private fun addBomb() {
-        fireParticleEffectActor = FireParticleEffectActor(assetsManager.getParticleEffect(FIRE))
+        fireParticleEffectActor = ParticleEffectActor(assetsManager.getParticleEffect(FIRE))
+        createBomb()
+        stage.addActor(fireParticleEffectActor)
+        val bombTexture = assetsManager.getTexture(TexturesDefinitions.BOMB)
+        uiTable.add(bomb).size(bombTexture.width.toFloat(), bombTexture.height.toFloat())
+            .pad(BOMB_PADDING).row()
+    }
+
+    private fun createBomb() {
+        val bombTexture = assetsManager.getTexture(TexturesDefinitions.BOMB)
         bomb = Bomb(
-            assetsManager.getTexture(TexturesDefinitions.BOMB),
+            bombTexture,
             fireParticleEffectActor,
             assetsManager.getFont(FontsDefinitions.VARELA_320),
             gameModel.triesLeft
         )
-        stage.addActor(fireParticleEffectActor)
-        uiTable.add(bomb).pad(BOMB_PADDING).row()
+        bomb.setOrigin(bombTexture.width / 2F, bombTexture.height / 2F)
+        bomb.isTransform = false
     }
 
     private fun addLettersOptionsTable() {
@@ -368,6 +379,21 @@ class GamePlayScreenView(
     }
 
     private fun animateGameOver() {
+        val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.EXP)
+        val bombPosition = bomb.localToScreenCoordinates(auxVector)
+        explosionParticleEffectActor = ParticleEffectActor(particleEffect)
+        explosionParticleEffectActor.setPosition(
+            bombPosition.x + bomb.width / 2F,
+            stage.height - bombPosition.y + bomb.height / 2F
+        )
+        bomb.addAction(
+            Actions.sequence(
+                Actions.sizeTo(0F, 0F, 0.5F, Interpolation.linear),
+                Actions.removeActor()
+            )
+        )
+        stage.addActor(explosionParticleEffectActor)
+        explosionParticleEffectActor.start()
         clearAllOptions()
     }
 

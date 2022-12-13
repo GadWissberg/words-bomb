@@ -3,8 +3,9 @@ package com.gadarts.shubutz.core.screens.game.view
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.ParticleEffect
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Group
 
-class FireParticleEffectActor(private val particleEffect: ParticleEffect) : Actor() {
+class ParticleEffectActor(private val particleEffect: ParticleEffect) : Actor() {
 
     var started = false
 
@@ -13,6 +14,14 @@ class FireParticleEffectActor(private val particleEffect: ParticleEffect) : Acto
         if (started) {
             particleEffect.update(delta)
         }
+        if (particleEffect.isComplete) {
+            remove()
+        }
+    }
+
+    override fun setParent(parent: Group?) {
+        super.setParent(parent)
+        particleEffect.setPosition(x, y)
     }
 
     override fun draw(batch: Batch?, parentAlpha: Float) {

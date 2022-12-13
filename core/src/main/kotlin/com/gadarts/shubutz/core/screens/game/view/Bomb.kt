@@ -12,7 +12,7 @@ import com.gadarts.shubutz.core.DebugSettings
 
 class Bomb(
     texture: Texture,
-    private val particleEffectActor: FireParticleEffectActor,
+    private val particleEffectActor: ParticleEffectActor,
     font: BitmapFont,
     triesLeft: Int
 ) :
@@ -20,7 +20,7 @@ class Bomb(
     private var label: Label
 
     init {
-        isTransform = true
+        isTransform = false
         setOrigin(texture.width / 2F, texture.height / 2F)
         background = TextureRegionDrawable(texture)
         val labelStyle = LabelStyle(font, Color.WHITE)
