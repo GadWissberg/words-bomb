@@ -4,6 +4,7 @@ import com.gadarts.shubutz.core.DebugSettings.FORCE_TEST_WORD
 import com.gadarts.shubutz.core.DebugSettings.TEST_WORD
 import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.model.GameModel
+import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
 import com.gadarts.shubutz.core.model.WordObject
 import java.util.HashMap
 
@@ -16,11 +17,8 @@ class BusinessLogicHandler : Notifier<BusinessLogicHandlerEventsSubscriber> {
         gameModel.currentTarget =
             if (FORCE_TEST_WORD) TEST_WORD.reversed() else category!!.random().word.reversed()
         decideHiddenLetters(gameModel)
-        val ops = gameModel.hiddenLettersIndices.map { gameModel.currentTarget[it] }.toMutableList()
-        for (i in 0 until GameModel.MAX_OPTIONS - gameModel.currentTarget.length) {
-            ops.add(GameModel.allowedLetters.random())
-        }
-        gameModel.options = ops
+        gameModel.options = allowedLetters.toMutableList()
+        gameModel.options.reversed()
     }
 
     private fun decideHiddenLetters(gameModel: GameModel) {
@@ -38,11 +36,12 @@ class BusinessLogicHandler : Notifier<BusinessLogicHandlerEventsSubscriber> {
     }
 
     fun onBrickClicked(letter: Char, gameModel: GameModel) {
-        val index = gameModel.hiddenLettersIndices.find { gameModel.currentTarget[it] == letter }
-        if (index != null) {
-            gameModel.hiddenLettersIndices.remove(index)
+        val indices =
+            gameModel.hiddenLettersIndices.filter { gameModel.currentTarget[it] == letter }
+        if (indices.isNotEmpty()) {
+            gameModel.hiddenLettersIndices.removeAll(indices)
             val gameWin = gameModel.hiddenLettersIndices.isEmpty()
-            subscribers.forEach { it.onGuessSuccess(index, gameWin) }
+            subscribers.forEach { it.onGuessSuccess(indices, gameWin) }
         } else {
             gameModel.triesLeft--
             subscribers.forEach { it.onGuessFail(gameModel.triesLeft <= 0) }

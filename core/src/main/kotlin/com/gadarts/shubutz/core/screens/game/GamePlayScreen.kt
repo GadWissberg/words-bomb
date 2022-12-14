@@ -65,8 +65,8 @@ class GamePlayScreen(
         gamePlayScreenView.onGameBegin()
     }
 
-    override fun onGuessSuccess(index: Int, gameWin: Boolean) {
-        gamePlayScreenView.onGuessSuccess(index, gameWin)
+    override fun onGuessSuccess(indices: List<Int>, gameWin: Boolean) {
+        gamePlayScreenView.onGuessSuccess(indices, gameWin)
     }
 
     override fun onGuessFail(gameOver: Boolean) {

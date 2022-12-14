@@ -4,7 +4,7 @@ import com.badlogic.gdx.assets.AssetLoaderParameters
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
-import com.gadarts.shubutz.core.model.Player
+import com.gadarts.shubutz.core.model.GameModel.Companion.LETTERS
 import java.util.*
 
 enum class FontsDefinitions : AssetDefinition<BitmapFont> {
@@ -57,7 +57,7 @@ enum class FontsDefinitions : AssetDefinition<BitmapFont> {
         params.fontParameters.shadowOffsetY = 4
         params.fontParameters.borderStraight = true
         params.fontParameters.kerning = true
-        params.fontParameters.characters += Player.LETTERS
+        params.fontParameters.characters += LETTERS
         return params
     }
 

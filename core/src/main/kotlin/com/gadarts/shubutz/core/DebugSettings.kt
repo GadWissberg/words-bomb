@@ -18,7 +18,7 @@ object DebugSettings {
     /**
      * Number of tries 'till game over.
      */
-    const val NUMBER_OF_TRIES = 1
+    const val NUMBER_OF_TRIES = 6
 
     /**
      * Whether to display the UI components borders.

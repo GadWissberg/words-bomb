@@ -7,11 +7,9 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Disposable
@@ -19,7 +17,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.model.GameModel
-import com.gadarts.shubutz.core.model.GameModel.Companion.MAX_OPTIONS
+import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions
@@ -28,6 +26,7 @@ import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.game.view.actors.BrickCell
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
+import kotlin.math.min
 
 
 class GamePlayScreenView(
@@ -108,20 +107,30 @@ class GamePlayScreenView(
         lettersOptionsTable.setSize(uiTable.width, uiTable.prefHeight)
         uiTable.add(lettersOptionsTable)
         val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-        gameModel.options.forEach {
-            val brick = Brick(it.toString(), brickTexture, letterSize, font80)
-            brick.addListener(object : ClickListener() {
-                override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                    super.clicked(event, x, y)
-                    selectedBrick = brick
-                    subscribers.forEach { sub -> sub.onBrickClicked(brick.letter[0]) }
-                }
-            })
-            lettersOptionsTable.add(brick).pad(10F)
-            if (lettersOptionsTable.children.size % MAX_OPTIONS_IN_ROW == 0) {
-                lettersOptionsTable.row()
-            }
+        for (row in 0..allowedLetters.length / (maxBricksPerLine - 1)) {
+            addOptionsRow(row, brickTexture)
         }
+    }
+
+    private fun addOptionsRow(row: Int, brickTexture: Texture) {
+        val startIndex = row * (maxBricksPerLine - 1)
+        val endIndex = min(startIndex + (maxBricksPerLine - 1), allowedLetters.length)
+        allowedLetters.subSequence(startIndex, endIndex)
+            .reversed()
+            .forEach {
+                val brick = Brick(it.toString(), brickTexture, letterSize, font80)
+                brick.addListener(object : ClickListener() {
+                    override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                        super.clicked(event, x, y)
+                        selectedBrick = brick
+                        subscribers.forEach { sub -> sub.onBrickClicked(brick.letter[0]) }
+                    }
+                })
+                lettersOptionsTable.add(brick).pad(10F)
+                if (lettersOptionsTable.children.size % (maxBricksPerLine - 1) == 0) {
+                    lettersOptionsTable.row()
+                }
+            }
     }
 
     private fun addTargetWordLines() {
@@ -235,13 +244,23 @@ class GamePlayScreenView(
     fun onHide() {
     }
 
-    fun onGuessSuccess(index: Int, gameWin: Boolean) {
+    fun onGuessSuccess(indices: List<Int>, gameWin: Boolean) {
         if (selectedBrick != null) {
-            selectionSuccessful(index, gameWin)
+            selectionSuccessful(indices, gameWin)
         }
     }
 
-    private fun selectionSuccessful(index: Int, gameWin: Boolean) {
+    private fun selectionSuccessful(indices: List<Int>, gameWin: Boolean) {
+        val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
+        indices.forEach {
+            animateBrickSuccess(it, gameWin, brickTexture)
+        }
+        selectedBrick!!.listeners.clear()
+        selectedBrick!!.remove()
+        selectedBrick = null
+    }
+
+    private fun animateBrickSuccess(index: Int, gameWin: Boolean, brickTexture: Texture) {
         var wordCount = 0
         var letterIndexInWord = 0
         for (i in 0 until index) {
@@ -254,38 +273,37 @@ class GamePlayScreenView(
         }
         val wordTable = wordsTables[wordCount]
         val cell = wordTable.cells[letterIndexInWord]
-        val localToScreenCoordinates = selectedBrick!!.localToStageCoordinates(auxVector.setZero())
-        switchBrickToStage(selectedBrick!!)
-        selectedBrick!!.setPosition(
-            localToScreenCoordinates.x,
-            localToScreenCoordinates.y,
+        val selectedBrickScreenCoords = selectedBrick!!.localToStageCoordinates(auxVector.setZero())
+        val brick =
+            Brick(gameModel.currentTarget[index].toString(), brickTexture, letterSize, font80)
+        brick.setPosition(
+            selectedBrickScreenCoords.x,
+            selectedBrickScreenCoords.y,
         )
-        animateBrickSuccess(cell, gameWin)
-        selectedBrick!!.listeners.clear()
-        selectedBrick = null
-    }
-
-    private fun switchBrickToStage(brick: Brick) {
-        brick.remove()
-        stage.addActor(brick)
-    }
-
-    private fun animateBrickSuccess(cell: Cell<Actor>, gameWin: Boolean) {
-        val localToScreenCoordinates = cell.actor.localToStageCoordinates(auxVector.setZero())
+        val cellActorScreenCoordinates = cell.actor.localToStageCoordinates(auxVector.setZero())
+        switchBrickToStage(brick)
         val sequence = Actions.sequence(
             Actions.moveTo(
-                localToScreenCoordinates.x,
-                localToScreenCoordinates.y,
+                cellActorScreenCoordinates.x,
+                cellActorScreenCoordinates.y,
                 BRICK_SUCCESS_ANIMATION_DURATION,
                 Interpolation.circle
             ),
-            ReplaceCellWithBrickAction(cell, selectedBrick!!)
+            ReplaceCellWithBrickAction(
+                cell,
+                brick
+            )
         )
 
         if (gameWin) {
             sequence.addAction(WordRevealedAction { animateGameWin() })
         }
-        selectedBrick!!.addAction(sequence)
+        brick.addAction(sequence)
+    }
+
+    private fun switchBrickToStage(brick: Brick) {
+        brick.remove()
+        stage.addActor(brick)
     }
 
     private fun animateGameWin() {
@@ -425,7 +443,6 @@ class GamePlayScreenView(
     }
 
     companion object {
-        private const val MAX_OPTIONS_IN_ROW = MAX_OPTIONS / 3
         private const val TARGET_WORD_TABLE_VERTICAL_PADDING = 80F
         private const val TARGET_WORD_LINE_VERTICAL_PADDING = 15F
         private const val TARGET_LETTER_PADDING = 10F
