@@ -40,6 +40,10 @@
           "appeared": false
         },
         {
+          "word": "ממנטו",
+          "appeared": false
+        },
+        {
           "word": "לאונרדו דיקפריו",
           "appeared": false
         }
@@ -48,6 +52,10 @@
     {
       "category": "טלוויזיה",
       "words": [
+        {
+          "word": "המפקדת",
+          "appeared": false
+        },
         {
           "word": "רחוב סומסום",
           "appeared": false
@@ -90,6 +98,15 @@
         },
         {
           "word": "דני קושמרו",
+          "appeared": false
+        }
+      ]
+    },
+    {
+      "category": "חיות",
+      "words": [
+        {
+          "word": "כלב",
           "appeared": false
         }
       ]
