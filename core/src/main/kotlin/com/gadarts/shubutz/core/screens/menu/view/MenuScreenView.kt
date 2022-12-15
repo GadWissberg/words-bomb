@@ -1,15 +1,11 @@
 package com.gadarts.shubutz.core.screens.menu.view
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Action
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.Notifier
-import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.LoadingAnimationHandler
 
 class MenuScreenView(private val assetsManager: GameAssetManager) : Disposable,
@@ -21,16 +17,16 @@ class MenuScreenView(private val assetsManager: GameAssetManager) : Disposable,
 
     override val subscribers = HashSet<MenuScreenViewEventsSubscriber>()
 
-    fun onShow() {
+    fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: ClickListener) {
         menuScreenViewComponentsHandler.init(assetsManager)
-        val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-        val font = assetsManager.getFont(FontsDefinitions.VARELA_80)
-        val style = Label.LabelStyle(font, Color.WHITE)
-        loadingAnimationRenderer.addLoadingAnimation(
-            brickTexture,
-            style,
-            menuScreenViewComponentsHandler.stage
-        )
+        if (!loadingDone) {
+            loadingAnimationRenderer.addLoadingAnimation(
+                assetsManager,
+                menuScreenViewComponentsHandler.stage
+            )
+        } else {
+            onLoadingAnimationReady(goToPlayScreenOnClick)
+        }
     }
 
     fun render(delta: Float) {
@@ -43,7 +39,6 @@ class MenuScreenView(private val assetsManager: GameAssetManager) : Disposable,
     }
 
     fun onHide() {
-        menuScreenViewComponentsHandler.onHide()
     }
 
     fun onLoadingAnimationReady(beginGameAction: ClickListener) {

@@ -6,22 +6,17 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
-import com.gadarts.shubutz.core.screens.game.GamePlayScreenEventsSubscriber
 import com.gadarts.shubutz.core.screens.menu.MenuScreen
-import com.gadarts.shubutz.core.screens.menu.MenuScreenEventsSubscriber
 
 
-class ShubutzGame(private val androidInterface: AndroidInterface) : Game(),
-    MenuScreenEventsSubscriber, GamePlayScreenEventsSubscriber {
+class ShubutzGame(private val androidInterface: AndroidInterface) : Game(), GameLifeCycleManager {
 
     private lateinit var assetsManager: GameAssetManager
-
+    override var loadingDone: Boolean = false
     override fun create() {
         loadAssets()
         Gdx.input.inputProcessor = InputMultiplexer()
-        val menuScreen = MenuScreen(assetsManager, androidInterface)
-        menuScreen.subscribeForEvents(this)
-        setScreen(menuScreen)
+        goToMenu()
     }
 
     override fun setScreen(screen: Screen?) {
@@ -41,9 +36,15 @@ class ShubutzGame(private val androidInterface: AndroidInterface) : Game(),
         assetsManager.dispose()
     }
 
-    override fun onBeginGame() {
-        val gameplayScreen = GamePlayScreen(assetsManager, androidInterface)
-        gameplayScreen.subscribeForEvents(this)
+    override fun goToMenu() {
+        screen?.dispose()
+        val menuScreen = MenuScreen(assetsManager, androidInterface, this)
+        setScreen(menuScreen)
+    }
+
+    override fun goToPlayScreen() {
+        screen?.dispose()
+        val gameplayScreen = GamePlayScreen(assetsManager, androidInterface, this)
         setScreen(gameplayScreen)
     }
 

@@ -1,6 +1,7 @@
 package com.gadarts.shubutz.core.screens.menu
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
@@ -9,26 +10,31 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.Align
+import com.gadarts.shubutz.core.model.assets.FontsDefinitions
+import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenViewEventsSubscriber
 
 class LoadingAnimationHandler {
     private var loadingReady: Boolean = false
-    private lateinit var brick1: MenuScreenView.BrickAnimation
-    private lateinit var brick2: MenuScreenView.BrickAnimation
-    private lateinit var brick3: MenuScreenView.BrickAnimation
-    private lateinit var brick4: MenuScreenView.BrickAnimation
+    private var brick1: MenuScreenView.BrickAnimation? = null
+    private var brick2: MenuScreenView.BrickAnimation? = null
+    private var brick3: MenuScreenView.BrickAnimation? = null
+    private var brick4: MenuScreenView.BrickAnimation? = null
 
     fun addLoadingAnimation(
-        brickTex: Texture,
-        style: Label.LabelStyle,
+        assetsManager: GameAssetManager,
         stage: Stage
     ) {
-        val halfWidth = brickTex.width / 2F
-        brick1 = addLoadingBrick(stage, brickTex, style, "ט", halfWidth + brickTex.width)
-        brick2 = addLoadingBrick(stage, brickTex, style, "ו", halfWidth)
-        brick3 = addLoadingBrick(stage, brickTex, style, "ע", -halfWidth)
-        brick4 = addLoadingBrick(stage, brickTex, style, "ן", -halfWidth - brickTex.width)
+        val texture = assetsManager.getTexture(TexturesDefinitions.BRICK)
+        val font = assetsManager.getFont(FontsDefinitions.VARELA_80)
+        val style = Label.LabelStyle(font, Color.WHITE)
+        val halfWidth = texture.width / 2F
+        brick1 = addLoadingBrick(stage, texture, style, "ט", halfWidth + texture.width)
+        brick2 = addLoadingBrick(stage, texture, style, "ו", halfWidth)
+        brick3 = addLoadingBrick(stage, texture, style, "ע", -halfWidth)
+        brick4 = addLoadingBrick(stage, texture, style, "ן", -halfWidth - texture.width)
     }
 
     private fun flyOutBrick(brickAnimation: MenuScreenView.BrickAnimation) {
@@ -42,18 +48,23 @@ class LoadingAnimationHandler {
     }
 
     fun render(subscribers: HashSet<MenuScreenViewEventsSubscriber>) {
-        if (!loadingReady && brick1.ready && brick2.ready && brick3.ready && brick4.ready) {
+        if (oneOfBricksMissing()) return
+        if (!loadingReady && brick1!!.ready && brick2!!.ready && brick3!!.ready && brick4!!.ready) {
             loadingReady = true
             subscribers.forEach { it.onLoadingAnimationReady() }
         }
     }
 
     fun onLoadingAnimationReady() {
-        flyOutBrick(brick1)
-        flyOutBrick(brick2)
-        flyOutBrick(brick3)
-        flyOutBrick(brick4)
+        if (oneOfBricksMissing()) return
+        flyOutBrick(brick1!!)
+        flyOutBrick(brick2!!)
+        flyOutBrick(brick3!!)
+        flyOutBrick(brick4!!)
     }
+
+    private fun oneOfBricksMissing() =
+        brick1 == null || brick2 == null || brick3 == null || brick4 == null
 
     private fun addLoadingBrick(
         stage: Stage,

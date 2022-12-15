@@ -1,6 +1,9 @@
 package com.gadarts.shubutz.core.screens.game.view
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Pixmap.*
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
@@ -10,8 +13,11 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gadarts.shubutz.core.DebugSettings
@@ -37,6 +43,7 @@ class GamePlayScreenView(
     Notifier<GamePlayScreenViewEventsSubscriber> {
 
 
+    private lateinit var topBarTexture: Texture
     private val wordsTables = ArrayList<Table>()
     private lateinit var targetTable: Table
     private var maxBricksPerLine: Int = 0
@@ -56,11 +63,53 @@ class GamePlayScreenView(
     fun onShow() {
         letterGlyphLayout = GlyphLayout(font80, "א")
         letterSize = Vector2(letterGlyphLayout.width, letterGlyphLayout.height)
-        val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-        maxBricksPerLine = Gdx.graphics.width / brickTexture.width - 1
+        calculateMaxBricksPerLine()
+        createInterface()
+    }
+
+    private fun createInterface() {
         createStage()
         addUiTable()
+        addTopBar()
         onGameBegin()
+    }
+
+    private fun calculateMaxBricksPerLine() {
+        val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
+        maxBricksPerLine = Gdx.graphics.width / brickTexture.width - 1
+    }
+
+    private fun addTopBar() {
+        createTopBarTexture()
+        val table = Table()
+        table.background = TextureRegionDrawable(topBarTexture)
+        table.setSize(stage.width, TOP_BAR_HEIGHT.toFloat())
+        table.debug = DebugSettings.SHOW_UI_BORDERS
+        stage.addActor(table)
+        table.setPosition(0F, stage.height - table.height)
+        addBackButton(table)
+    }
+
+    private fun addBackButton(table: Table) {
+        val texture = assetsManager.getTexture(TexturesDefinitions.BACK_BUTTON)
+        val button = ImageButton(TextureRegionDrawable(texture))
+        button.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                super.clicked(event, x, y)
+                subscribers.forEach { it.onClickedBackButton() }
+            }
+        })
+        table.add(button).expandX().pad(40F).left()
+    }
+
+    private fun createTopBarTexture() {
+        val pixmap = Pixmap(stage.width.toInt(), TOP_BAR_HEIGHT, Format.RGBA8888)
+        val color = Color.valueOf(TOP_BAR_COLOR)
+        color.a /= 2F
+        pixmap.setColor(color)
+        pixmap.fill()
+        topBarTexture = Texture(pixmap)
+        pixmap.dispose()
     }
 
     private fun addTargetTable() {
@@ -207,8 +256,8 @@ class GamePlayScreenView(
 
     private fun addUiTable() {
         uiTable = addTable()
-        stage.addActor(uiTable)
         uiTable.setFillParent(true)
+        stage.addActor(uiTable)
     }
 
     private fun addTable(): Table {
@@ -239,6 +288,7 @@ class GamePlayScreenView(
 
     override fun dispose() {
         stage.dispose()
+        topBarTexture.dispose()
     }
 
     fun onHide() {
@@ -454,6 +504,8 @@ class GamePlayScreenView(
         private const val WIN_DELAY = 3F
         private const val OPTIONS_BRICK_FALL_MAX_DELAY = 1000F
         private const val NOTIFY_SCREEN_EMPTY_DELAY = 2F
+        private const val TOP_BAR_HEIGHT = 150
+        private const val TOP_BAR_COLOR = "#85adb0"
         private val auxVector = Vector2()
     }
 }

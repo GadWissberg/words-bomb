@@ -4,7 +4,7 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.gadarts.shubutz.core.AndroidInterface
-import com.gadarts.shubutz.core.Notifier
+import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenViewEventsSubscriber
@@ -12,16 +12,16 @@ import com.gadarts.shubutz.core.screens.menu.view.MenuScreenViewEventsSubscriber
 class MenuScreen(
     assetsManager: GameAssetManager,
     private val androidInterface: AndroidInterface,
+    private val gameLifeCycleManager: GameLifeCycleManager,
 ) :
-    Screen, Notifier<MenuScreenEventsSubscriber>, MenuScreenViewEventsSubscriber {
+    Screen, MenuScreenViewEventsSubscriber {
 
 
     private val menuScreenView = MenuScreenView(assetsManager)
-    override val subscribers = HashSet<MenuScreenEventsSubscriber>()
 
     override fun show() {
         menuScreenView.subscribeForEvents(this)
-        menuScreenView.onShow()
+        menuScreenView.onShow(gameLifeCycleManager.loadingDone, goToPlayScreenOnClick())
     }
 
     override fun render(delta: Float) {
@@ -45,22 +45,16 @@ class MenuScreen(
         menuScreenView.dispose()
     }
 
-    override fun subscribeForEvents(subscriber: MenuScreenEventsSubscriber) {
-        subscribers.add(subscriber)
-    }
-
     override fun onLoadingAnimationReady() {
-        menuScreenView.onLoadingAnimationReady(object : ClickListener() {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                super.clicked(event, x, y)
-                subscribers.forEach { it.onBeginGame() }
-            }
-        })
+        gameLifeCycleManager.loadingDone = true
+        menuScreenView.onLoadingAnimationReady(goToPlayScreenOnClick())
     }
 
-    companion object {
-        const val HOST_IP = "192.168.1.136"
-        const val SOCKET_TIMEOUT_SECONDS = 10
+    private fun goToPlayScreenOnClick() = object : ClickListener() {
+        override fun clicked(event: InputEvent?, x: Float, y: Float) {
+            super.clicked(event, x, y)
+            gameLifeCycleManager.goToPlayScreen()
+        }
     }
 
 }

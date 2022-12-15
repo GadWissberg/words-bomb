@@ -2,15 +2,12 @@ package com.gadarts.shubutz.core.screens.menu.view
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Gdx.graphics
-import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation.*
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.Table.Debug
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -25,7 +22,6 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 class MenuScreenViewComponentsHandler(private val assetsManager: GameAssetManager) : Disposable {
 
 
-    private lateinit var listLabelStyle: Label.LabelStyle
     private var uiTable: Table? = null
     lateinit var stage: GameStage
     private var bitmapFont: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
@@ -35,8 +31,7 @@ class MenuScreenViewComponentsHandler(private val assetsManager: GameAssetManage
             FitViewport(graphics.width.toFloat(), graphics.height.toFloat()),
             assetsManager
         )
-        val multiplexer = Gdx.input.inputProcessor as InputMultiplexer
-        multiplexer.addProcessor(stage)
+        Gdx.input.inputProcessor = stage
     }
 
     private fun addUserInterface(beginGameAction: ClickListener) {
@@ -112,8 +107,6 @@ class MenuScreenViewComponentsHandler(private val assetsManager: GameAssetManage
 
     fun init(assetsManager: GameAssetManager) {
         addStage(assetsManager)
-        val font = assetsManager.getFont(FontsDefinitions.VARELA_80)
-        listLabelStyle = Label.LabelStyle(font, Color.WHITE)
     }
 
     fun render(delta: Float) {
@@ -123,11 +116,6 @@ class MenuScreenViewComponentsHandler(private val assetsManager: GameAssetManage
 
     override fun dispose() {
         stage.dispose()
-    }
-
-    fun onHide() {
-        val multiplexer = Gdx.input.inputProcessor as InputMultiplexer
-        multiplexer.removeProcessor(stage)
     }
 
     fun onLoadingAnimationReady(beginGameAction: ClickListener) {

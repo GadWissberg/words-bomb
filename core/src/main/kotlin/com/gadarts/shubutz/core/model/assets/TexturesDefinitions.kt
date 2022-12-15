@@ -6,6 +6,7 @@ import java.util.Locale.ROOT
 
 enum class TexturesDefinitions(ninepatch: Boolean) : AssetDefinition<Texture> {
     HUD(true),
+    BACK_BUTTON(false),
     BUTTON_UP(false),
     BUTTON_DOWN(false),
     CELL(false),

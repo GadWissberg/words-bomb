@@ -2,8 +2,8 @@ package com.gadarts.shubutz.core.screens.game
 
 import com.badlogic.gdx.Screen
 import com.gadarts.shubutz.core.AndroidInterface
+import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.business.BusinessLogicHandler
-import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.business.BusinessLogicHandlerEventsSubscriber
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -13,15 +13,15 @@ import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenViewEventsSubscr
 class GamePlayScreen(
     private val assetsManager: GameAssetManager,
     private val androidInterface: AndroidInterface,
+    private val lifeCycleManager: GameLifeCycleManager,
 ) :
-    Screen, Notifier<GamePlayScreenEventsSubscriber>, GamePlayScreenViewEventsSubscriber,
+    Screen, GamePlayScreenViewEventsSubscriber,
     BusinessLogicHandlerEventsSubscriber {
 
 
     private val gameModel = GameModel()
     private val businessLogicHandler = BusinessLogicHandler()
     private lateinit var gamePlayScreenView: GamePlayScreenView
-    override val subscribers = HashSet<GamePlayScreenEventsSubscriber>()
 
     override fun show() {
         businessLogicHandler.beginGame(gameModel, assetsManager.words)
@@ -52,10 +52,6 @@ class GamePlayScreen(
         gamePlayScreenView.dispose()
     }
 
-    override fun subscribeForEvents(subscriber: GamePlayScreenEventsSubscriber) {
-        subscribers.add(subscriber)
-    }
-
     override fun onBrickClicked(letter: Char) {
         businessLogicHandler.onBrickClicked(letter, gameModel)
     }
@@ -63,6 +59,10 @@ class GamePlayScreen(
     override fun onScreenEmpty() {
         businessLogicHandler.beginGame(gameModel, assetsManager.words)
         gamePlayScreenView.onGameBegin()
+    }
+
+    override fun onClickedBackButton() {
+        lifeCycleManager.goToMenu()
     }
 
     override fun onGuessSuccess(indices: List<Int>, gameWin: Boolean) {
