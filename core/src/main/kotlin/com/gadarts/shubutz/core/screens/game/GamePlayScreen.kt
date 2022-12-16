@@ -1,5 +1,7 @@
 package com.gadarts.shubutz.core.screens.game
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.GameLifeCycleManager
@@ -33,6 +35,9 @@ class GamePlayScreen(
 
     override fun render(delta: Float) {
         gamePlayScreenView.render(delta)
+        if (Gdx.input.isKeyJustPressed(Input.Keys.BACK)) {
+            lifeCycleManager.goToMenu()
+        }
     }
 
     override fun resize(width: Int, height: Int) {

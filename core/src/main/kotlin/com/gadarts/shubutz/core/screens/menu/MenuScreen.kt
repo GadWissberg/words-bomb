@@ -1,5 +1,7 @@
 package com.gadarts.shubutz.core.screens.menu
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -11,13 +13,12 @@ import com.gadarts.shubutz.core.screens.menu.view.MenuScreenViewEventsSubscriber
 
 class MenuScreen(
     assetsManager: GameAssetManager,
-    private val androidInterface: AndroidInterface,
+    androidInterface: AndroidInterface,
     private val gameLifeCycleManager: GameLifeCycleManager,
 ) :
     Screen, MenuScreenViewEventsSubscriber {
 
-
-    private val menuScreenView = MenuScreenView(assetsManager)
+    private val menuScreenView = MenuScreenView(assetsManager, androidInterface.versionName())
 
     override fun show() {
         menuScreenView.subscribeForEvents(this)
@@ -26,6 +27,9 @@ class MenuScreen(
 
     override fun render(delta: Float) {
         menuScreenView.render(delta)
+        if (Gdx.input.isKeyJustPressed(Input.Keys.BACK)) {
+            Gdx.app.exit()
+        }
     }
 
     override fun resize(width: Int, height: Int) {

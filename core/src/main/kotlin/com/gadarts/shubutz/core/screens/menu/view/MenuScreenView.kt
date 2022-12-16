@@ -8,12 +8,15 @@ import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.menu.LoadingAnimationHandler
 
-class MenuScreenView(private val assetsManager: GameAssetManager) : Disposable,
+class MenuScreenView(private val assetsManager: GameAssetManager, versionName: String) : Disposable,
     Notifier<MenuScreenViewEventsSubscriber> {
 
 
     private var loadingAnimationRenderer = LoadingAnimationHandler()
-    private val menuScreenViewComponentsHandler = MenuScreenViewComponentsHandler(assetsManager)
+    private val menuScreenViewComponentsHandler = MenuScreenViewComponentsHandler(
+        assetsManager,
+        versionName
+    )
 
     override val subscribers = HashSet<MenuScreenViewEventsSubscriber>()
 

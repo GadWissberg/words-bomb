@@ -20,7 +20,6 @@ class Bomb(
     private var label: Label
 
     init {
-        isTransform = false
         setOrigin(texture.width / 2F, texture.height / 2F)
         background = TextureRegionDrawable(texture)
         val labelStyle = LabelStyle(font, Color.WHITE)

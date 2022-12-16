@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.Interpolation.*
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -148,7 +149,6 @@ class GamePlayScreenView(
             gameModel.triesLeft
         )
         bomb.setOrigin(bombTexture.width / 2F, bombTexture.height / 2F)
-        bomb.isTransform = false
     }
 
     private fun addLettersOptionsTable() {
@@ -337,7 +337,7 @@ class GamePlayScreenView(
                 cellActorScreenCoordinates.x,
                 cellActorScreenCoordinates.y,
                 BRICK_SUCCESS_ANIMATION_DURATION,
-                Interpolation.circle
+                circle
             ),
             ReplaceCellWithBrickAction(
                 cell,
@@ -395,7 +395,7 @@ class GamePlayScreenView(
 
         bomb.addAction(
             Actions.sequence(
-                Actions.sizeTo(0F, 0F, 1F, Interpolation.exp10),
+                Actions.sizeTo(0F, 0F, 1F, exp10),
                 Actions.removeActor()
             )
         )
@@ -407,7 +407,7 @@ class GamePlayScreenView(
                 it.actor.addAction(
                     Actions.sequence(
                         Actions.delay(MathUtils.random(OPTIONS_BRICK_FALL_MAX_DELAY)),
-                        Actions.sizeTo(0F, 0F, 1F, Interpolation.circle),
+                        Actions.sizeTo(0F, 0F, 1F, circle),
                         Actions.removeActor()
                     )
                 )
@@ -448,18 +448,28 @@ class GamePlayScreenView(
 
     private fun animateGameOver() {
         val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.EXP)
-        val bombPosition = bomb.localToScreenCoordinates(auxVector)
+        val bombPosition = bomb.localToScreenCoordinates(auxVector.setZero())
         explosionParticleEffectActor = ParticleEffectActor(particleEffect)
         explosionParticleEffectActor.setPosition(
             bombPosition.x + bomb.width / 2F,
-            stage.height - bombPosition.y + bomb.height / 2F
+            stage.height - bombPosition.y + bomb.height / 5F
         )
+
         bomb.addAction(
-            Actions.sequence(
-                Actions.sizeTo(0F, 0F, 0.5F, Interpolation.linear),
-                Actions.removeActor()
+            Actions.parallel(
+                Actions.sequence(
+                    Actions.sizeTo(0F, 0F, BOMB_GAME_OVER_ANIMATION_DURATION, linear),
+                    Actions.removeActor()
+                ),
+                Actions.moveBy(
+                    bomb.width / 2F,
+                    bomb.height / 2F,
+                    BOMB_GAME_OVER_ANIMATION_DURATION,
+                    linear
+                )
             )
         )
+
         stage.addActor(explosionParticleEffectActor)
         explosionParticleEffectActor.start()
         clearAllOptions()
@@ -486,7 +496,7 @@ class GamePlayScreenView(
                     brick.x,
                     -brick.height,
                     BRICK_FAIL_ANIMATION_DURATION,
-                    Interpolation.exp10
+                    exp10
                 ), Actions.removeActor()
             ),
         )
@@ -506,6 +516,7 @@ class GamePlayScreenView(
         private const val NOTIFY_SCREEN_EMPTY_DELAY = 2F
         private const val TOP_BAR_HEIGHT = 150
         private const val TOP_BAR_COLOR = "#85adb0"
+        private const val BOMB_GAME_OVER_ANIMATION_DURATION = 0.5F
         private val auxVector = Vector2()
     }
 }

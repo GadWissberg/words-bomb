@@ -29,11 +29,6 @@ enum class FontsDefinitions : AssetDefinition<BitmapFont> {
         override fun getParameters(): AssetLoaderParameters<BitmapFont> {
             return createFontParameters(35, 3.5f)
         }
-    },
-    VARELA_20 {
-        override fun getParameters(): AssetLoaderParameters<BitmapFont> {
-            return createFontParameters(20, 2f)
-        }
     };
 
     private var path: String = "${name.toLowerCase(Locale.ROOT)}.ttf"

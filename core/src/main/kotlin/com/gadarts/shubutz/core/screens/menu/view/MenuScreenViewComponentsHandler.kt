@@ -2,12 +2,14 @@ package com.gadarts.shubutz.core.screens.menu.view
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Gdx.graphics
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation.*
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.Table.Debug
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -19,12 +21,16 @@ import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class MenuScreenViewComponentsHandler(private val assetsManager: GameAssetManager) : Disposable {
+class MenuScreenViewComponentsHandler(
+    private val assetsManager: GameAssetManager,
+    private val versionName: String
+) : Disposable {
 
 
     private var uiTable: Table? = null
     lateinit var stage: GameStage
-    private var bitmapFont: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
+    private var varela80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
+    private var varela35: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_35)
 
     private fun addStage(assetsManager: GameAssetManager) {
         stage = GameStage(
@@ -41,6 +47,8 @@ class MenuScreenViewComponentsHandler(private val assetsManager: GameAssetManage
         addLogo()
         addButtons(uiTable!!, beginGameAction)
         uiTable!!.touchable = Touchable.childrenOnly
+        val versionLabel = Label("v$versionName", Label.LabelStyle(varela35, Color.BLACK))
+        stage.addActor(versionLabel)
     }
 
     private fun addLogo() {
@@ -100,7 +108,7 @@ class MenuScreenViewComponentsHandler(private val assetsManager: GameAssetManage
             span = 2,
             up = buttonUpTex,
             down = buttonDownTex,
-            bitmapFont = bitmapFont,
+            bitmapFont = varela80,
             topPadding = MenuScreenView.BUTTON_PADDING
         )
     }
