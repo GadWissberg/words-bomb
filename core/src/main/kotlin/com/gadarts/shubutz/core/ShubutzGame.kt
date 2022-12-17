@@ -2,7 +2,7 @@ package com.gadarts.shubutz.core
 
 import com.badlogic.gdx.*
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.screens.game.GamePlayScreen
+import com.gadarts.shubutz.core.screens.game.GamePlayScreenImpl
 import com.gadarts.shubutz.core.screens.menu.MenuScreen
 
 
@@ -12,7 +12,7 @@ class ShubutzGame(private val androidInterface: AndroidInterface) : Game(), Game
     override var loadingDone: Boolean = false
 
     override fun create() {
-        Gdx.input.setCatchKey(Input.Keys.BACK, true);
+        Gdx.input.setCatchKey(Input.Keys.BACK, true)
         loadAssets()
         Gdx.input.inputProcessor = InputMultiplexer()
         goToMenu()
@@ -43,8 +43,8 @@ class ShubutzGame(private val androidInterface: AndroidInterface) : Game(), Game
 
     override fun goToPlayScreen() {
         screen?.dispose()
-        val gameplayScreen = GamePlayScreen(assetsManager, androidInterface, this)
-        setScreen(gameplayScreen)
+        val gameplayScreenImpl = GamePlayScreenImpl(assetsManager, this)
+        setScreen(gameplayScreenImpl)
     }
 
 }

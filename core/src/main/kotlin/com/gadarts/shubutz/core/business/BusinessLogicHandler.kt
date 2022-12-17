@@ -35,9 +35,11 @@ class BusinessLogicHandler : Notifier<BusinessLogicHandlerEventsSubscriber> {
             gameModel.hiddenLettersIndices.drop(toDrop).toMutableList()
     }
 
-    fun onBrickClicked(letter: Char, gameModel: GameModel) {
-        val indices =
-            gameModel.hiddenLettersIndices.filter { gameModel.currentTarget[it] == letter }
+    fun onBrickClicked(selectedLetter: Char, gameModel: GameModel) {
+        val indices = gameModel.hiddenLettersIndices.filter {
+            val currentLetter = gameModel.currentTarget[it]
+            currentLetter == selectedLetter || suffixLetters[selectedLetter] == currentLetter
+        }
         if (indices.isNotEmpty()) {
             gameModel.hiddenLettersIndices.removeAll(indices)
             val gameWin = gameModel.hiddenLettersIndices.isEmpty()
@@ -46,6 +48,16 @@ class BusinessLogicHandler : Notifier<BusinessLogicHandlerEventsSubscriber> {
             gameModel.triesLeft--
             subscribers.forEach { it.onGuessFail(gameModel.triesLeft <= 0) }
         }
+    }
+
+    companion object {
+        val suffixLetters = mapOf(
+            'פ' to 'ף',
+            'כ' to 'ך',
+            'נ' to 'ן',
+            'צ' to 'ץ',
+            'מ' to 'ם'
+        )
     }
 
 }

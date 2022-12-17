@@ -3,26 +3,24 @@ package com.gadarts.shubutz.core.screens.game.view
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Pixmap.*
+import com.badlogic.gdx.graphics.Pixmap.Format
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
-import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Interpolation.*
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
-import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gadarts.shubutz.core.DebugSettings
-import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
@@ -30,6 +28,7 @@ import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions.FIRE
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
+import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.game.view.actors.BrickCell
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
@@ -38,10 +37,10 @@ import kotlin.math.min
 
 class GamePlayScreenView(
     private val assetsManager: GameAssetManager,
-    private val gameModel: GameModel
+    private val gameModel: GameModel,
+    private val gamePlayScreen: GamePlayScreen
 ) :
-    Disposable,
-    Notifier<GamePlayScreenViewEventsSubscriber> {
+    Disposable {
 
 
     private lateinit var topBarTexture: Texture
@@ -57,7 +56,6 @@ class GamePlayScreenView(
     private lateinit var letterGlyphLayout: GlyphLayout
     private lateinit var uiTable: Table
     private lateinit var stage: GameStage
-    override val subscribers = HashSet<GamePlayScreenViewEventsSubscriber>()
     private var font80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
     private lateinit var letterSize: Vector2
 
@@ -97,7 +95,7 @@ class GamePlayScreenView(
         button.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 super.clicked(event, x, y)
-                subscribers.forEach { it.onClickedBackButton() }
+                gamePlayScreen.onClickedBackButton()
             }
         })
         table.add(button).expandX().pad(40F).left()
@@ -172,10 +170,12 @@ class GamePlayScreenView(
                     override fun clicked(event: InputEvent?, x: Float, y: Float) {
                         super.clicked(event, x, y)
                         selectedBrick = brick
-                        subscribers.forEach { sub -> sub.onBrickClicked(brick.letter[0]) }
+                        gamePlayScreen.onBrickClicked(brick.letter[0])
                     }
                 })
-                lettersOptionsTable.add(brick).pad(10F)
+                lettersOptionsTable.add(brick)
+                    .pad(10F)
+                    .size(brickTexture.width.toFloat(), brickTexture.height.toFloat())
                 if (lettersOptionsTable.children.size % (maxBricksPerLine - 1) == 0) {
                     lettersOptionsTable.row()
                 }
@@ -339,14 +339,11 @@ class GamePlayScreenView(
                 BRICK_SUCCESS_ANIMATION_DURATION,
                 circle
             ),
-            ReplaceCellWithBrickAction(
-                cell,
-                brick
-            )
+            Actions.run { (cell as Cell).setActor(brick) }
         )
 
         if (gameWin) {
-            sequence.addAction(WordRevealedAction { animateGameWin() })
+            sequence.addAction(Actions.run { animateGameWin() })
         }
         brick.addAction(sequence)
     }
@@ -358,35 +355,41 @@ class GamePlayScreenView(
 
     private fun animateGameWin() {
         fireParticleEffectActor.stop()
-        val last = targetWordLines.last()
-        for (i in 0 until last.cells.size) {
-            val actor = last.cells[i].actor
-            actor.addAction(
-                Actions.sequence(
-                    Actions.delay(i / 10F),
-                    Actions.moveBy(
-                        0F,
-                        GAME_SUCCESS_ANIMATION_DISTANCE,
-                        GAME_SUCCESS_ANIMATION_DURATION
-                    ),
-                    Actions.moveBy(
-                        0F,
-                        -2 * GAME_SUCCESS_ANIMATION_DISTANCE,
-                        GAME_SUCCESS_ANIMATION_DURATION
-                    ),
-                    Actions.moveBy(
-                        0F,
-                        GAME_SUCCESS_ANIMATION_DISTANCE,
-                        GAME_SUCCESS_ANIMATION_DURATION
-                    ),
-                )
-            )
-            if (i == last.cells.size - 1) {
-                actor.addAction(
-                    Actions.sequence(
-                        Actions.delay(WIN_DELAY),
-                        Actions.run { clearScreen() }
-                    ))
+        var i = 0
+        targetWordLines.reversed().forEach {
+            it.cells.forEach { wordCell ->
+                val word = wordCell.actor as Table
+                for (letterIndex in 0 until word.cells.size) {
+                    val actor = word.cells[letterIndex].actor
+                    actor.addAction(
+                        Actions.sequence(
+                            Actions.delay(i / 10F),
+                            Actions.moveBy(
+                                0F,
+                                GAME_SUCCESS_ANIMATION_DISTANCE,
+                                GAME_SUCCESS_ANIMATION_DURATION
+                            ),
+                            Actions.moveBy(
+                                0F,
+                                -2 * GAME_SUCCESS_ANIMATION_DISTANCE,
+                                GAME_SUCCESS_ANIMATION_DURATION
+                            ),
+                            Actions.moveBy(
+                                0F,
+                                GAME_SUCCESS_ANIMATION_DISTANCE,
+                                GAME_SUCCESS_ANIMATION_DURATION
+                            ),
+                        )
+                    )
+                    if (i == word.cells.size - 1) {
+                        actor.addAction(
+                            Actions.sequence(
+                                Actions.delay(WIN_DELAY),
+                                Actions.run { clearScreen() }
+                            ))
+                    }
+                    i++
+                }
             }
         }
     }
@@ -428,7 +431,7 @@ class GamePlayScreenView(
         uiTable.addAction(
             Actions.delay(
                 NOTIFY_SCREEN_EMPTY_DELAY,
-                Actions.run { subscribers.forEach { sub -> sub.onScreenEmpty() } })
+                Actions.run { gamePlayScreen.onScreenEmpty() })
         )
     }
 
@@ -447,6 +450,7 @@ class GamePlayScreenView(
     }
 
     private fun animateGameOver() {
+        fireParticleEffectActor.stop()
         val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.EXP)
         val bombPosition = bomb.localToScreenCoordinates(auxVector.setZero())
         explosionParticleEffectActor = ParticleEffectActor(particleEffect)
@@ -459,7 +463,7 @@ class GamePlayScreenView(
             Actions.parallel(
                 Actions.sequence(
                     Actions.sizeTo(0F, 0F, BOMB_GAME_OVER_ANIMATION_DURATION, linear),
-                    Actions.removeActor()
+                    Actions.delay(10F, Actions.run { gamePlayScreen.onGameOverAnimationDone() })
                 ),
                 Actions.moveBy(
                     bomb.width / 2F,

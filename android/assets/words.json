@@ -1,7 +1,7 @@
 {
   "words_by_category": [
     {
-      "category": "סרטים",
+      "category": "קולנוע",
       "words": [
         {
           "word": "חלף עם הרוח",
@@ -46,6 +46,10 @@
         {
           "word": "לאונרדו דיקפריו",
           "appeared": false
+        },
+        {
+          "word": "מהיר ועצבני",
+          "appeared": false
         }
       ]
     },
@@ -89,7 +93,7 @@
           "appeared": false
         },
         {
-          "word": "כולם אוהבים את ריימונד",
+          "word": "קרתגו",
           "appeared": false
         },
         {
@@ -127,6 +131,19 @@
         },
         {
           "word": "עורב",
+          "appeared": false
+        },
+        {
+          "word": "יונק",
+          "appeared": false
+        }
+      ]
+    },
+    {
+      "category": "אוכל",
+      "words": [
+        {
+          "word": "פיצה",
           "appeared": false
         }
       ]
