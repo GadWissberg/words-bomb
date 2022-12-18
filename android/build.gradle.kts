@@ -22,6 +22,12 @@ android {
         versionName = appVersion
     }
     buildTypes {
+        release {
+            isDebuggable = false
+        }
+        debug {
+            isDebuggable = false
+        }
         named("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
