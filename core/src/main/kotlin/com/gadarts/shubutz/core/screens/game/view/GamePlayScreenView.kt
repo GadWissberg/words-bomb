@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.math.Interpolation.*
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
@@ -358,39 +359,50 @@ class GamePlayScreenView(
         var i = 0
         targetWordLines.reversed().forEach {
             it.cells.forEach { wordCell ->
-                val word = wordCell.actor as Table
-                for (letterIndex in 0 until word.cells.size) {
-                    val actor = word.cells[letterIndex].actor
-                    actor.addAction(
-                        Actions.sequence(
-                            Actions.delay(i / 10F),
-                            Actions.moveBy(
-                                0F,
-                                GAME_SUCCESS_ANIMATION_DISTANCE,
-                                GAME_SUCCESS_ANIMATION_DURATION
-                            ),
-                            Actions.moveBy(
-                                0F,
-                                -2 * GAME_SUCCESS_ANIMATION_DISTANCE,
-                                GAME_SUCCESS_ANIMATION_DURATION
-                            ),
-                            Actions.moveBy(
-                                0F,
-                                GAME_SUCCESS_ANIMATION_DISTANCE,
-                                GAME_SUCCESS_ANIMATION_DURATION
-                            ),
-                        )
-                    )
-                    if (i == word.cells.size - 1) {
-                        actor.addAction(
-                            Actions.sequence(
-                                Actions.delay(WIN_DELAY),
-                                Actions.run { clearScreen() }
-                            ))
+                if (wordCell.actor is Table) {
+                    val word = wordCell.actor as Table
+                    val size = word.cells.size
+                    for (letterIndex in 0 until size) {
+                        val actor = word.cells[letterIndex].actor
+                        animateLetterForGameWin(actor, i, word)
+                        i++
                     }
-                    i++
                 }
             }
+        }
+    }
+
+    private fun animateLetterForGameWin(
+        actor: Actor,
+        i: Int,
+        word: Table
+    ) {
+        actor.addAction(
+            Actions.sequence(
+                Actions.delay(i / 10F),
+                Actions.moveBy(
+                    0F,
+                    GAME_SUCCESS_ANIMATION_DISTANCE,
+                    GAME_SUCCESS_ANIMATION_DURATION
+                ),
+                Actions.moveBy(
+                    0F,
+                    -2 * GAME_SUCCESS_ANIMATION_DISTANCE,
+                    GAME_SUCCESS_ANIMATION_DURATION
+                ),
+                Actions.moveBy(
+                    0F,
+                    GAME_SUCCESS_ANIMATION_DISTANCE,
+                    GAME_SUCCESS_ANIMATION_DURATION
+                ),
+            )
+        )
+        if (i == word.cells.size - 1) {
+            actor.addAction(
+                Actions.sequence(
+                    Actions.delay(WIN_DELAY),
+                    Actions.run { clearScreen() }
+                ))
         }
     }
 

@@ -1,30 +1,24 @@
-package com.gadarts.shubutz.core
+package com.gadarts.shubutz.core.model.assets
 
 import com.badlogic.gdx.Gdx
-import com.gadarts.shubutz.core.model.WordObject
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 
 class WordsLoader {
     private val gson = Gson()
 
-    fun load(): HashMap<String, List<WordObject>> {
-        val result = HashMap<String, List<WordObject>>()
+    fun load(): HashMap<String, ArrayList<String>> {
+        val result = HashMap<String, ArrayList<String>>()
         val reader = Gdx.files.local(WORDS_JSON_FILE_PATH).reader()
         val jsonObject = gson.fromJson(reader, JsonObject::class.java)
         val wordsByCategoryJsonArray = jsonObject.get(JSON_KEY_WORDS_BY_CATEGORY).asJsonArray
         wordsByCategoryJsonArray.forEach {
             val asJsonObject = it.asJsonObject
             val category = asJsonObject.get(JSON_KEY_CATEGORY).asString
-            val list = ArrayList<WordObject>()
+            val list = ArrayList<String>()
             asJsonObject.getAsJsonArray(JSON_KEY_WORDS)
                 .forEach { wordJsonElement ->
-                    val wordJsonObject = wordJsonElement.asJsonObject
-                    val wordObject = WordObject(
-                        wordJsonObject.get(JSON_KEY_WORD).asString,
-                        wordJsonObject.get(JSON_KEY_APPEARED).asBoolean
-                    )
-                    list.add(wordObject)
+                    list.add(wordJsonElement.asString)
                 }
             result[category] = list
         }
@@ -35,8 +29,6 @@ class WordsLoader {
         const val JSON_KEY_WORDS_BY_CATEGORY = "words_by_category"
         const val JSON_KEY_CATEGORY = "category"
         const val JSON_KEY_WORDS = "words"
-        const val JSON_KEY_WORD = "word"
-        const val JSON_KEY_APPEARED = "appeared"
         const val WORDS_JSON_FILE_PATH = "assets/words.json"
     }
 }

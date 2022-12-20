@@ -5,20 +5,33 @@ import com.gadarts.shubutz.core.DebugSettings.TEST_WORD
 import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
-import com.gadarts.shubutz.core.model.WordObject
 import java.util.HashMap
 
-class BusinessLogicHandler : Notifier<BusinessLogicHandlerEventsSubscriber> {
+class BusinessLogicHandler(private val words: HashMap<String, ArrayList<String>>) :
+    Notifier<BusinessLogicHandlerEventsSubscriber> {
 
+    private var unusedWords: HashMap<String, ArrayList<String>> = HashMap(words)
     override val subscribers = HashSet<BusinessLogicHandlerEventsSubscriber>()
 
-    fun beginGame(gameModel: GameModel, words: HashMap<String, List<WordObject>>) {
-        val category = words[words.keys.random()]
-        gameModel.currentTarget =
-            if (FORCE_TEST_WORD) TEST_WORD.reversed() else category!!.random().word.reversed()
+    fun beginGame(gameModel: GameModel) {
+        if (unusedWords.isEmpty()) {
+            unusedWords = words
+        }
+        chooseWord(gameModel)
         decideHiddenLetters(gameModel)
         gameModel.options = allowedLetters.toMutableList()
         gameModel.options.reversed()
+    }
+
+    private fun chooseWord(gameModel: GameModel) {
+        val categoryName = unusedWords.keys.random()
+        val category = words[categoryName]
+        gameModel.currentTarget =
+            if (FORCE_TEST_WORD) TEST_WORD.reversed() else category!!.random().reversed()
+        category!!.remove(gameModel.currentTarget)
+        if (category.isEmpty()) {
+            words.remove(categoryName)
+        }
     }
 
     private fun decideHiddenLetters(gameModel: GameModel) {

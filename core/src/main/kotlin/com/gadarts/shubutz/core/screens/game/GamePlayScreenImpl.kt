@@ -17,11 +17,12 @@ class GamePlayScreenImpl(
 
 
     private val gameModel = GameModel()
-    private val businessLogicHandler = BusinessLogicHandler()
+    private lateinit var businessLogicHandler: BusinessLogicHandler
     private lateinit var gamePlayScreenView: GamePlayScreenView
 
     override fun show() {
-        businessLogicHandler.beginGame(gameModel, assetsManager.words)
+        businessLogicHandler = BusinessLogicHandler(assetsManager.words)
+        businessLogicHandler.beginGame(gameModel)
         businessLogicHandler.subscribeForEvents(this)
         gamePlayScreenView = GamePlayScreenView(assetsManager, gameModel, this)
         gamePlayScreenView.onShow()
@@ -56,7 +57,7 @@ class GamePlayScreenImpl(
     }
 
     override fun onScreenEmpty() {
-        businessLogicHandler.beginGame(gameModel, assetsManager.words)
+        businessLogicHandler.beginGame(gameModel)
         gamePlayScreenView.onGameBegin()
     }
 

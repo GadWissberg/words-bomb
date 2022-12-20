@@ -10,15 +10,13 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
-import com.gadarts.shubutz.core.WordsLoader
-import com.gadarts.shubutz.core.model.WordObject
 import java.util.HashMap
 
 /**
  * Responsible to load the assets.
  */
 open class GameAssetManager : AssetManager() {
-    lateinit var words: HashMap<String, List<WordObject>>
+    lateinit var words: HashMap<String, ArrayList<String>>
     private val wordsLoader = WordsLoader()
 
     /**

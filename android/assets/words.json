@@ -3,149 +3,63 @@
     {
       "category": "קולנוע",
       "words": [
-        {
-          "word": "חלף עם הרוח",
-          "appeared": false
-        },
-        {
-          "word": "הסנדק",
-          "appeared": false
-        },
-        {
-          "word": "טיטאניק",
-          "appeared": false
-        },
-        {
-          "word": "נער החידות ממומביי",
-          "appeared": false
-        },
-        {
-          "word": "ברוס וויליס",
-          "appeared": false
-        },
-        {
-          "word": "דמי מור",
-          "appeared": false
-        },
-        {
-          "word": "האלי ברי",
-          "appeared": false
-        },
-        {
-          "word": "זאב רווח",
-          "appeared": false
-        },
-        {
-          "word": "רוברט דה נירו",
-          "appeared": false
-        },
-        {
-          "word": "ממנטו",
-          "appeared": false
-        },
-        {
-          "word": "לאונרדו דיקפריו",
-          "appeared": false
-        },
-        {
-          "word": "מהיר ועצבני",
-          "appeared": false
-        }
+        "חלף עם הרוח",
+        "הסנדק",
+        "טיטאניק",
+        "ברוס וויליס",
+        "דמי מור",
+        "האלי ברי",
+        "זאב רווח",
+        "רוברט דה נירו",
+        "ממנטו",
+        "לאונרדו דיקפריו",
+        "מהיר ועצבני",
+        "מלחמת הכוכבים"
       ]
     },
     {
       "category": "טלוויזיה",
       "words": [
-        {
-          "word": "המפקדת",
-          "appeared": false
-        },
-        {
-          "word": "רחוב סומסום",
-          "appeared": false
-        },
-        {
-          "word": "בטיפול",
-          "appeared": false
-        },
-        {
-          "word": "דודו טופז",
-          "appeared": false
-        },
-        {
-          "word": "קשת",
-          "appeared": false
-        },
-        {
-          "word": "קרובים קרובים",
-          "appeared": false
-        },
-        {
-          "word": "בובספוג",
-          "appeared": false
-        },
-        {
-          "word": "נשואים פלוס",
-          "appeared": false
-        },
-        {
-          "word": "סיינפלד",
-          "appeared": false
-        },
-        {
-          "word": "קרתגו",
-          "appeared": false
-        },
-        {
-          "word": "חברים",
-          "appeared": false
-        },
-        {
-          "word": "דני קושמרו",
-          "appeared": false
-        }
+        "המפקדת",
+        "רחוב סומסום",
+        "בטיפול",
+        "דודו טופז",
+        "קשת",
+        "קרובים קרובים",
+        "בובספוג",
+        "נשואים פלוס",
+        "סיינפלד",
+        "קרתגו",
+        "חברים",
+        "דני קושמרו",
+        "טלי מורנו"
       ]
     },
     {
       "category": "חיות",
       "words": [
-        {
-          "word": "כלב",
-          "appeared": false
-        },
-        {
-          "word": "חתול",
-          "appeared": false
-        },
-        {
-          "word": "פיל",
-          "appeared": false
-        },
-        {
-          "word": "תוכי",
-          "appeared": false
-        },
-        {
-          "word": "פנתר",
-          "appeared": false
-        },
-        {
-          "word": "עורב",
-          "appeared": false
-        },
-        {
-          "word": "יונק",
-          "appeared": false
-        }
+        "כלב",
+        "חתול",
+        "פיל",
+        "תוכי",
+        "פנתר",
+        "עורב",
+        "יונק",
+        "קוף"
       ]
     },
     {
       "category": "אוכל",
       "words": [
-        {
-          "word": "פיצה",
-          "appeared": false
-        }
+        "פיצה",
+        "סלט"
+      ]
+    },
+    {
+      "category": "גאוגרפיה",
+      "words": [
+        "אוזון",
+        "אקוויפר"
       ]
     }
   ]

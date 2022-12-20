@@ -26,7 +26,7 @@ android {
             isDebuggable = false
         }
         debug {
-            isDebuggable = false
+            isDebuggable = true
         }
         named("release") {
             isMinifyEnabled = false
