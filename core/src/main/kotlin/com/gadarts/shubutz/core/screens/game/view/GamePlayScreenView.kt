@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import com.badlogic.gdx.graphics.g2d.ParticleEffect
 import com.badlogic.gdx.math.Interpolation.*
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
@@ -28,6 +29,7 @@ import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions.FIRE
+import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions.STARS
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.game.view.actors.Brick
@@ -357,6 +359,7 @@ class GamePlayScreenView(
     private fun animateGameWin() {
         fireParticleEffectActor.stop()
         var i = 0
+        val particleEffect = assetsManager.getParticleEffect(STARS)
         targetWordLines.reversed().forEach {
             it.cells.forEach { wordCell ->
                 if (wordCell.actor is Table) {
@@ -364,7 +367,7 @@ class GamePlayScreenView(
                     val size = word.cells.size
                     for (letterIndex in 0 until size) {
                         val actor = word.cells[letterIndex].actor
-                        animateLetterForGameWin(actor, i, word)
+                        animateLetterForGameWin(actor, i, word, particleEffect)
                         i++
                     }
                 }
@@ -375,11 +378,21 @@ class GamePlayScreenView(
     private fun animateLetterForGameWin(
         actor: Actor,
         i: Int,
-        word: Table
+        word: Table,
+        particleEffect: ParticleEffect
     ) {
+        val particleEffectActor = ParticleEffectActor(ParticleEffect(particleEffect))
+        val localToScreenCoordinates = actor.localToStageCoordinates(auxVector.setZero())
+        particleEffectActor.setPosition(
+            localToScreenCoordinates.x + actor.width / 2F,
+            localToScreenCoordinates.y + actor.height / 2F
+        )
+        stage.addActor(particleEffectActor)
+
         actor.addAction(
             Actions.sequence(
                 Actions.delay(i / 10F),
+                Actions.run { particleEffectActor.start() },
                 Actions.moveBy(
                     0F,
                     GAME_SUCCESS_ANIMATION_DISTANCE,
