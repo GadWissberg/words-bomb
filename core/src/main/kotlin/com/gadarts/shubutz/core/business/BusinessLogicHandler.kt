@@ -8,12 +8,19 @@ import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
 import java.util.HashMap
 
+/**
+ * Responsible to take care of the actual game's rules.
+ */
 class BusinessLogicHandler(private val words: HashMap<String, ArrayList<String>>) :
     Notifier<BusinessLogicHandlerEventsSubscriber> {
 
     private var unusedWords: HashMap<String, ArrayList<String>> = HashMap(words)
     override val subscribers = HashSet<BusinessLogicHandlerEventsSubscriber>()
 
+    /**
+     * Initializes the bomb's counter, decide the letter to be hidden and initialize the options
+     * letters array.
+     */
     fun beginGame(gameModel: GameModel) {
         if (unusedWords.isEmpty()) {
             unusedWords = words
@@ -25,31 +32,9 @@ class BusinessLogicHandler(private val words: HashMap<String, ArrayList<String>>
         gameModel.options.reversed()
     }
 
-    private fun chooseWord(gameModel: GameModel) {
-        val categoryName = unusedWords.keys.random()
-        val category = words[categoryName]
-        gameModel.currentTarget =
-            if (FORCE_TEST_WORD) TEST_WORD.reversed() else category!!.random().reversed()
-        category!!.remove(gameModel.currentTarget)
-        if (category.isEmpty()) {
-            words.remove(categoryName)
-        }
-    }
-
-    private fun decideHiddenLetters(gameModel: GameModel) {
-        val listOfIndices = mutableListOf<Int>()
-        for (i in 0 until gameModel.currentTarget.length) {
-            if (gameModel.currentTarget[i] != ' ') {
-                listOfIndices.add(i)
-            }
-        }
-        gameModel.hiddenLettersIndices = listOfIndices.shuffled().toMutableList()
-        val toDrop =
-            gameModel.currentTarget.length - ((gameModel.currentTarget.length / 2F).toInt() + 1)
-        gameModel.hiddenLettersIndices =
-            gameModel.hiddenLettersIndices.drop(toDrop).toMutableList()
-    }
-
+    /**
+     * Called when a brick is clicked.
+     */
     fun onBrickClicked(selectedLetter: Char, gameModel: GameModel) {
         val indices = gameModel.hiddenLettersIndices.filter {
             val currentLetter = gameModel.currentTarget[it]
@@ -65,8 +50,31 @@ class BusinessLogicHandler(private val words: HashMap<String, ArrayList<String>>
         }
     }
 
+    private fun chooseWord(gameModel: GameModel) {
+        val categoryName = unusedWords.keys.random()
+        val category = words[categoryName]
+        gameModel.currentTarget =
+            if (FORCE_TEST_WORD) TEST_WORD.reversed() else category!!.random().reversed()
+        category!!.remove(gameModel.currentTarget)
+        if (category.isEmpty()) {
+            words.remove(categoryName)
+        }
+    }
+
+    private fun decideHiddenLetters(model: GameModel) {
+        val listOfIndices = mutableListOf<Int>()
+        for (i in 0 until model.currentTarget.length) {
+            if (model.currentTarget[i] != ' ') {
+                listOfIndices.add(i)
+            }
+        }
+        model.hiddenLettersIndices = listOfIndices.shuffled().toMutableList()
+            .drop(model.currentTarget.length - ((model.currentTarget.length / 2F).toInt() + 1))
+            .toMutableList()
+    }
+
     companion object {
-        val suffixLetters = mapOf(
+        private val suffixLetters = mapOf(
             'פ' to 'ף',
             'כ' to 'ך',
             'נ' to 'ן',
@@ -74,5 +82,4 @@ class BusinessLogicHandler(private val words: HashMap<String, ArrayList<String>>
             'מ' to 'ם'
         )
     }
-
 }

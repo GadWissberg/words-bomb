@@ -8,7 +8,7 @@ enum class ShaderDefinitions : AssetDefinition<String> {
     FRAGMENT,
     BLUR_FRAGMENT;
 
-    private var path: String = "shaders/${name.toLowerCase(Locale.ROOT)}.shader"
+    private var path: String = "shaders/${name.lowercase(Locale.ROOT)}.shader"
 
     override fun getPath(): String {
         return path

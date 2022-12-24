@@ -30,7 +30,7 @@ enum class TexturesDefinitions(ninepatch: Boolean) : AssetDefinition<Texture> {
     BOMB(false);
 
     private var path: String =
-        "textures/${(if (ninepatch) "$name.9" else name).toLowerCase(ROOT)}.png"
+        "textures/${(if (ninepatch) "$name.9" else name).lowercase(ROOT)}.png"
 
     override fun getPath(): String {
         return path

@@ -31,7 +31,7 @@ enum class FontsDefinitions : AssetDefinition<BitmapFont> {
         }
     };
 
-    private var path: String = "${name.toLowerCase(Locale.ROOT)}.ttf"
+    private var path: String = "${name.lowercase(Locale.ROOT)}.ttf"
 
     override fun getPath(): String {
         return path
