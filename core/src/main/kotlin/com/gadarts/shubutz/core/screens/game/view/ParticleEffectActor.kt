@@ -5,9 +5,14 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 
-class ParticleEffectActor(private val particleEffect: ParticleEffect) : Actor() {
+class ParticleEffectActor(particleEffect: ParticleEffect) : Actor() {
 
+    private var particleEffect: ParticleEffect
     var started = false
+
+    init {
+        this.particleEffect = ParticleEffect(particleEffect)
+    }
 
     override fun act(delta: Float) {
         super.act(delta)
@@ -34,6 +39,11 @@ class ParticleEffectActor(private val particleEffect: ParticleEffect) : Actor() 
     fun start() {
         started = true
         particleEffect.start()
+        particleEffect.setPosition(x, y)
+    }
+
+    override fun positionChanged() {
+        super.positionChanged()
         particleEffect.setPosition(x, y)
     }
 

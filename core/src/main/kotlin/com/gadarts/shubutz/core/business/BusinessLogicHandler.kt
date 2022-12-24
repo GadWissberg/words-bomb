@@ -1,5 +1,6 @@
 package com.gadarts.shubutz.core.business
 
+import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.DebugSettings.FORCE_TEST_WORD
 import com.gadarts.shubutz.core.DebugSettings.TEST_WORD
 import com.gadarts.shubutz.core.Notifier
@@ -17,6 +18,7 @@ class BusinessLogicHandler(private val words: HashMap<String, ArrayList<String>>
         if (unusedWords.isEmpty()) {
             unusedWords = words
         }
+        gameModel.triesLeft = DebugSettings.NUMBER_OF_TRIES
         chooseWord(gameModel)
         decideHiddenLetters(gameModel)
         gameModel.options = allowedLetters.toMutableList()

@@ -149,7 +149,17 @@ class GamePlayScreenView(
             assetsManager.getFont(FontsDefinitions.VARELA_320),
             gameModel.triesLeft
         )
+        bomb.addAction(
+            Actions.forever(
+                Actions.sequence(
+                    Actions.moveBy(0F, BOMB_IDLE_ANIMATION_DISTANCE / 2F, 2.5F, exp10Out),
+                    Actions.moveBy(0F, -BOMB_IDLE_ANIMATION_DISTANCE, 5F, exp10),
+                    Actions.moveBy(0F, BOMB_IDLE_ANIMATION_DISTANCE / 2F, 2.5F, exp10In)
+                )
+            )
+        )
         bomb.setOrigin(bombTexture.width / 2F, bombTexture.height / 2F)
+        bomb.toBack()
     }
 
     private fun addLettersOptionsTable() {
@@ -381,7 +391,7 @@ class GamePlayScreenView(
         word: Table,
         particleEffect: ParticleEffect
     ) {
-        val particleEffectActor = ParticleEffectActor(ParticleEffect(particleEffect))
+        val particleEffectActor = ParticleEffectActor(particleEffect)
         val localToScreenCoordinates = actor.localToStageCoordinates(auxVector.setZero())
         particleEffectActor.setPosition(
             localToScreenCoordinates.x + actor.width / 2F,
@@ -395,18 +405,18 @@ class GamePlayScreenView(
                 Actions.run { particleEffectActor.start() },
                 Actions.moveBy(
                     0F,
-                    GAME_SUCCESS_ANIMATION_DISTANCE,
-                    GAME_SUCCESS_ANIMATION_DURATION
+                    GAME_WIN_ANIMATION_DISTANCE,
+                    GAME_WIN_ANIMATION_LETTER_MOVE_DURATION
                 ),
                 Actions.moveBy(
                     0F,
-                    -2 * GAME_SUCCESS_ANIMATION_DISTANCE,
-                    GAME_SUCCESS_ANIMATION_DURATION
+                    -2 * GAME_WIN_ANIMATION_DISTANCE,
+                    GAME_WIN_ANIMATION_LETTER_MOVE_DURATION
                 ),
                 Actions.moveBy(
                     0F,
-                    GAME_SUCCESS_ANIMATION_DISTANCE,
-                    GAME_SUCCESS_ANIMATION_DURATION
+                    GAME_WIN_ANIMATION_DISTANCE,
+                    GAME_WIN_ANIMATION_LETTER_MOVE_DURATION
                 ),
             )
         )
@@ -488,7 +498,9 @@ class GamePlayScreenView(
             Actions.parallel(
                 Actions.sequence(
                     Actions.sizeTo(0F, 0F, BOMB_GAME_OVER_ANIMATION_DURATION, linear),
-                    Actions.delay(10F, Actions.run { gamePlayScreen.onGameOverAnimationDone() })
+                    Actions.delay(
+                        GAME_OVER_ANIMATION_POST_DELAY,
+                        Actions.run { gamePlayScreen.onGameOverAnimationDone() })
                 ),
                 Actions.moveBy(
                     bomb.width / 2F,
@@ -501,6 +513,7 @@ class GamePlayScreenView(
 
         stage.addActor(explosionParticleEffectActor)
         explosionParticleEffectActor.start()
+        bomb.hideLabel()
         clearAllOptions()
     }
 
@@ -537,8 +550,8 @@ class GamePlayScreenView(
         private const val TARGET_LETTER_PADDING = 10F
         private const val BRICK_SUCCESS_ANIMATION_DURATION = 1F
         private const val BRICK_FAIL_ANIMATION_DURATION = 1F
-        private const val GAME_SUCCESS_ANIMATION_DISTANCE = 50F
-        private const val GAME_SUCCESS_ANIMATION_DURATION = 0.5F
+        private const val GAME_WIN_ANIMATION_DISTANCE = 50F
+        private const val GAME_WIN_ANIMATION_LETTER_MOVE_DURATION = 0.25F
         private const val BOMB_PADDING = 20F
         private const val WIN_DELAY = 3F
         private const val OPTIONS_BRICK_FALL_MAX_DELAY = 1000F
@@ -546,6 +559,8 @@ class GamePlayScreenView(
         private const val TOP_BAR_HEIGHT = 150
         private const val TOP_BAR_COLOR = "#85adb0"
         private const val BOMB_GAME_OVER_ANIMATION_DURATION = 0.5F
+        private const val GAME_OVER_ANIMATION_POST_DELAY = 5F
+        private const val BOMB_IDLE_ANIMATION_DISTANCE = 40F
         private val auxVector = Vector2()
     }
 }

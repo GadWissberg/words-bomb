@@ -29,17 +29,20 @@ class Bomb(
     }
 
     fun startFire() {
-        particleEffectActor.setPosition(x + FIRE_RELATIVE_X, y + FIRE_RELATIVE_Y)
         particleEffectActor.start()
+    }
+
+    override fun positionChanged() {
+        super.positionChanged()
+        particleEffectActor.setPosition(x + FIRE_RELATIVE_X, y + FIRE_RELATIVE_Y)
     }
 
     fun updateLabel(triesLeft: Int) {
         label.setText(triesLeft.toString())
     }
 
-    override fun addAction(action: Action?) {
+    fun hideLabel() {
         label.isVisible = false
-        super.addAction(action)
     }
 
     companion object {

@@ -2,8 +2,8 @@ Smoke
 - Delay -
 active: false
 - Duration - 
-lowMin: 3000.0
-lowMax: 3000.0
+lowMin: 1500.0
+lowMax: 1500.0
 - Count - 
 min: 50
 max: 200
@@ -20,8 +20,8 @@ timeline0: 0.0
 - Life - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 4000.0
-highMax: 8000.0
+highMin: 2000.0
+highMax: 4000.0
 relative: false
 scalingCount: 3
 scaling0: 1.0
@@ -94,8 +94,8 @@ timeline2: 1.0
 active: true
 lowMin: 0.0
 lowMax: 0.0
-highMin: 20.0
-highMax: 150.0
+highMin: 40.0
+highMax: 300.0
 relative: false
 scalingCount: 1
 scaling0: 1.0
@@ -157,8 +157,8 @@ Smoke Light
 - Delay -
 active: false
 - Duration - 
-lowMin: 3000.0
-lowMax: 3000.0
+lowMin: 1500.0
+lowMax: 1500.0
 - Count - 
 min: 25
 max: 100
@@ -175,8 +175,8 @@ timeline0: 0.0
 - Life - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 4000.0
-highMax: 8000.0
+highMin: 2000.0
+highMax: 4000.0
 relative: false
 scalingCount: 3
 scaling0: 1.0
@@ -249,8 +249,8 @@ timeline2: 1.0
 active: true
 lowMin: 0.0
 lowMax: 0.0
-highMin: 20.0
-highMax: 150.0
+highMin: 40.0
+highMax: 300.0
 relative: false
 scalingCount: 1
 scaling0: 1.0
@@ -312,8 +312,8 @@ Red
 - Delay -
 active: false
 - Duration - 
-lowMin: 1500.0
-lowMax: 1500.0
+lowMin: 750.0
+lowMax: 750.0
 - Count - 
 min: 50
 max: 200
@@ -330,8 +330,8 @@ timeline0: 0.0
 - Life - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 1000.0
-highMax: 2000.0
+highMin: 500.0
+highMax: 1000.0
 relative: false
 scalingCount: 3
 scaling0: 1.0
@@ -398,10 +398,10 @@ timeline0: 0.0
 timeline1: 1.0
 - Velocity - 
 active: true
-lowMin: 10.0
-lowMax: 75.0
-highMin: 600.0
-highMax: 1200.0
+lowMin: 20.0
+lowMax: 150.0
+highMin: 1200.0
+highMax: 2400.0
 relative: false
 scalingCount: 2
 scaling0: 1.0
@@ -465,8 +465,8 @@ Yellow
 - Delay -
 active: false
 - Duration - 
-lowMin: 750.0
-lowMax: 750.0
+lowMin: 375.0
+lowMax: 375.0
 - Count - 
 min: 25
 max: 100
@@ -483,8 +483,8 @@ timeline0: 0.0
 - Life - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 1000.0
-highMax: 2000.0
+highMin: 500.0
+highMax: 1000.0
 relative: false
 scalingCount: 3
 scaling0: 1.0
@@ -551,10 +551,10 @@ timeline0: 0.0
 timeline1: 1.0
 - Velocity - 
 active: true
-lowMin: 10.0
-lowMax: 75.0
-highMin: 600.0
-highMax: 1200.0
+lowMin: 20.0
+lowMax: 150.0
+highMin: 1200.0
+highMax: 2400.0
 relative: false
 scalingCount: 2
 scaling0: 1.0
