@@ -34,4 +34,20 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     override fun versionName(): String {
         return versionName
     }
+
+    override fun getSharedPreferencesValue(key: String): Int {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_DATA_NAME, MODE_PRIVATE)
+        return sharedPreferences.getInt(key, 0)
+    }
+
+    override fun saveSharedPreferencesValue(key: String, value: Int) {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_DATA_NAME, MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putInt(key, value)
+        editor.commit()
+    }
+
+    companion object {
+        private const val SHARED_PREFERENCES_DATA_NAME = "data"
+    }
 }

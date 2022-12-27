@@ -1,5 +1,6 @@
 package com.gadarts.shubutz.core.business
 
+import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.DebugSettings.FORCE_TEST_WORD
 import com.gadarts.shubutz.core.DebugSettings.TEST_WORD
@@ -11,7 +12,10 @@ import java.util.HashMap
 /**
  * Responsible to take care of the actual game's rules.
  */
-class BusinessLogicHandler(private val words: HashMap<String, ArrayList<String>>) :
+class BusinessLogicHandler(
+    private val words: HashMap<String, ArrayList<String>>,
+    private val androidInterface: AndroidInterface
+) :
     Notifier<BusinessLogicHandlerEventsSubscriber> {
 
     private var unusedWords: HashMap<String, ArrayList<String>> = HashMap(words)
@@ -43,6 +47,13 @@ class BusinessLogicHandler(private val words: HashMap<String, ArrayList<String>>
         if (indices.isNotEmpty()) {
             gameModel.hiddenLettersIndices.removeAll(indices)
             val gameWin = gameModel.hiddenLettersIndices.isEmpty()
+            if (gameWin) {
+                gameModel.coins++
+                androidInterface.saveSharedPreferencesValue(
+                    SHARED_PREFERENCES_DATA_KEY_COINS,
+                    gameModel.coins
+                )
+            }
             subscribers.forEach { it.onGuessSuccess(indices, gameWin) }
         } else {
             gameModel.triesLeft--
@@ -74,6 +85,8 @@ class BusinessLogicHandler(private val words: HashMap<String, ArrayList<String>>
     }
 
     companion object {
+        const val SHARED_PREFERENCES_DATA_KEY_COINS = "coins"
+
         private val suffixLetters = mapOf(
             'פ' to 'ף',
             'כ' to 'ך',

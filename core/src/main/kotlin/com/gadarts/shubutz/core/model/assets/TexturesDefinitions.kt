@@ -27,7 +27,8 @@ enum class TexturesDefinitions(ninepatch: Boolean) : AssetDefinition<Texture> {
     LOGO_BET(false),
     LOGO_VAV2(false),
     LOGO_LAST(false),
-    BOMB(false);
+    BOMB(false),
+    COINS_ICON(false);
 
     private var path: String =
         "textures/${(if (ninepatch) "$name.9" else name).lowercase(ROOT)}.png"

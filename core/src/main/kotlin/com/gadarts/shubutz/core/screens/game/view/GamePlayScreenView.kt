@@ -7,13 +7,12 @@ import com.badlogic.gdx.graphics.Pixmap.Format
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
-import com.badlogic.gdx.math.Interpolation.circle
+import com.badlogic.gdx.math.Interpolation.*
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.ui.Cell
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
-import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Disposable
@@ -22,6 +21,7 @@ import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.game.view.actors.Brick
@@ -31,10 +31,11 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 class GamePlayScreenView(
     private val assetsManager: GameAssetManager,
     private val gameModel: GameModel,
-    private val gamePlayScreen: GamePlayScreen
+    private val gamePlayScreen: GamePlayScreen,
 ) :
     Disposable {
 
+    private lateinit var coinsLabel: Label
     private lateinit var topBarTexture: Texture
     private val gamePlayScreenViewHandlers = GamePlayScreenViewHandlers(assetsManager)
     private lateinit var uiTable: Table
@@ -65,7 +66,17 @@ class GamePlayScreenView(
         table.debug = DebugSettings.SHOW_UI_BORDERS
         stage.addActor(table)
         table.setPosition(0F, stage.height - table.height)
+        addTopBarComponents(table)
+    }
+
+    private fun addTopBarComponents(table: Table) {
         addBackButton(table)
+        val coinsTexture = assetsManager.getTexture(TexturesDefinitions.COINS_ICON)
+        coinsLabel = Label(gameModel.coins.toString(), LabelStyle(font80, Color.WHITE))
+        table.add(coinsLabel)
+            .pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
+        table.add(Image(coinsTexture))
+            .size(topBarTexture.height.toFloat(), topBarTexture.height.toFloat()).pad(40F)
     }
 
     private fun addBackButton(table: Table) {
@@ -190,6 +201,21 @@ class GamePlayScreenView(
 
         if (gameWin) {
             sequence.addAction(Actions.run { animateGameWin(stage) })
+            coinsLabel.setText(gameModel.coins.toString())
+            val particleEffectActor = ParticleEffectActor(
+                assetsManager.getParticleEffect(
+                    ParticleEffectsDefinitions.STARS
+                )
+            )
+            stage.addActor(
+                particleEffectActor
+            )
+            particleEffectActor.start()
+            val localToScreenCoordinates = coinsLabel.localToStageCoordinates(auxVector.setZero())
+            particleEffectActor.setPosition(
+                localToScreenCoordinates.x + coinsLabel.width / 2F,
+                localToScreenCoordinates.y + coinsLabel.height / 2F
+            )
         }
         brick.addAction(sequence)
     }
@@ -233,6 +259,7 @@ class GamePlayScreenView(
         private const val TOP_BAR_HEIGHT = 150
         private const val TOP_BAR_COLOR = "#85adb0"
         private const val NOTIFY_SCREEN_EMPTY_DELAY = 2F
+        private const val COINS_LABEL_PADDING_RIGHT = 40F
         private val auxVector = Vector2()
     }
 }
