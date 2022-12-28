@@ -1,6 +1,5 @@
 package com.gadarts.shubutz.core.screens.game.view.actors
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -42,14 +41,12 @@ open class Brick(
     private fun drawChar(
         batch: Batch?, position: Vector2, bitmapFont: BitmapFont, text: String
     ) {
-        if (batch != null) {
-            bitmapFont.color = LETTER_COLOR_REGULAR
+        if (batch != null && color.a == 1F) {
             bitmapFont.draw(batch, text, position.x, position.y)
         }
     }
 
     companion object {
-        private val LETTER_COLOR_REGULAR = Color.WHITE
         private val auxVector = Vector2()
     }
 }

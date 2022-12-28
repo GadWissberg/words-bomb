@@ -47,7 +47,6 @@ class GamePlayScreenView(
         val letterGlyphLayout = GlyphLayout(font80, "א")
         letterSize = Vector2(letterGlyphLayout.width, letterGlyphLayout.height)
         createInterface()
-        gamePlayScreenViewHandlers.onShow(letterSize, font80, assetsManager, stage)
         onGameBegin()
     }
 
@@ -55,8 +54,15 @@ class GamePlayScreenView(
         createStage()
         addUiTable()
         addTopBar()
+        gamePlayScreenViewHandlers.onShow(
+            letterSize,
+            font80,
+            assetsManager,
+            stage,
+            uiTable,
+            gameModel
+        )
     }
-
 
     private fun addTopBar() {
         createTopBarTexture()
@@ -104,16 +110,15 @@ class GamePlayScreenView(
 
     fun onGameBegin() {
         gamePlayScreenViewHandlers.onGameBegin(
-            stage,
             uiTable,
             gameModel,
             letterSize,
             font80,
-            gamePlayScreen
+            gamePlayScreen,
+            stage
         )
 
     }
-
 
     private fun addUiTable() {
         uiTable = addTable()
@@ -230,13 +235,10 @@ class GamePlayScreenView(
     }
 
     private fun clearScreen() {
-        gamePlayScreenViewHandlers.onScreenClear()
-        uiTable.clear()
-        uiTable.addAction(
-            Actions.delay(
-                NOTIFY_SCREEN_EMPTY_DELAY,
-                Actions.run { gamePlayScreen.onScreenEmpty() })
-        )
+        gamePlayScreenViewHandlers.onScreenClear {
+            uiTable.clear()
+            uiTable.addAction(Actions.run { gamePlayScreen.onScreenEmpty() })
+        }
     }
 
 
@@ -251,6 +253,7 @@ class GamePlayScreenView(
 
     private fun animateGameOver() {
         gamePlayScreenViewHandlers.onGameOverAnimation(stage, gamePlayScreen)
+        stage.addAction(Actions.delay(5F, Actions.run { gamePlayScreen.onGameOverAnimationDone() }))
     }
 
 
@@ -258,7 +261,6 @@ class GamePlayScreenView(
         private const val BRICK_SUCCESS_ANIMATION_DURATION = 1F
         private const val TOP_BAR_HEIGHT = 150
         private const val TOP_BAR_COLOR = "#85adb0"
-        private const val NOTIFY_SCREEN_EMPTY_DELAY = 2F
         private const val COINS_LABEL_PADDING_RIGHT = 40F
         private val auxVector = Vector2()
     }

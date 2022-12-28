@@ -1,7 +1,6 @@
 package com.gadarts.shubutz.core.screens.game.view
 
-import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.Interpolation.linear
+import com.badlogic.gdx.math.Interpolation.*
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -17,6 +16,7 @@ class BombHandler {
     private lateinit var bomb: Bomb
     private lateinit var fireParticleEffectActor: ParticleEffectActor
     private lateinit var explosionParticleEffectActor: ParticleEffectActor
+
     fun addBomb(
         assetsManager: GameAssetManager,
         stage: GameStage,
@@ -48,15 +48,15 @@ class BombHandler {
                 Actions.sequence(
                     Actions.moveBy(
                         0F, BOMB_IDLE_ANIMATION_DISTANCE / 2F, 2.5F,
-                        Interpolation.exp10Out
+                        exp10Out
                     ),
                     Actions.moveBy(
                         0F, -BOMB_IDLE_ANIMATION_DISTANCE, 5F,
-                        Interpolation.exp10
+                        exp10
                     ),
                     Actions.moveBy(
                         0F, BOMB_IDLE_ANIMATION_DISTANCE / 2F, 2.5F,
-                        Interpolation.exp10In
+                        exp10In
                     )
                 )
             )
@@ -67,16 +67,6 @@ class BombHandler {
 
     fun onGameWinAnimation() {
         fireParticleEffectActor.stop()
-    }
-
-    fun onScreenClear() {
-        bomb.addAction(
-            Actions.sequence(
-                Actions.sizeTo(0F, 0F, 1F, Interpolation.exp10),
-                Actions.removeActor()
-            )
-        )
-
     }
 
     fun updateLabel(gameModel: GameModel) {
@@ -107,9 +97,7 @@ class BombHandler {
             Actions.parallel(
                 Actions.sequence(
                     Actions.sizeTo(0F, 0F, BOMB_GAME_OVER_ANIMATION_DURATION, linear),
-                    Actions.delay(
-                        GAME_OVER_ANIMATION_POST_DELAY,
-                        Actions.run { gamePlayScreen.onGameOverAnimationDone() })
+                    Actions.removeActor()
                 ),
                 Actions.moveBy(
                     bomb.width / 2F,
@@ -123,6 +111,16 @@ class BombHandler {
         stage.addActor(explosionParticleEffectActor)
         explosionParticleEffectActor.start()
         bomb.hideLabel()
+    }
+
+    fun onScreenClear(postAction: Runnable) {
+        bomb.addAction(
+            Actions.sequence(
+                Actions.fadeOut(1F, swingIn),
+                Actions.run { postAction.run() },
+                Actions.run { bomb.remove() }
+            )
+        )
     }
 
     companion object {

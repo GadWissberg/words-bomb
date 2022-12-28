@@ -14,11 +14,14 @@ class GamePlayScreenViewHandlers(private val assetsManager: GameAssetManager) {
     lateinit var targetWordsHandler: TargetWordsHandler
     val bombHandler = BombHandler()
     lateinit var optionsHandler: OptionsHandler
+
     fun onShow(
         letterSize: Vector2,
         font80: BitmapFont,
         assetsManager: GameAssetManager,
-        stage: GameStage
+        stage: GameStage,
+        uiTable: Table,
+        gameModel: GameModel,
     ) {
         targetWordsHandler = TargetWordsHandler(letterSize, font80)
         targetWordsHandler.calculateMaxBricksPerLine(assetsManager)
@@ -26,12 +29,12 @@ class GamePlayScreenViewHandlers(private val assetsManager: GameAssetManager) {
     }
 
     fun onGameBegin(
-        stage: GameStage,
         uiTable: Table,
         gameModel: GameModel,
         letterSize: Vector2,
         font80: BitmapFont,
-        gamePlayScreen: GamePlayScreen
+        gamePlayScreen: GamePlayScreen,
+        stage: GameStage
     ) {
         bombHandler.addBomb(assetsManager, stage, uiTable, gameModel)
         targetWordsHandler.onGameBegin(gameModel, assetsManager, uiTable)
@@ -50,10 +53,11 @@ class GamePlayScreenViewHandlers(private val assetsManager: GameAssetManager) {
         targetWordsHandler.onGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
     }
 
-    fun onScreenClear() {
-        bombHandler.onScreenClear()
-        optionsHandler.onScreenClear()
-        targetWordsHandler.onScreenClear()
+    fun onScreenClear(postAction: Runnable) {
+        bombHandler.onScreenClear {
+            optionsHandler.onScreenClear(postAction)
+            targetWordsHandler.onScreenClear()
+        }
     }
 
     fun onLetterFail() {

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.ParticleEffect
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.Actor
@@ -33,6 +34,14 @@ class TargetWordsHandler(private val letterSize: Vector2, private val font80: Bi
         val brickCell = BrickCell(texture)
         wordTable.add(brickCell).pad(TARGET_LETTER_PADDING)
         brickCell.touchable = Touchable.enabled
+        brickCell.addAction(
+            Actions.sequence(
+                Actions.fadeOut(0F), Actions.fadeIn(
+                    0.5F,
+                    Interpolation.smooth2
+                )
+            )
+        )
     }
 
     private fun addGivenLetter(
@@ -50,6 +59,18 @@ class TargetWordsHandler(private val letterSize: Vector2, private val font80: Bi
         )
         brick.isVisible = isLetter
         wordTable.add(brick).pad(TARGET_LETTER_PADDING)
+        fadeIn(brick)
+    }
+
+    private fun fadeIn(brick: Brick) {
+        brick.addAction(
+            Actions.sequence(
+                Actions.fadeOut(0F), Actions.fadeIn(
+                    0.5F,
+                    Interpolation.smooth2
+                )
+            )
+        )
     }
 
     private fun addLetterToTarget(
@@ -216,7 +237,6 @@ class TargetWordsHandler(private val letterSize: Vector2, private val font80: Bi
         wordsTables.clear()
         targetTable.clear()
         targetTable.remove()
-
     }
 
     fun onGameBegin(gameModel: GameModel, assetsManager: GameAssetManager, uiTable: Table) {

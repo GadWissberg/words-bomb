@@ -19,6 +19,9 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) :
         SpriteBatch(),
         assetsManager
     ) {
+
+    override val subscribers = HashSet<MenuStageEventsSubscriber>()
+
     init {
         addCloud(assetsManager, TexturesDefinitions.CLOUD_1, 0)
         addCloud(assetsManager, TexturesDefinitions.CLOUD_2, 1)
@@ -74,8 +77,6 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) :
         )
     }
 
-    override val subscribers = HashSet<MenuStageEventsSubscriber>()
-
     override fun draw() {
         GeneralUtils.resetDisplay(BACKGROUND_COLOR)
         super.draw()
@@ -84,10 +85,10 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) :
     companion object {
         val BACKGROUND_COLOR: Color = Color.valueOf("B5EAEA")
         const val NUMBER_OF_CLOUDS = 4
-        const val CLOUDS_SCALE = 0.2F
-        const val CLOUDS_SCALE_DURATION_MIN = 10F
-        const val CLOUDS_SCALE_DURATION_MAX = 20F
-        const val CLOUDS_MOVEMENT_DUR_MIN = 30F
-        const val CLOUDS_MOVEMENT_DUR_MAX = 40F
+        const val CLOUDS_SCALE = 0.1F
+        const val CLOUDS_SCALE_DURATION_MIN = 15F
+        const val CLOUDS_SCALE_DURATION_MAX = 25F
+        const val CLOUDS_MOVEMENT_DUR_MIN = 25F
+        const val CLOUDS_MOVEMENT_DUR_MAX = 35F
     }
 }

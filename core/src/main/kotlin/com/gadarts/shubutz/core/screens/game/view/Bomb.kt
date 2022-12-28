@@ -3,7 +3,9 @@ package com.gadarts.shubutz.core.screens.game.view
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Action
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -38,7 +40,13 @@ class Bomb(
     }
 
     fun updateLabel(triesLeft: Int) {
-        label.setText(triesLeft.toString())
+        label.addAction(
+            Actions.sequence(
+                Actions.fadeOut(0.5F, Interpolation.swingIn),
+                Actions.run { label.setText(triesLeft.toString()) },
+                Actions.fadeIn(0.5F, Interpolation.smoother)
+            )
+        )
     }
 
     fun hideLabel() {

@@ -3,7 +3,6 @@ package com.gadarts.shubutz.core.screens.game.view
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
@@ -70,6 +69,14 @@ class OptionsHandler(private val stage: GameStage) {
                 if (lettersOptionsTable.children.size % (maxBricksPerLine - 1) == 0) {
                     lettersOptionsTable.row()
                 }
+                brick.addAction(
+                    Actions.sequence(
+                        Actions.fadeOut(0F), Actions.fadeIn(
+                            0.5F,
+                            Interpolation.smooth2
+                        )
+                    )
+                )
             }
     }
 
@@ -79,21 +86,8 @@ class OptionsHandler(private val stage: GameStage) {
         selectedBrick = null
     }
 
-    fun onScreenClear() {
-        clearAllOptions()
-        lettersOptionsTable.cells.forEach {
-            if (it.actor != null) {
-                it.actor.addAction(
-                    Actions.sequence(
-                        Actions.delay(MathUtils.random(OPTIONS_BRICK_FALL_MAX_DELAY)),
-                        Actions.sizeTo(0F, 0F, 1F, Interpolation.circle),
-                        Actions.removeActor()
-                    )
-                )
-            }
-        }
-        lettersOptionsTable.remove()
-
+    fun onScreenClear(postAction: Runnable) {
+        clearAllOptions(postAction)
     }
 
     fun onLetterFail() {
@@ -102,15 +96,18 @@ class OptionsHandler(private val stage: GameStage) {
         selectedBrick = null
     }
 
-    fun clearAllOptions() {
-        lettersOptionsTable.cells.forEach {
-            if (it.actor != null) {
-                animateBrickFail(it.actor as Brick)
+    fun clearAllOptions(postAction: Runnable? = null) {
+        for (i in 0 until lettersOptionsTable.cells.size) {
+            if (lettersOptionsTable.cells[i].actor != null) {
+                animateBrickFail(
+                    lettersOptionsTable.cells[i].actor as Brick,
+                    if (i == lettersOptionsTable.cells.size - 1) postAction else null
+                )
             }
         }
     }
 
-    private fun animateBrickFail(brick: Brick) {
+    private fun animateBrickFail(brick: Brick, runnable: Runnable? = null) {
         brick.remove()
         stage.addActor(brick)
         brick.setPosition(
@@ -125,14 +122,13 @@ class OptionsHandler(private val stage: GameStage) {
                     -brick.height,
                     BRICK_FAIL_ANIMATION_DURATION,
                     Interpolation.exp10
-                ), Actions.removeActor()
+                ), Actions.run { runnable?.run() }, Actions.removeActor()
             ),
         )
     }
 
     companion object {
         private const val BRICK_FAIL_ANIMATION_DURATION = 1F
-        private const val OPTIONS_BRICK_FALL_MAX_DELAY = 1000F
     }
 
 }

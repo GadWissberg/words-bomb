@@ -44,7 +44,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         val sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_DATA_NAME, MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putInt(key, value)
-        editor.commit()
+        editor.apply()
     }
 
     companion object {
