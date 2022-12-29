@@ -13,7 +13,7 @@ object DebugSettings {
     /**
      * The given word to be forced.
      */
-    const val TEST_WORD = "יש"
+    const val TEST_WORD = "חלף עם הרוח"
 
     /**
      * Number of tries 'till game over.

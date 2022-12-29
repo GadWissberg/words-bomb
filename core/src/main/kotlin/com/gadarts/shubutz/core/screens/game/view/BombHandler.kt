@@ -9,7 +9,6 @@ import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
-import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class BombHandler {
@@ -81,8 +80,7 @@ class BombHandler {
 
     fun onGameOverAnimation(
         assetsManager: GameAssetManager,
-        stage: GameStage,
-        gamePlayScreen: GamePlayScreen
+        stage: GameStage
     ) {
         fireParticleEffectActor.stop()
         val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.EXP)
@@ -126,7 +124,6 @@ class BombHandler {
     companion object {
         private const val BOMB_PADDING = 20F
         private const val BOMB_GAME_OVER_ANIMATION_DURATION = 0.5F
-        private const val GAME_OVER_ANIMATION_POST_DELAY = 5F
         private const val BOMB_IDLE_ANIMATION_DISTANCE = 40F
         private val auxVector = Vector2()
     }

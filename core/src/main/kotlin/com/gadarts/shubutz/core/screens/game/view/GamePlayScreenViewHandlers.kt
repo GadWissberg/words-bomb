@@ -2,7 +2,6 @@ package com.gadarts.shubutz.core.screens.game.view
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -20,8 +19,6 @@ class GamePlayScreenViewHandlers(private val assetsManager: GameAssetManager) {
         font80: BitmapFont,
         assetsManager: GameAssetManager,
         stage: GameStage,
-        uiTable: Table,
-        gameModel: GameModel,
     ) {
         targetWordsHandler = TargetWordsHandler(letterSize, font80)
         targetWordsHandler.calculateMaxBricksPerLine(assetsManager)
@@ -48,7 +45,7 @@ class GamePlayScreenViewHandlers(private val assetsManager: GameAssetManager) {
         )
     }
 
-    fun onGameWinAnimation(stage: GameStage, actionOnGameWinAnimationFinish: Action) {
+    fun onGameWinAnimation(stage: GameStage, actionOnGameWinAnimationFinish: Runnable) {
         bombHandler.onGameWinAnimation()
         targetWordsHandler.onGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
     }
@@ -65,8 +62,8 @@ class GamePlayScreenViewHandlers(private val assetsManager: GameAssetManager) {
         optionsHandler.onLetterFail()
     }
 
-    fun onGameOverAnimation(stage: GameStage, gamePlayScreen: GamePlayScreen) {
-        bombHandler.onGameOverAnimation(assetsManager, stage, gamePlayScreen)
+    fun onGameOverAnimation(stage: GameStage) {
+        bombHandler.onGameOverAnimation(assetsManager, stage)
         optionsHandler.clearAllOptions()
     }
 

@@ -59,8 +59,6 @@ class GamePlayScreenView(
             font80,
             assetsManager,
             stage,
-            uiTable,
-            gameModel
         )
     }
 
@@ -155,7 +153,7 @@ class GamePlayScreenView(
     fun onHide() {
     }
 
-    fun onGuessSuccess(indices: List<Int>, gameWin: Boolean) {
+    fun onCorrectGuess(indices: List<Int>, gameWin: Boolean) {
         if (gamePlayScreenViewHandlers.optionsHandler.selectedBrick != null) {
             selectionSuccessful(indices, gameWin)
         }
@@ -231,7 +229,7 @@ class GamePlayScreenView(
     }
 
     private fun animateGameWin(stage: GameStage) {
-        gamePlayScreenViewHandlers.onGameWinAnimation(stage, Actions.run { clearScreen() })
+        gamePlayScreenViewHandlers.onGameWinAnimation(stage) { clearScreen() }
     }
 
     private fun clearScreen() {
@@ -242,7 +240,7 @@ class GamePlayScreenView(
     }
 
 
-    fun onGuessFail(gameOver: Boolean) {
+    fun onIncorrectGuess(gameOver: Boolean) {
         gamePlayScreenViewHandlers.bombHandler.updateLabel(gameModel)
         if (gameOver) {
             animateGameOver()
@@ -252,7 +250,7 @@ class GamePlayScreenView(
     }
 
     private fun animateGameOver() {
-        gamePlayScreenViewHandlers.onGameOverAnimation(stage, gamePlayScreen)
+        gamePlayScreenViewHandlers.onGameOverAnimation(stage)
         stage.addAction(Actions.delay(5F, Actions.run { gamePlayScreen.onGameOverAnimationDone() }))
     }
 

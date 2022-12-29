@@ -54,10 +54,10 @@ class BusinessLogicHandler(
                     gameModel.coins
                 )
             }
-            subscribers.forEach { it.onGuessSuccess(indices, gameWin) }
+            subscribers.forEach { it.onCorrectGuess(indices, gameWin) }
         } else {
             gameModel.triesLeft--
-            subscribers.forEach { it.onGuessFail(gameModel.triesLeft <= 0) }
+            subscribers.forEach { it.onIncorrectGuess(gameModel.triesLeft <= 0) }
         }
     }
 

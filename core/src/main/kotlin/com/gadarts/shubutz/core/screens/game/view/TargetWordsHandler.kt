@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.ParticleEffect
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
@@ -155,7 +154,7 @@ class TargetWordsHandler(private val letterSize: Vector2, private val font80: Bi
         word: Table,
         particleEffect: ParticleEffect,
         stage: GameStage,
-        actionOnAnimationFinish: Action
+        runOnAnimationFinish: Runnable
     ) {
         val particleEffectActor = ParticleEffectActor(particleEffect)
         val localToScreenCoordinates =
@@ -191,7 +190,7 @@ class TargetWordsHandler(private val letterSize: Vector2, private val font80: Bi
             actor.addAction(
                 Actions.sequence(
                     Actions.delay(WIN_DELAY),
-                    actionOnAnimationFinish
+                    Actions.run { runOnAnimationFinish.run() }
                 )
             )
         }
@@ -200,7 +199,7 @@ class TargetWordsHandler(private val letterSize: Vector2, private val font80: Bi
     fun onGameWinAnimation(
         assetsManager: GameAssetManager,
         stage: GameStage,
-        actionOnAnimationFinish: Action
+        runOnAnimationFinish: Runnable
     ) {
         var i = 0
         val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.STARS)
@@ -217,7 +216,7 @@ class TargetWordsHandler(private val letterSize: Vector2, private val font80: Bi
                             word,
                             particleEffect,
                             stage,
-                            actionOnAnimationFinish
+                            runOnAnimationFinish
                         )
                         i++
                     }
@@ -250,7 +249,7 @@ class TargetWordsHandler(private val letterSize: Vector2, private val font80: Bi
         private const val TARGET_WORD_LINE_VERTICAL_PADDING = 15F
         private const val GAME_WIN_ANIMATION_DISTANCE = 50F
         private const val GAME_WIN_ANIMATION_LETTER_MOVE_DURATION = 0.25F
-        private const val WIN_DELAY = 3F
+        private const val WIN_DELAY = 2F
         private const val TARGET_LETTER_PADDING = 10F
         private val auxVector = Vector2()
 

@@ -68,12 +68,12 @@ class GamePlayScreenImpl(
         lifeCycleManager.goToMenu()
     }
 
-    override fun onGuessSuccess(indices: List<Int>, gameWin: Boolean) {
-        gamePlayScreenView.onGuessSuccess(indices, gameWin)
+    override fun onCorrectGuess(indices: List<Int>, gameWin: Boolean) {
+        gamePlayScreenView.onCorrectGuess(indices, gameWin)
     }
 
-    override fun onGuessFail(gameOver: Boolean) {
-        gamePlayScreenView.onGuessFail(gameOver)
+    override fun onIncorrectGuess(gameOver: Boolean) {
+        gamePlayScreenView.onIncorrectGuess(gameOver)
     }
 
     override fun onGameOverAnimationDone() {
