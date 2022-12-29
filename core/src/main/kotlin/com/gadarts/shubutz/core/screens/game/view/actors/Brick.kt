@@ -30,7 +30,7 @@ open class Brick(
         drawChar(
             batch,
             auxVector.set(
-                x + letterSize.x / 2F,
+                x + width / 2F - letterSize.x / 2F,
                 y + height / 2F + letterSize.y / 2F
             ),
             bitmapFont,

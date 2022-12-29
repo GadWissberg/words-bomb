@@ -12,14 +12,14 @@ import java.util.HashMap
 /**
  * Responsible to take care of the actual game's rules.
  */
-class BusinessLogicHandler(
+class GameLogicHandler(
     private val words: HashMap<String, ArrayList<String>>,
     private val androidInterface: AndroidInterface
 ) :
-    Notifier<BusinessLogicHandlerEventsSubscriber> {
+    Notifier<GameLogicHandlerEventsSubscriber> {
 
     private var unusedWords: HashMap<String, ArrayList<String>> = HashMap(words)
-    override val subscribers = HashSet<BusinessLogicHandlerEventsSubscriber>()
+    override val subscribers = HashSet<GameLogicHandlerEventsSubscriber>()
 
     /**
      * Initializes the bomb's counter, decide the letter to be hidden and initialize the options
@@ -63,12 +63,12 @@ class BusinessLogicHandler(
 
     private fun chooseWord(gameModel: GameModel) {
         val categoryName = unusedWords.keys.random()
-        val category = words[categoryName]
+        val category = unusedWords[categoryName]
         gameModel.currentTarget =
             if (FORCE_TEST_WORD) TEST_WORD.reversed() else category!!.random().reversed()
         category!!.remove(gameModel.currentTarget)
         if (category.isEmpty()) {
-            words.remove(categoryName)
+            unusedWords.remove(categoryName)
         }
     }
 

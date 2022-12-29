@@ -1,7 +1,7 @@
 package com.gadarts.shubutz.core
 
 import com.badlogic.gdx.*
-import com.gadarts.shubutz.core.business.BusinessLogicHandler
+import com.gadarts.shubutz.core.business.GameLogicHandler
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.game.GamePlayScreenImpl
 import com.gadarts.shubutz.core.screens.menu.MenuScreen
@@ -47,7 +47,7 @@ class ShubutzGame(private val androidInterface: AndroidInterface) : Game(), Game
         val gameplayScreenImpl = GamePlayScreenImpl(
             assetsManager,
             this,
-            androidInterface.getSharedPreferencesValue(BusinessLogicHandler.SHARED_PREFERENCES_DATA_KEY_COINS),
+            androidInterface.getSharedPreferencesValue(GameLogicHandler.SHARED_PREFERENCES_DATA_KEY_COINS),
             androidInterface
         )
         setScreen(gameplayScreenImpl)

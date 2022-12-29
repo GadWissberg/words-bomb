@@ -5,8 +5,8 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.GameLifeCycleManager
-import com.gadarts.shubutz.core.business.BusinessLogicHandler
-import com.gadarts.shubutz.core.business.BusinessLogicHandlerEventsSubscriber
+import com.gadarts.shubutz.core.business.GameLogicHandler
+import com.gadarts.shubutz.core.business.GameLogicHandlerEventsSubscriber
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenView
@@ -16,17 +16,17 @@ class GamePlayScreenImpl(
     private val lifeCycleManager: GameLifeCycleManager,
     private val coins: Int,
     private val androidInterface: AndroidInterface,
-) : Screen, BusinessLogicHandlerEventsSubscriber, GamePlayScreen {
+) : Screen, GameLogicHandlerEventsSubscriber, GamePlayScreen {
 
 
     private val gameModel = GameModel(coins)
-    private lateinit var businessLogicHandler: BusinessLogicHandler
+    private lateinit var gameLogicHandler: GameLogicHandler
     private lateinit var gamePlayScreenView: GamePlayScreenView
 
     override fun show() {
-        businessLogicHandler = BusinessLogicHandler(assetsManager.words, androidInterface)
-        businessLogicHandler.beginGame(gameModel)
-        businessLogicHandler.subscribeForEvents(this)
+        gameLogicHandler = GameLogicHandler(assetsManager.words, androidInterface)
+        gameLogicHandler.beginGame(gameModel)
+        gameLogicHandler.subscribeForEvents(this)
         gamePlayScreenView = GamePlayScreenView(assetsManager, gameModel, this)
         gamePlayScreenView.onShow()
     }
@@ -56,11 +56,11 @@ class GamePlayScreenImpl(
     }
 
     override fun onBrickClicked(letter: Char) {
-        businessLogicHandler.onBrickClicked(letter, gameModel)
+        gameLogicHandler.onBrickClicked(letter, gameModel)
     }
 
     override fun onScreenEmpty() {
-        businessLogicHandler.beginGame(gameModel)
+        gameLogicHandler.beginGame(gameModel)
         gamePlayScreenView.onGameBegin()
     }
 
