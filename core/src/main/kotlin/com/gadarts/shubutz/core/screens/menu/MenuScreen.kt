@@ -45,7 +45,6 @@ class MenuScreen(
     }
 
     override fun hide() {
-        menuScreenView.onHide()
     }
 
     override fun dispose() {

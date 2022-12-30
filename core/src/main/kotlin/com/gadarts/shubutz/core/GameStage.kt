@@ -21,7 +21,6 @@ import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions.*
-import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 
 /**
  * Common code for the stages.
@@ -89,9 +88,9 @@ abstract class GameStage<T>(
         button.addListener(onClick)
         val add = uiTable.add(button).pad(
             topPadding,
-            MenuScreenView.BUTTON_PADDING,
-            MenuScreenView.BUTTON_PADDING,
-            MenuScreenView.BUTTON_PADDING
+            BUTTON_PADDING,
+            BUTTON_PADDING,
+            BUTTON_PADDING
         ).colspan(span)
         if (size > 0) {
             add.size(size)
@@ -220,6 +219,7 @@ abstract class GameStage<T>(
         private const val DIALOG_FADE_DURATION = 1F
         private const val DIALOG_BUTTON_OK_TEXT = "סבבה"
         private val BUTTON_FONT_COLOR_DISABLED = Color.LIGHT_GRAY
+        private const val BUTTON_PADDING = 20F
     }
 
 }

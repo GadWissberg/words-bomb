@@ -45,7 +45,7 @@ class GameLogicHandler(
             currentLetter == selectedLetter || suffixLetters[selectedLetter] == currentLetter
         }
         if (indices.isNotEmpty()) {
-            gameModel.hiddenLettersIndices.removeAll(indices)
+            gameModel.hiddenLettersIndices.removeAll(indices.toSet())
             val gameWin = gameModel.hiddenLettersIndices.isEmpty()
             if (gameWin) {
                 gameModel.coins++

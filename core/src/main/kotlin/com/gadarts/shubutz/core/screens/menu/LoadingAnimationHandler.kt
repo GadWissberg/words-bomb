@@ -37,16 +37,6 @@ class LoadingAnimationHandler {
         brick4 = addLoadingBrick(stage, texture, style, "ן", -halfWidth - texture.width)
     }
 
-    private fun flyOutBrick(brickAnimation: MenuScreenView.BrickAnimation) {
-        val yDelta = Gdx.graphics.height.toFloat()
-        brickAnimation.addAction(
-            Actions.sequence(
-                Actions.moveBy(0F, yDelta, 2F, Interpolation.exp10),
-                Actions.removeActor()
-            )
-        )
-    }
-
     fun render(subscribers: HashSet<MenuScreenViewEventsSubscriber>) {
         if (oneOfBricksMissing()) return
         if (!loadingReady && brick1!!.ready && brick2!!.ready && brick3!!.ready && brick4!!.ready) {
@@ -65,6 +55,16 @@ class LoadingAnimationHandler {
 
     private fun oneOfBricksMissing() =
         brick1 == null || brick2 == null || brick3 == null || brick4 == null
+
+    private fun flyOutBrick(brickAnimation: MenuScreenView.BrickAnimation) {
+        val yDelta = Gdx.graphics.height.toFloat()
+        brickAnimation.addAction(
+            Actions.sequence(
+                Actions.moveBy(0F, yDelta, 2F, Interpolation.exp10),
+                Actions.removeActor()
+            )
+        )
+    }
 
     private fun addLoadingBrick(
         stage: Stage,
@@ -98,7 +98,7 @@ class LoadingAnimationHandler {
                             MathUtils.random(FALL_MIN_DURATION, FALL_MAX_DURATION),
                             Interpolation.bounce
                         ),
-                        MenuScreenView.LetterArrivedAction(brickTable),
+                        Actions.run { brickTable.ready = true },
                         Actions.forever(
                             Actions.sequence(
                                 Actions.delay(2F),
@@ -132,10 +132,6 @@ class LoadingAnimationHandler {
             .center()
             .size(brickTexture.width.toFloat(), brickTexture.height.toFloat())
         return brickTable
-    }
-
-    fun clear() {
-
     }
 
     companion object {

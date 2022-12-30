@@ -17,9 +17,6 @@ class GeneralUtils {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT or coveSampling)
         }
 
-        fun writeMessage(writer: OutputStreamWriter, request: Int, message: String) {
-            writer.append(request.toChar()).append(message).flush()
-        }
     }
 
 }
