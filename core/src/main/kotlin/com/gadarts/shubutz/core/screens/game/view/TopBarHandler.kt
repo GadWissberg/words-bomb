@@ -17,19 +17,22 @@ import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
+import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class TopBarHandler : Table(), Disposable {
+class TopBarHandler : Disposable {
 
     private lateinit var topBarTable: Table
     private lateinit var topBarTexture: Texture
     lateinit var coinsLabel: Label
+
     fun addTopBar(
         assetsManager: GameAssetManager,
         gameModel: GameModel,
         gamePlayScreen: GamePlayScreen,
-        font80: BitmapFont
+        font80: BitmapFont,
+        stage: GameStage
     ) {
-        createTopBarTexture()
+        createTopBarTexture(stage)
         topBarTable = Table()
         topBarTable.background = TextureRegionDrawable(topBarTexture)
         topBarTable.setSize(stage.width, TOP_BAR_HEIGHT.toFloat())
@@ -72,7 +75,7 @@ class TopBarHandler : Table(), Disposable {
             ).pad(40F)
     }
 
-    private fun createTopBarTexture() {
+    private fun createTopBarTexture(stage: GameStage) {
         val pixmap =
             Pixmap(stage.width.toInt(), TOP_BAR_HEIGHT, Pixmap.Format.RGBA8888)
         val color = Color.valueOf(TOP_BAR_COLOR)

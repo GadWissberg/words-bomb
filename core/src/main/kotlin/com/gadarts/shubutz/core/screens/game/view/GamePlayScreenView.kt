@@ -43,7 +43,7 @@ class GamePlayScreenView(
 
     private fun createInterface() {
         addUiTable()
-        topBarHandler.addTopBar(assetsManager, gameModel, gamePlayScreen, font80)
+        topBarHandler.addTopBar(assetsManager, gameModel, gamePlayScreen, font80, stage)
         gamePlayScreenViewHandlers.onShow(
             letterSize,
             font80,

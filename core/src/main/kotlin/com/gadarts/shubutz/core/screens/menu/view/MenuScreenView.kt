@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
+import com.gadarts.shubutz.core.GameStage.Companion.BUTTON_PADDING
 import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager

@@ -219,7 +219,7 @@ abstract class GameStage<T>(
         private const val DIALOG_FADE_DURATION = 1F
         private const val DIALOG_BUTTON_OK_TEXT = "סבבה"
         private val BUTTON_FONT_COLOR_DISABLED = Color.LIGHT_GRAY
-        private const val BUTTON_PADDING = 20F
+        const val BUTTON_PADDING = 20F
     }
 
 }
