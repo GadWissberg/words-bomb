@@ -10,15 +10,18 @@ import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenViewEventsSubscriber
+import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class MenuScreen(
     assetsManager: GameAssetManager,
     androidInterface: AndroidInterface,
     private val gameLifeCycleManager: GameLifeCycleManager,
+    stage: GameStage,
 ) :
     Screen, MenuScreenViewEventsSubscriber {
 
-    private val menuScreenView = MenuScreenView(assetsManager, androidInterface.versionName())
+    private val menuScreenView =
+        MenuScreenView(assetsManager, androidInterface.versionName(), stage)
 
     override fun show() {
         menuScreenView.subscribeForEvents(this)

@@ -1,13 +1,12 @@
 package com.gadarts.shubutz.core.screens.game.view
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Pixmap.Format
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
-import com.badlogic.gdx.math.Interpolation.*
+import com.badlogic.gdx.math.Interpolation.circle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
@@ -16,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
@@ -32,14 +30,15 @@ class GamePlayScreenView(
     private val assetsManager: GameAssetManager,
     private val gameModel: GameModel,
     private val gamePlayScreen: GamePlayScreen,
+    private val stage: GameStage,
 ) :
     Disposable {
 
+    private lateinit var topBarTable: Table
     private lateinit var coinsLabel: Label
     private lateinit var topBarTexture: Texture
     private val gamePlayScreenViewHandlers = GamePlayScreenViewHandlers(assetsManager)
     private lateinit var uiTable: Table
-    private lateinit var stage: GameStage
     private var font80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
     private lateinit var letterSize: Vector2
 
@@ -51,7 +50,6 @@ class GamePlayScreenView(
     }
 
     private fun createInterface() {
-        createStage()
         addUiTable()
         addTopBar()
         gamePlayScreenViewHandlers.onShow(
@@ -64,13 +62,13 @@ class GamePlayScreenView(
 
     private fun addTopBar() {
         createTopBarTexture()
-        val table = Table()
-        table.background = TextureRegionDrawable(topBarTexture)
-        table.setSize(stage.width, TOP_BAR_HEIGHT.toFloat())
-        table.debug = DebugSettings.SHOW_UI_BORDERS
-        stage.addActor(table)
-        table.setPosition(0F, stage.height - table.height)
-        addTopBarComponents(table)
+        topBarTable = Table()
+        topBarTable.background = TextureRegionDrawable(topBarTexture)
+        topBarTable.setSize(stage.width, TOP_BAR_HEIGHT.toFloat())
+        topBarTable.debug = DebugSettings.SHOW_UI_BORDERS
+        stage.addActor(topBarTable)
+        topBarTable.setPosition(0F, stage.height - topBarTable.height)
+        addTopBarComponents(topBarTable)
     }
 
     private fun addTopBarComponents(table: Table) {
@@ -130,27 +128,18 @@ class GamePlayScreenView(
         return table
     }
 
-
-    private fun createStage() {
-        stage = GameStage(
-            FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()),
-            assetsManager
-        )
-        stage.setDebugInvisible(DebugSettings.SHOW_UI_BORDERS)
-        Gdx.input.inputProcessor = stage
-    }
-
     fun render(delta: Float) {
         stage.act(delta)
         stage.draw()
     }
 
     override fun dispose() {
-        stage.dispose()
         topBarTexture.dispose()
     }
 
     fun onHide() {
+        uiTable.remove()
+        topBarTable.remove()
     }
 
     fun onCorrectGuess(indices: List<Int>, gameWin: Boolean) {

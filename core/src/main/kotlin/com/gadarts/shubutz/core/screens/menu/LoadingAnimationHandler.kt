@@ -42,7 +42,7 @@ class LoadingAnimationHandler {
         brickAnimation.addAction(
             Actions.sequence(
                 Actions.moveBy(0F, yDelta, 2F, Interpolation.exp10),
-                Actions.hide()
+                Actions.removeActor()
             )
         )
     }
@@ -132,6 +132,10 @@ class LoadingAnimationHandler {
             .center()
             .size(brickTexture.width.toFloat(), brickTexture.height.toFloat())
         return brickTable
+    }
+
+    fun clear() {
+
     }
 
     companion object {

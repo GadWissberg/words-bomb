@@ -7,25 +7,29 @@ import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.menu.LoadingAnimationHandler
+import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class MenuScreenView(private val assetsManager: GameAssetManager, versionName: String) : Disposable,
-    Notifier<MenuScreenViewEventsSubscriber> {
+class MenuScreenView(
+    private val assetsManager: GameAssetManager,
+    versionName: String,
+    private val stage: GameStage
+) : Disposable, Notifier<MenuScreenViewEventsSubscriber> {
 
 
     private var loadingAnimationRenderer = LoadingAnimationHandler()
     private val menuScreenViewComponentsHandler = MenuScreenViewComponentsHandler(
         assetsManager,
-        versionName
+        versionName,
+        stage
     )
 
     override val subscribers = HashSet<MenuScreenViewEventsSubscriber>()
 
     fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: ClickListener) {
-        menuScreenViewComponentsHandler.init(assetsManager)
         if (!loadingDone) {
             loadingAnimationRenderer.addLoadingAnimation(
                 assetsManager,
-                menuScreenViewComponentsHandler.stage
+                stage
             )
         } else {
             onLoadingAnimationReady(goToPlayScreenOnClick)
@@ -35,10 +39,6 @@ class MenuScreenView(private val assetsManager: GameAssetManager, versionName: S
     fun render(delta: Float) {
         menuScreenViewComponentsHandler.render(delta)
         loadingAnimationRenderer.render(subscribers)
-    }
-
-    override fun dispose() {
-        menuScreenViewComponentsHandler.dispose()
     }
 
     fun onHide() {
@@ -64,6 +64,10 @@ class MenuScreenView(private val assetsManager: GameAssetManager, versionName: S
     companion object {
         const val LABEL_OPEN_ROOM = "התחל משחק"
         const val BUTTON_PADDING = 20F
+    }
+
+    override fun dispose() {
+        menuScreenViewComponentsHandler.clear()
     }
 
 }

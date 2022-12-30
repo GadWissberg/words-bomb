@@ -1,7 +1,6 @@
 package com.gadarts.shubutz.core.screens.menu.view
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Gdx.graphics
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation.*
@@ -13,8 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.Table.Debug
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -23,22 +20,15 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class MenuScreenViewComponentsHandler(
     private val assetsManager: GameAssetManager,
-    private val versionName: String
-) : Disposable {
+    private val versionName: String,
+    private val stage: GameStage
+) {
 
 
+    private lateinit var versionLabel: Label
     private var uiTable: Table? = null
-    lateinit var stage: GameStage
     private var varela80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
     private var varela35: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_35)
-
-    private fun addStage(assetsManager: GameAssetManager) {
-        stage = GameStage(
-            FitViewport(graphics.width.toFloat(), graphics.height.toFloat()),
-            assetsManager
-        )
-        Gdx.input.inputProcessor = stage
-    }
 
     private fun addUserInterface(beginGameAction: ClickListener) {
         uiTable = Table()
@@ -47,7 +37,7 @@ class MenuScreenViewComponentsHandler(
         addLogo()
         addButtons(uiTable!!, beginGameAction)
         uiTable!!.touchable = Touchable.childrenOnly
-        val versionLabel = Label("v$versionName", Label.LabelStyle(varela35, Color.BLACK))
+        versionLabel = Label("v$versionName", Label.LabelStyle(varela35, Color.BLACK))
         stage.addActor(versionLabel)
     }
 
@@ -113,17 +103,9 @@ class MenuScreenViewComponentsHandler(
         )
     }
 
-    fun init(assetsManager: GameAssetManager) {
-        addStage(assetsManager)
-    }
-
     fun render(delta: Float) {
         stage.act(delta)
         stage.draw()
-    }
-
-    override fun dispose() {
-        stage.dispose()
     }
 
     fun onLoadingAnimationReady(beginGameAction: ClickListener) {
@@ -133,6 +115,11 @@ class MenuScreenViewComponentsHandler(
                 stage.addActor(uiTable)
             }
         }
+    }
+
+    fun clear() {
+        uiTable?.remove()
+        versionLabel.remove()
     }
 
     companion object {

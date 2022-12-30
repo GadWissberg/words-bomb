@@ -10,12 +10,14 @@ import com.gadarts.shubutz.core.business.GameLogicHandlerEventsSubscriber
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenView
+import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class GamePlayScreenImpl(
     private val assetsManager: GameAssetManager,
     private val lifeCycleManager: GameLifeCycleManager,
-    private val coins: Int,
+    coins: Int,
     private val androidInterface: AndroidInterface,
+    private val stage: GameStage,
 ) : Screen, GameLogicHandlerEventsSubscriber, GamePlayScreen {
 
 
@@ -27,7 +29,7 @@ class GamePlayScreenImpl(
         gameLogicHandler = GameLogicHandler(assetsManager.words, androidInterface)
         gameLogicHandler.beginGame(gameModel)
         gameLogicHandler.subscribeForEvents(this)
-        gamePlayScreenView = GamePlayScreenView(assetsManager, gameModel, this)
+        gamePlayScreenView = GamePlayScreenView(assetsManager, gameModel, this, stage)
         gamePlayScreenView.onShow()
     }
 
