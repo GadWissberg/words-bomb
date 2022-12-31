@@ -4,15 +4,17 @@ import com.badlogic.gdx.*
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gadarts.shubutz.core.business.GameLogicHandler
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.MusicDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreenImpl
 import com.gadarts.shubutz.core.screens.menu.MenuScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 
-class ShubutzGame(private val androidInterface: AndroidInterface) : Game(), GameLifeCycleManager {
+class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycleManager {
 
     private lateinit var stage: GameStage
     private lateinit var assetsManager: GameAssetManager
+    private val soundPlayer = SoundPlayer()
     override var loadingDone: Boolean = false
 
     override fun create() {
@@ -51,21 +53,25 @@ class ShubutzGame(private val androidInterface: AndroidInterface) : Game(), Game
     }
 
     override fun goToMenu() {
+        soundPlayer.playMusic(assetsManager.getMusic(MusicDefinitions.MENU))
         screen?.dispose()
-        val menuScreen = MenuScreen(assetsManager, androidInterface, this, stage)
+        val menuScreen = MenuScreen(assetsManager, android, this, stage)
         setScreen(menuScreen)
     }
 
     override fun goToPlayScreen() {
+        soundPlayer.playMusic(assetsManager.getMusic(MusicDefinitions.IN_GAME))
         screen?.dispose()
-        val gameplayScreenImpl = GamePlayScreenImpl(
-            assetsManager,
-            this,
-            androidInterface.getSharedPreferencesValue(GameLogicHandler.SHARED_PREFERENCES_DATA_KEY_COINS),
-            androidInterface,
-            stage
-        )
-        setScreen(gameplayScreenImpl)
+        setScreen(createGamePlayScreen())
     }
+
+    private fun createGamePlayScreen() = GamePlayScreenImpl(
+        assetsManager,
+        this,
+        android.getSharedPreferencesValue(GameLogicHandler.SHARED_PREFERENCES_DATA_KEY_COINS),
+        android,
+        stage,
+        soundPlayer
+    )
 
 }

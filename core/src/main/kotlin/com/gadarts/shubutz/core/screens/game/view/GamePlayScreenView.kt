@@ -10,11 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
+import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
-import com.gadarts.shubutz.core.model.assets.FontsDefinitions
-import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions
-import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
+import com.gadarts.shubutz.core.model.assets.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
@@ -25,6 +23,7 @@ class GamePlayScreenView(
     private val gameModel: GameModel,
     private val gamePlayScreen: GamePlayScreen,
     private val stage: GameStage,
+    private val soundPlayer: SoundPlayer,
 ) :
     Disposable {
 
@@ -180,6 +179,7 @@ class GamePlayScreenView(
 
 
     fun onIncorrectGuess(gameOver: Boolean) {
+        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.INCORRECT))
         gamePlayScreenViewHandlers.bombHandler.updateLabel(gameModel)
         if (gameOver) {
             animateGameOver()

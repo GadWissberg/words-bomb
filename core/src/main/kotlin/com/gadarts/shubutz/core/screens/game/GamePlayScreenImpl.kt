@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.GameLifeCycleManager
+import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.business.GameLogicHandler
 import com.gadarts.shubutz.core.business.GameLogicHandlerEventsSubscriber
 import com.gadarts.shubutz.core.model.GameModel
@@ -18,6 +19,7 @@ class GamePlayScreenImpl(
     coins: Int,
     private val androidInterface: AndroidInterface,
     private val stage: GameStage,
+    private val soundPlayer: SoundPlayer,
 ) : Screen, GameLogicHandlerEventsSubscriber, GamePlayScreen {
 
 
@@ -29,9 +31,17 @@ class GamePlayScreenImpl(
         gameLogicHandler = GameLogicHandler(assetsManager.words, androidInterface)
         gameLogicHandler.beginGame(gameModel)
         gameLogicHandler.subscribeForEvents(this)
-        gamePlayScreenView = GamePlayScreenView(assetsManager, gameModel, this, stage)
+        gamePlayScreenView = createGamePlayScreenView()
         gamePlayScreenView.onShow()
     }
+
+    private fun createGamePlayScreenView() = GamePlayScreenView(
+        assetsManager,
+        gameModel,
+        this,
+        stage,
+        soundPlayer
+    )
 
     override fun render(delta: Float) {
         gamePlayScreenView.render(delta)
