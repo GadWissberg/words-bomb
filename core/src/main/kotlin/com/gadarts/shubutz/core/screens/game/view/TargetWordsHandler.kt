@@ -11,15 +11,22 @@ import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.gadarts.shubutz.core.DebugSettings
+import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions
+import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.game.view.actors.BrickCell
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class TargetWordsHandler(private val letterSize: Vector2, private val font80: BitmapFont) {
+class TargetWordsHandler(
+    private val letterSize: Vector2,
+    private val font80: BitmapFont,
+    private val soundPlayer: SoundPlayer,
+    private val assetsManager: GameAssetManager
+) {
     val wordsTables = ArrayList<Table>()
     private lateinit var targetTable: Table
     var maxBricksPerLine: Int = 0
@@ -174,6 +181,10 @@ class TargetWordsHandler(private val letterSize: Vector2, private val font80: Bi
                     GAME_WIN_ANIMATION_DISTANCE,
                     GAME_WIN_ANIMATION_LETTER_MOVE_DURATION
                 ),
+                Actions.run {
+                    val sound = assetsManager.getSound(SoundsDefinitions.BRICK_JUMP)
+                    soundPlayer.playSound(sound)
+                },
                 Actions.moveBy(
                     0F,
                     -2 * GAME_WIN_ANIMATION_DISTANCE,
@@ -201,6 +212,7 @@ class TargetWordsHandler(private val letterSize: Vector2, private val font80: Bi
         stage: GameStage,
         runOnAnimationFinish: Runnable
     ) {
+        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.WIN))
         var i = 0
         val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.STARS)
         targetWordLines.reversed().forEach {

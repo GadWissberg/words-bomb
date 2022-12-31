@@ -4,14 +4,15 @@ import com.badlogic.gdx.math.Interpolation.*
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
-import com.gadarts.shubutz.core.model.assets.FontsDefinitions
-import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.model.assets.ParticleEffectsDefinitions
-import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
+import com.gadarts.shubutz.core.model.assets.*
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class BombHandler {
+class BombHandler(
+    private val soundPlayer: SoundPlayer,
+    private val assetsManager: GameAssetManager
+) {
     private lateinit var bomb: Bomb
     private lateinit var fireParticleEffectActor: ParticleEffectActor
     private lateinit var explosionParticleEffectActor: ParticleEffectActor
@@ -72,8 +73,9 @@ class BombHandler {
         bomb.updateLabel(gameModel.triesLeft)
     }
 
-    fun onLetterFail() {
+    fun onIncorrectGuess() {
         if (!fireParticleEffectActor.started) {
+            soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.IGNITE))
             bomb.startFire()
         }
     }

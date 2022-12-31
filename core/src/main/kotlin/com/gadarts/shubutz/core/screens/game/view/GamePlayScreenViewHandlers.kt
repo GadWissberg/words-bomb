@@ -3,15 +3,19 @@ package com.gadarts.shubutz.core.screens.game.view
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class GamePlayScreenViewHandlers(private val assetsManager: GameAssetManager) {
+class GamePlayScreenViewHandlers(
+    private val assetsManager: GameAssetManager,
+    private val soundPlayer: SoundPlayer
+) {
 
     lateinit var targetWordsHandler: TargetWordsHandler
-    val bombHandler = BombHandler()
+    val bombHandler = BombHandler(soundPlayer, assetsManager)
     lateinit var optionsHandler: OptionsHandler
 
     fun onShow(
@@ -20,7 +24,7 @@ class GamePlayScreenViewHandlers(private val assetsManager: GameAssetManager) {
         assetsManager: GameAssetManager,
         stage: GameStage,
     ) {
-        targetWordsHandler = TargetWordsHandler(letterSize, font80)
+        targetWordsHandler = TargetWordsHandler(letterSize, font80, soundPlayer, assetsManager)
         targetWordsHandler.calculateMaxBricksPerLine(assetsManager)
         optionsHandler = OptionsHandler(stage)
     }
@@ -58,7 +62,7 @@ class GamePlayScreenViewHandlers(private val assetsManager: GameAssetManager) {
     }
 
     fun onLetterFail() {
-        bombHandler.onLetterFail()
+        bombHandler.onIncorrectGuess()
         optionsHandler.onLetterFail()
     }
 

@@ -10,6 +10,7 @@ class SoundPlayer {
     fun playMusic(music: Music) {
         currentMusic?.stop()
         music.isLooping = true
+        music.volume = MUSIC_VOLUME
         music.play()
         currentMusic = music
     }
@@ -18,4 +19,7 @@ class SoundPlayer {
         sound.play()
     }
 
+    companion object {
+        private const val MUSIC_VOLUME = 0.75F
+    }
 }

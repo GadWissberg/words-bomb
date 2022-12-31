@@ -4,7 +4,11 @@ import com.badlogic.gdx.assets.AssetLoaderParameters
 import com.badlogic.gdx.audio.Sound
 
 enum class SoundsDefinitions : AssetDefinition<Sound> {
-    INCORRECT;
+    INCORRECT,
+    BRICK_JUMP,
+    WIN,
+    IGNITE,
+    CORRECT;
 
     private var path: String =
         "sfx/${name.lowercase()}.wav"

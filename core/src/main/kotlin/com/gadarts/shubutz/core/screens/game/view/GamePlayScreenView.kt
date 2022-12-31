@@ -28,7 +28,7 @@ class GamePlayScreenView(
     Disposable {
 
     private val topBarHandler = TopBarHandler()
-    private val gamePlayScreenViewHandlers = GamePlayScreenViewHandlers(assetsManager)
+    private val gamePlayScreenViewHandlers = GamePlayScreenViewHandlers(assetsManager, soundPlayer)
     private lateinit var uiTable: Table
     private var font80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
     private lateinit var letterSize: Vector2
@@ -91,6 +91,7 @@ class GamePlayScreenView(
     }
 
     fun onCorrectGuess(indices: List<Int>, gameWin: Boolean) {
+        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.CORRECT))
         if (gamePlayScreenViewHandlers.optionsHandler.selectedBrick != null) {
             selectionSuccessful(indices, gameWin)
         }
