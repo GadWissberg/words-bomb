@@ -8,6 +8,7 @@ class SoundPlayer {
     private var currentMusic: Music? = null
 
     fun playMusic(music: Music) {
+        if (!DebugSettings.ENABLE_MUSIC) return
         currentMusic?.stop()
         music.isLooping = true
         music.volume = MUSIC_VOLUME
@@ -16,6 +17,7 @@ class SoundPlayer {
     }
 
     fun playSound(sound: Sound) {
+        if (!DebugSettings.ENABLE_SOUNDS) return
         sound.play()
     }
 

@@ -1,5 +1,6 @@
 package com.gadarts.shubutz.core.screens.game.view
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation
@@ -92,29 +93,27 @@ class OptionsHandler(
         selectedBrick = null
     }
 
-    fun onScreenClear(postAction: Runnable) {
-        clearAllOptions(postAction)
+    fun onScreenClear() {
+        clearAllOptions()
     }
 
     fun onIncorrectGuess() {
-        animateBrickFail(selectedBrick!!)
+        animateBrickFall(selectedBrick!!)
         selectedBrick!!.listeners.clear()
         selectedBrick = null
     }
 
-    fun clearAllOptions(postAction: Runnable? = null) {
+    fun clearAllOptions() {
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.FLYBY))
+        val lastIndex = lettersOptionsTable.cells.size - 1
         for (i in 0 until lettersOptionsTable.cells.size) {
             if (lettersOptionsTable.cells[i].actor != null) {
-                animateBrickFail(
-                    lettersOptionsTable.cells[i].actor as Brick,
-                    if (i == lettersOptionsTable.cells.size - 1) postAction else null
-                )
+                animateBrickFall(lettersOptionsTable.cells[i].actor as Brick)
             }
         }
     }
 
-    private fun animateBrickFail(brick: Brick, runnable: Runnable? = null) {
+    private fun animateBrickFall(brick: Brick) {
         brick.remove()
         stage.addActor(brick)
         brick.setPosition(
@@ -129,7 +128,8 @@ class OptionsHandler(
                     -brick.height,
                     BRICK_FAIL_ANIMATION_DURATION,
                     Interpolation.exp10
-                ), Actions.run { runnable?.run() }, Actions.removeActor()
+                ),
+                Actions.removeActor()
             ),
         )
     }

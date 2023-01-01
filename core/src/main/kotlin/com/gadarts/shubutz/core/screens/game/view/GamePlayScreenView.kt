@@ -1,5 +1,6 @@
 package com.gadarts.shubutz.core.screens.game.view
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
@@ -174,10 +175,11 @@ class GamePlayScreenView(
     }
 
     private fun clearScreen() {
-        gamePlayScreenViewHandlers.onScreenClear {
+        gamePlayScreenViewHandlers.onScreenClear()
+        stage.addAction(Actions.delay(2F, Actions.run {
             uiTable.clear()
             gamePlayScreen.onScreenEmpty()
-        }
+        }))
     }
 
 

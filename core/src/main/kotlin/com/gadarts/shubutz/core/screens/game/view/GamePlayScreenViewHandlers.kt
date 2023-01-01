@@ -60,9 +60,9 @@ class GamePlayScreenViewHandlers(
         targetWordsHandler.onGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
     }
 
-    fun onScreenClear(postAction: Runnable) {
+    fun onScreenClear() {
         bombHandler.onScreenClear {
-            optionsHandler.onScreenClear(postAction)
+            optionsHandler.onScreenClear()
             targetWordsHandler.onScreenClear()
         }
     }
