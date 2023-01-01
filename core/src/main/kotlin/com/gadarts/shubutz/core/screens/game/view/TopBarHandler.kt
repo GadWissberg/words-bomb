@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
+import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
@@ -23,6 +24,7 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
 
+    private lateinit var categoryLabel: Label
     private lateinit var topBarTable: Table
     private lateinit var topBarTexture: Texture
     lateinit var coinsLabel: Label
@@ -31,7 +33,6 @@ class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
         assetsManager: GameAssetManager,
         gameModel: GameModel,
         gamePlayScreen: GamePlayScreen,
-        font80: BitmapFont,
         stage: GameStage
     ) {
         createTopBarTexture(stage)
@@ -41,7 +42,7 @@ class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
         topBarTable.debug = DebugSettings.SHOW_UI_BORDERS
         stage.addActor(topBarTable)
         topBarTable.setPosition(0F, stage.height - topBarTable.height)
-        addTopBarComponents(topBarTable, assetsManager, gamePlayScreen, gameModel, font80)
+        addTopBarComponents(topBarTable, assetsManager, gamePlayScreen, gameModel)
     }
 
     private fun addBackButton(
@@ -65,10 +66,24 @@ class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
         table: Table,
         assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
-        gameModel: GameModel,
-        font80: BitmapFont
+        gameModel: GameModel
     ) {
         addBackButton(table, assetsManager, gamePlayScreen)
+        categoryLabel = Label(
+            gameModel.currentCategory,
+            Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
+        )
+        table.add(categoryLabel).pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
+        val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
+        addCoinsLabel(gameModel, font80, table, assetsManager)
+    }
+
+    private fun addCoinsLabel(
+        gameModel: GameModel,
+        font80: BitmapFont,
+        table: Table,
+        assetsManager: GameAssetManager
+    ) {
         coinsLabel = Label(gameModel.coins.toString(), Label.LabelStyle(font80, Color.WHITE))
         table.add(coinsLabel).pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
         table.add(Image(assetsManager.getTexture(TexturesDefinitions.COINS_ICON)))
@@ -95,6 +110,10 @@ class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
 
     fun onHide() {
         topBarTable.remove()
+    }
+
+    fun onGameBegin(currentCategory: String) {
+        categoryLabel.setText(currentCategory.reversed())
     }
 
     companion object {

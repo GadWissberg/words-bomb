@@ -66,6 +66,7 @@ class GameLogicHandler(
         val category = unusedWords[categoryName]
         gameModel.currentTarget =
             if (FORCE_TEST_WORD) TEST_WORD.reversed() else category!!.random().reversed()
+        gameModel.currentCategory = categoryName
         category!!.remove(gameModel.currentTarget)
         if (category.isEmpty()) {
             unusedWords.remove(categoryName)

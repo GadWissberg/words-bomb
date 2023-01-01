@@ -27,7 +27,6 @@ class GamePlayScreenView(
 ) :
     Disposable {
 
-    private val topBarHandler = TopBarHandler(soundPlayer)
     private val gamePlayScreenViewHandlers = GamePlayScreenViewHandlers(assetsManager, soundPlayer)
     private lateinit var uiTable: Table
     private var font80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
@@ -42,12 +41,13 @@ class GamePlayScreenView(
 
     private fun createInterface() {
         addUiTable()
-        topBarHandler.addTopBar(assetsManager, gameModel, gamePlayScreen, font80, stage)
         gamePlayScreenViewHandlers.onShow(
             letterSize,
             font80,
             assetsManager,
             stage,
+            gameModel,
+            gamePlayScreen
         )
     }
 
@@ -82,12 +82,12 @@ class GamePlayScreenView(
     }
 
     override fun dispose() {
-        topBarHandler.dispose()
+        gamePlayScreenViewHandlers.dispose()
     }
 
     fun onHide() {
         uiTable.remove()
-        topBarHandler.onHide()
+        gamePlayScreenViewHandlers.onHide()
     }
 
     fun onCorrectGuess(indices: List<Int>, gameWin: Boolean) {
@@ -142,7 +142,7 @@ class GamePlayScreenView(
 
         if (gameWin) {
             sequence.addAction(Actions.run { animateGameWin(stage) })
-            topBarHandler.coinsLabel.setText(gameModel.coins.toString())
+            gamePlayScreenViewHandlers.topBarHandler.coinsLabel.setText(gameModel.coins.toString())
             val particleEffectActor = ParticleEffectActor(
                 assetsManager.getParticleEffect(
                     ParticleEffectsDefinitions.STARS
@@ -153,10 +153,12 @@ class GamePlayScreenView(
             )
             particleEffectActor.start()
             val localToScreenCoordinates =
-                topBarHandler.coinsLabel.localToStageCoordinates(auxVector.setZero())
+                gamePlayScreenViewHandlers.topBarHandler.coinsLabel.localToStageCoordinates(
+                    auxVector.setZero()
+                )
             particleEffectActor.setPosition(
-                localToScreenCoordinates.x + topBarHandler.coinsLabel.width / 2F,
-                localToScreenCoordinates.y + topBarHandler.coinsLabel.height / 2F
+                localToScreenCoordinates.x + gamePlayScreenViewHandlers.topBarHandler.coinsLabel.width / 2F,
+                localToScreenCoordinates.y + gamePlayScreenViewHandlers.topBarHandler.coinsLabel.height / 2F
             )
         }
         brick.addAction(sequence)
@@ -174,7 +176,7 @@ class GamePlayScreenView(
     private fun clearScreen() {
         gamePlayScreenViewHandlers.onScreenClear {
             uiTable.clear()
-            uiTable.addAction(Actions.run { gamePlayScreen.onScreenEmpty() })
+            gamePlayScreen.onScreenEmpty()
         }
     }
 

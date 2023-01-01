@@ -3,6 +3,7 @@ package com.gadarts.shubutz.core.model
 import com.gadarts.shubutz.core.DebugSettings
 
 class GameModel(var coins: Int) {
+    lateinit var currentCategory: String
     var triesLeft = DebugSettings.NUMBER_OF_TRIES
     lateinit var currentTarget: String
     lateinit var hiddenLettersIndices: MutableList<Int>
