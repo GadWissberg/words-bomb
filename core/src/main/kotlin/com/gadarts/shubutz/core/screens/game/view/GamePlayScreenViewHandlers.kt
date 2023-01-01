@@ -26,7 +26,7 @@ class GamePlayScreenViewHandlers(
     ) {
         targetWordsHandler = TargetWordsHandler(letterSize, font80, soundPlayer, assetsManager)
         targetWordsHandler.calculateMaxBricksPerLine(assetsManager)
-        optionsHandler = OptionsHandler(stage)
+        optionsHandler = OptionsHandler(stage, soundPlayer, assetsManager)
     }
 
     fun onGameBegin(
@@ -63,7 +63,7 @@ class GamePlayScreenViewHandlers(
 
     fun onLetterFail() {
         bombHandler.onIncorrectGuess()
-        optionsHandler.onLetterFail()
+        optionsHandler.onIncorrectGuess()
     }
 
     fun onGameOverAnimation(stage: GameStage) {

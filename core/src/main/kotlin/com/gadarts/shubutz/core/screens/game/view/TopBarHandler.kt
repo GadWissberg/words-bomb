@@ -13,13 +13,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
+import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class TopBarHandler : Disposable {
+class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
 
     private lateinit var topBarTable: Table
     private lateinit var topBarTexture: Texture
@@ -53,6 +55,7 @@ class TopBarHandler : Disposable {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 super.clicked(event, x, y)
                 gamePlayScreen.onClickedBackButton()
+                soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
             }
         })
         table.add(button).expandX().pad(40F).left()

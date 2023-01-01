@@ -8,6 +8,9 @@ enum class SoundsDefinitions : AssetDefinition<Sound> {
     BRICK_JUMP,
     WIN,
     IGNITE,
+    EXPLOSION,
+    BUTTON,
+    FLYBY,
     CORRECT;
 
     private var path: String =

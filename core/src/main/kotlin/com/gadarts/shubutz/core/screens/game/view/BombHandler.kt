@@ -109,6 +109,7 @@ class BombHandler(
         )
 
         stage.addActor(explosionParticleEffectActor)
+        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.EXPLOSION))
         explosionParticleEffectActor.start()
         bomb.hideLabel()
     }

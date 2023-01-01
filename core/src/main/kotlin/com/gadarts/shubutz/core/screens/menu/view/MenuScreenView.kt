@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
@@ -15,8 +16,10 @@ import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GameStage.Companion.BUTTON_PADDING
 import com.gadarts.shubutz.core.Notifier
+import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.LoadingAnimationHandler
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
@@ -27,7 +30,8 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 class MenuScreenView(
     private val assetsManager: GameAssetManager,
     private val versionName: String,
-    private val stage: GameStage
+    private val stage: GameStage,
+    private val soundPlayer: SoundPlayer
 ) : Disposable, Notifier<MenuScreenViewEventsSubscriber> {
 
 
@@ -41,7 +45,7 @@ class MenuScreenView(
     /**
      * Adding loading animation.
      */
-    fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: ClickListener) {
+    fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: Runnable) {
         if (!loadingDone) {
             loadingAnimationRenderer.addLoadingAnimation(
                 assetsManager,
@@ -64,7 +68,7 @@ class MenuScreenView(
     /**
      * Handles loading animation finish and calls to add an interface.
      */
-    fun onLoadingAnimationReady(beginGameAction: ClickListener) {
+    fun onLoadingAnimationReady(beginGameAction: Runnable) {
         loadingAnimationRenderer.onLoadingAnimationReady()
         Gdx.app.postRunnable {
             if (uiTable == null) {
@@ -74,7 +78,7 @@ class MenuScreenView(
         }
     }
 
-    private fun addUserInterface(beginGameAction: ClickListener) {
+    private fun addUserInterface(beginGameAction: Runnable) {
         uiTable = Table()
         uiTable!!.debug = DebugSettings.SHOW_UI_BORDERS
         uiTable!!.setFillParent(true)
@@ -87,11 +91,17 @@ class MenuScreenView(
 
     private fun addButtons(
         table: Table,
-        beginGameAction: ClickListener,
+        beginGameAction: Runnable,
     ) {
         stage.addButton(
             table,
-            beginGameAction,
+            object : ClickListener() {
+                override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                    super.clicked(event, x, y)
+                    beginGameAction.run()
+                    soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
+                }
+            },
             LABEL_OPEN_ROOM.reversed(),
             span = 2,
             up = assetsManager.getTexture(TexturesDefinitions.BUTTON_UP),

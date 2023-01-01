@@ -8,15 +8,21 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import kotlin.math.min
 
-class OptionsHandler(private val stage: GameStage) {
+class OptionsHandler(
+    private val stage: GameStage,
+    private val soundPlayer: SoundPlayer,
+    private val assetsManager: GameAssetManager
+) {
 
     var selectedBrick: Brick? = null
     private lateinit var lettersOptionsTable: Table
@@ -90,13 +96,14 @@ class OptionsHandler(private val stage: GameStage) {
         clearAllOptions(postAction)
     }
 
-    fun onLetterFail() {
+    fun onIncorrectGuess() {
         animateBrickFail(selectedBrick!!)
         selectedBrick!!.listeners.clear()
         selectedBrick = null
     }
 
     fun clearAllOptions(postAction: Runnable? = null) {
+        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.FLYBY))
         for (i in 0 until lettersOptionsTable.cells.size) {
             if (lettersOptionsTable.cells[i].actor != null) {
                 animateBrickFail(

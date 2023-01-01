@@ -20,6 +20,6 @@ class SoundPlayer {
     }
 
     companion object {
-        private const val MUSIC_VOLUME = 0.75F
+        private const val MUSIC_VOLUME = 0.5F
     }
 }

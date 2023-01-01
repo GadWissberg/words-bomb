@@ -27,7 +27,7 @@ class GamePlayScreenView(
 ) :
     Disposable {
 
-    private val topBarHandler = TopBarHandler()
+    private val topBarHandler = TopBarHandler(soundPlayer)
     private val gamePlayScreenViewHandlers = GamePlayScreenViewHandlers(assetsManager, soundPlayer)
     private lateinit var uiTable: Table
     private var font80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)

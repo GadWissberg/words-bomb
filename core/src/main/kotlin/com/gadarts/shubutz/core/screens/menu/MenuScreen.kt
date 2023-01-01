@@ -3,10 +3,9 @@ package com.gadarts.shubutz.core.screens.menu
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.GameLifeCycleManager
+import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenViewEventsSubscriber
@@ -17,11 +16,12 @@ class MenuScreen(
     androidInterface: AndroidInterface,
     private val gameLifeCycleManager: GameLifeCycleManager,
     stage: GameStage,
+    soundPlayer: SoundPlayer,
 ) :
     Screen, MenuScreenViewEventsSubscriber {
 
     private val menuScreenView =
-        MenuScreenView(assetsManager, androidInterface.versionName(), stage)
+        MenuScreenView(assetsManager, androidInterface.versionName(), stage, soundPlayer)
 
     override fun show() {
         menuScreenView.subscribeForEvents(this)
@@ -56,11 +56,6 @@ class MenuScreen(
         menuScreenView.onLoadingAnimationReady(goToPlayScreenOnClick())
     }
 
-    private fun goToPlayScreenOnClick() = object : ClickListener() {
-        override fun clicked(event: InputEvent?, x: Float, y: Float) {
-            super.clicked(event, x, y)
-            gameLifeCycleManager.goToPlayScreen()
-        }
-    }
+    private fun goToPlayScreenOnClick() = Runnable { gameLifeCycleManager.goToPlayScreen() }
 
 }
