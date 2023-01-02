@@ -1,6 +1,5 @@
 package com.gadarts.shubutz.core.screens.game.view
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
@@ -91,20 +90,18 @@ class GamePlayScreenView(
         gamePlayScreenViewHandlers.onHide()
     }
 
-    fun onCorrectGuess(indices: List<Int>, gameWin: Boolean) {
+    fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
+        gamePlayScreenViewHandlers.onCorrectGuess(coinsAmount)
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.CORRECT))
         if (gamePlayScreenViewHandlers.optionsHandler.selectedBrick != null) {
-            selectionSuccessful(indices, gameWin)
+            val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
+            indices.forEach {
+                animateBrickSuccess(it, gameWin, brickTexture)
+            }
+            gamePlayScreenViewHandlers.optionsHandler.onSelectionSuccessful()
         }
     }
 
-    private fun selectionSuccessful(indices: List<Int>, gameWin: Boolean) {
-        val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-        indices.forEach {
-            animateBrickSuccess(it, gameWin, brickTexture)
-        }
-        gamePlayScreenViewHandlers.optionsHandler.onSelectionSuccessful()
-    }
 
     private fun animateBrickSuccess(index: Int, gameWin: Boolean, brickTexture: Texture) {
         var wordCount = 0
@@ -189,7 +186,7 @@ class GamePlayScreenView(
         if (gameOver) {
             animateGameOver()
         } else if (gamePlayScreenViewHandlers.optionsHandler.selectedBrick != null) {
-            gamePlayScreenViewHandlers.onLetterFail()
+            gamePlayScreenViewHandlers.onIncorrectGuess()
         }
     }
 

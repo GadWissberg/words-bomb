@@ -124,6 +124,10 @@ class BombHandler(
         )
     }
 
+    fun onHide() {
+        fireParticleEffectActor.remove()
+    }
+
     companion object {
         private const val BOMB_PADDING = 20F
         private const val BOMB_GAME_OVER_ANIMATION_DURATION = 0.5F

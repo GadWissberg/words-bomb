@@ -4,7 +4,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
@@ -116,9 +119,47 @@ class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
         categoryLabel.setText(currentCategory.reversed())
     }
 
+    fun onCorrectGuess(coinsAmount: Int, assetsManager: GameAssetManager) {
+        if (coinsAmount > 0) {
+            val winCoinLabel = addWinCoinLabel(coinsAmount, assetsManager)
+
+            winCoinLabel.addAction(
+                Actions.sequence(
+                    Actions.moveBy(
+                        0F,
+                        -100F,
+                        WIN_COIN_LABEL_ANIMATION_DURATION,
+                        Interpolation.smooth2
+                    ),
+                    Actions.removeActor()
+                )
+            )
+
+        }
+    }
+
+    private fun addWinCoinLabel(
+        coinsAmount: Int,
+        assetsManager: GameAssetManager
+    ): Label {
+        val winCoinLabel = Label(
+            "+$coinsAmount",
+            Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.GOLD)
+        )
+        topBarTable.stage.addActor(winCoinLabel)
+        val coinsLabelPosition = coinsLabel.localToScreenCoordinates(auxVector.setZero())
+        winCoinLabel.setPosition(
+            coinsLabelPosition.x,
+            topBarTable.stage.height - coinsLabelPosition.y
+        )
+        return winCoinLabel
+    }
+
     companion object {
         private const val TOP_BAR_HEIGHT = 150
+        private val auxVector = Vector2()
         private const val TOP_BAR_COLOR = "#85adb0"
         private const val COINS_LABEL_PADDING_RIGHT = 40F
+        private const val WIN_COIN_LABEL_ANIMATION_DURATION = 4F
     }
 }

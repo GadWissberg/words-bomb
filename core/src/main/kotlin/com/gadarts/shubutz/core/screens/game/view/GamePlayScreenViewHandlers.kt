@@ -67,7 +67,7 @@ class GamePlayScreenViewHandlers(
         }
     }
 
-    fun onLetterFail() {
+    fun onIncorrectGuess() {
         bombHandler.onIncorrectGuess()
         optionsHandler.onIncorrectGuess()
     }
@@ -83,6 +83,11 @@ class GamePlayScreenViewHandlers(
 
     fun onHide() {
         topBarHandler.onHide()
+        bombHandler.onHide()
+    }
+
+    fun onCorrectGuess(coinsAmount: Int) {
+        topBarHandler.onCorrectGuess(coinsAmount, assetsManager)
     }
 
 }

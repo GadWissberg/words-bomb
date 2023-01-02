@@ -47,14 +47,18 @@ class GameLogicHandler(
         if (indices.isNotEmpty()) {
             gameModel.hiddenLettersIndices.removeAll(indices.toSet())
             val gameWin = gameModel.hiddenLettersIndices.isEmpty()
+            var coinsAmount = 0
             if (gameWin) {
-                gameModel.coins++
+                coinsAmount = 1
+                gameModel.coins += coinsAmount
                 androidInterface.saveSharedPreferencesValue(
                     SHARED_PREFERENCES_DATA_KEY_COINS,
                     gameModel.coins
                 )
             }
-            subscribers.forEach { it.onCorrectGuess(indices, gameWin) }
+            subscribers.forEach {
+                it.onCorrectGuess(indices, gameWin, coinsAmount)
+            }
         } else {
             gameModel.triesLeft--
             subscribers.forEach { it.onIncorrectGuess(gameModel.triesLeft <= 0) }
