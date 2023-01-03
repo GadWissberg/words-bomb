@@ -72,6 +72,7 @@ class GamePlayScreenImpl(
     }
 
     override fun onScreenEmpty() {
+        if (gameModel.hiddenLettersIndices.isNotEmpty()) return
         gameLogicHandler.beginGame(gameModel)
         gamePlayScreenView.onGameBegin()
     }

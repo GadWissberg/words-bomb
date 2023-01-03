@@ -198,6 +198,7 @@ class TargetWordsHandler(
             )
         )
         if (i == word.cells.size - 1) {
+            Gdx.app.log("!", "$i")
             actor.addAction(
                 Actions.sequence(
                     Actions.delay(WIN_DELAY),

@@ -6,7 +6,7 @@ class GameModel(var coins: Int) {
     lateinit var currentCategory: String
     var triesLeft = DebugSettings.NUMBER_OF_TRIES
     lateinit var currentTarget: String
-    lateinit var hiddenLettersIndices: MutableList<Int>
+    var hiddenLettersIndices = mutableListOf<Int>()
     lateinit var options: MutableList<Char>
 
     companion object {
