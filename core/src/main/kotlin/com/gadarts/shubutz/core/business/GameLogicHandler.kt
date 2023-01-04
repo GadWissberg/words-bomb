@@ -30,7 +30,7 @@ class GameLogicHandler(
             unusedWords = words
         }
         gameModel.triesLeft = DebugSettings.NUMBER_OF_TRIES
-        chooseWord(gameModel)
+        chooseTarget(gameModel)
         decideHiddenLetters(gameModel)
         gameModel.options = allowedLetters.toMutableList()
         gameModel.options.reversed()
@@ -65,13 +65,13 @@ class GameLogicHandler(
         }
     }
 
-    private fun chooseWord(gameModel: GameModel) {
+    private fun chooseTarget(gameModel: GameModel) {
         val categoryName = unusedWords.keys.random()
         val category = unusedWords[categoryName]
-        gameModel.currentTarget =
-            if (FORCE_TEST_WORD) TEST_WORD.reversed() else category!!.random().reversed()
+        val selectedTarget = if (FORCE_TEST_WORD) TEST_WORD else category!!.random()
+        gameModel.currentTarget = selectedTarget.reversed()
         gameModel.currentCategory = categoryName
-        category!!.remove(gameModel.currentTarget)
+        category!!.remove(selectedTarget)
         if (category.isEmpty()) {
             unusedWords.remove(categoryName)
         }

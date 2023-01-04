@@ -13,7 +13,7 @@ object DebugSettings {
     /**
      * The given word to be forced.
      */
-    const val TEST_WORD = "קרובים קרובים"
+    const val TEST_WORD = "הכוכבים של שלומי"
 
     /**
      * Number of tries 'till game over.
@@ -28,12 +28,12 @@ object DebugSettings {
     /**
      * Whether to play music.
      */
-    const val ENABLE_MUSIC = true
+    const val ENABLE_MUSIC = false
 
     /**
      * Whether to play sounds.
      */
-    const val ENABLE_SOUNDS = true
+    const val ENABLE_SOUNDS = false
 
 }
 

@@ -54,6 +54,7 @@ class GamePlayScreenView(
 
 
     fun onGameBegin() {
+        stage.root.clearActions()
         gamePlayScreenViewHandlers.onGameBegin(
             uiTable,
             gameModel,
@@ -62,7 +63,6 @@ class GamePlayScreenView(
             gamePlayScreen,
             stage
         )
-
     }
 
     private fun addUiTable() {
