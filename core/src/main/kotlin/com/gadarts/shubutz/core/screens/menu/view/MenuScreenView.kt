@@ -17,10 +17,12 @@ import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GameStage.Companion.BUTTON_PADDING
 import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.SoundPlayer
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
+import com.gadarts.shubutz.core.screens.menu.BeginGameAction
 import com.gadarts.shubutz.core.screens.menu.LoadingAnimationHandler
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
@@ -35,9 +37,12 @@ class MenuScreenView(
 ) : Disposable, Notifier<MenuScreenViewEventsSubscriber> {
 
 
+    private lateinit var logoTable: Table
     private lateinit var versionLabel: Label
-    private var uiTable: Table? = null
+    private var mainMenuTable = Table()
+    private var difficultySelectionTable = Table()
     private var varela80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
+    private var varela40: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_40)
     private var varela35: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_35)
     private var loadingAnimationRenderer = LoadingAnimationHandler()
     override val subscribers = HashSet<MenuScreenViewEventsSubscriber>()
@@ -45,14 +50,14 @@ class MenuScreenView(
     /**
      * Adding loading animation.
      */
-    fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: Runnable) {
+    fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: BeginGameAction) {
         if (!loadingDone) {
             loadingAnimationRenderer.addLoadingAnimation(
                 assetsManager,
                 stage
             )
         } else {
-            onLoadingAnimationReady(goToPlayScreenOnClick)
+            finishLoadingAnimationAndDisplayMenu(goToPlayScreenOnClick)
         }
     }
 
@@ -68,46 +73,98 @@ class MenuScreenView(
     /**
      * Handles loading animation finish and calls to add an interface.
      */
-    fun onLoadingAnimationReady(beginGameAction: Runnable) {
-        loadingAnimationRenderer.onLoadingAnimationReady()
+    fun finishLoadingAnimationAndDisplayMenu(beginGameAction: BeginGameAction) {
+        loadingAnimationRenderer.flyOutBricks()
         Gdx.app.postRunnable {
-            if (uiTable == null) {
-                addUserInterface(beginGameAction)
-                stage.addActor(uiTable)
-            }
+            addUserInterface(beginGameAction)
+            stage.addActor(mainMenuTable)
+            difficultySelectionTable.isVisible = false
+            stage.addActor(difficultySelectionTable)
         }
     }
 
-    private fun addUserInterface(beginGameAction: Runnable) {
-        uiTable = Table()
-        uiTable!!.debug = DebugSettings.SHOW_UI_BORDERS
-        uiTable!!.setFillParent(true)
-        addLogo()
-        addButtons(uiTable!!, beginGameAction)
-        uiTable!!.touchable = Touchable.childrenOnly
+    private fun addUserInterface(beginGameAction: BeginGameAction) {
+        addMainMenuTable()
+        addDifficultySelectionTable(beginGameAction)
         versionLabel = Label("v$versionName", Label.LabelStyle(varela35, Color.BLACK))
         stage.addActor(versionLabel)
     }
 
-    private fun addButtons(
+    private fun addDifficultySelectionTable(beginGameAction: BeginGameAction) {
+        initMenuTable(difficultySelectionTable)
+        addDifficultySelectionLabel()
+        Difficulties.values().forEach {
+            addButton(
+                difficultySelectionTable,
+                { beginGameAction.begin(it) },
+                it.displayName,
+            )
+        }
+        addBackButton()
+    }
+
+    private fun addBackButton() {
+        addButton(
+            difficultySelectionTable,
+            {
+                difficultySelectionTable.isVisible = false
+                mainMenuTable.isVisible = true
+            },
+            LABEL_BACK,
+            160,
+            varela40,
+            scale = 0.5F
+        )
+    }
+
+    private fun addDifficultySelectionLabel() {
+        difficultySelectionTable.add(
+            Label(
+                LABEL_DIFFICULTY_SELECT.reversed(),
+                Label.LabelStyle(varela80, Color.WHITE)
+            )
+        ).pad(20F).row()
+    }
+
+    private fun addMainMenuTable() {
+        initMenuTable(mainMenuTable)
+        addLogo()
+        addButton(mainMenuTable, {
+            mainMenuTable.isVisible = false
+            difficultySelectionTable.isVisible = true
+        }, LABEL_BEGIN_GAME, font = varela80)
+    }
+
+    private fun initMenuTable(table: Table) {
+        table.debug = DebugSettings.SHOW_UI_BORDERS
+        table.setFillParent(true)
+        table.touchable = Touchable.childrenOnly
+    }
+
+    private fun addButton(
         table: Table,
-        beginGameAction: Runnable,
+        onClick: Runnable,
+        label: String,
+        topPadding: Int = BUTTON_PADDING,
+        font: BitmapFont = varela80,
+        scale: Float = 1F
     ) {
         stage.addButton(
             table,
             object : ClickListener() {
                 override fun clicked(event: InputEvent?, x: Float, y: Float) {
                     super.clicked(event, x, y)
-                    beginGameAction.run()
+                    onClick.run()
                     soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
                 }
             },
-            LABEL_OPEN_ROOM.reversed(),
+            label.reversed(),
             span = 2,
             up = assetsManager.getTexture(TexturesDefinitions.BUTTON_UP),
             down = assetsManager.getTexture(TexturesDefinitions.BUTTON_DOWN),
-            bitmapFont = varela80,
-            topPadding = BUTTON_PADDING
+            bitmapFont = font,
+            topPadding = topPadding,
+            scale = scale
         )
     }
 
@@ -149,9 +206,9 @@ class MenuScreenView(
     }
 
     private fun addLogoTable(): Table {
-        val logoTable = Table()
+        logoTable = Table()
         logoTable.debug(if (DebugSettings.SHOW_UI_BORDERS) Table.Debug.all else Table.Debug.none)
-        uiTable!!.add(logoTable).pad(
+        mainMenuTable.add(logoTable).pad(
             LOGO_PADDING_TOP, 0F,
             LOGO_PADDING_BOTTOM, 0F
         ).colspan(2).row()
@@ -159,7 +216,12 @@ class MenuScreenView(
     }
 
     override fun dispose() {
-        uiTable?.remove()
+
+    }
+
+    fun clearScreen() {
+        mainMenuTable.remove()
+        difficultySelectionTable.remove()
         versionLabel.remove()
     }
 
@@ -171,7 +233,9 @@ class MenuScreenView(
     }
 
     companion object {
-        private const val LABEL_OPEN_ROOM = "התחל משחק"
+        private const val LABEL_BEGIN_GAME = "התחל משחק"
+        private const val LABEL_DIFFICULTY_SELECT = "בחר רמת קושי:"
+        private const val LABEL_BACK = "חזרה"
         private const val LOGO_PADDING_TOP = 300F
         private const val LOGO_PADDING_BOTTOM = 75F
     }

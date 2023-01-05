@@ -53,7 +53,8 @@ abstract class GameStage<T>(
         down: Texture,
         disabled: Texture? = null,
         bitmapFont: BitmapFont,
-        topPadding: Float
+        topPadding: Int,
+        scale: Float = 1F
     ): TextButton {
         val upDrawable = TextureRegionDrawable(up)
         val downDrawable = TextureRegionDrawable(down)
@@ -71,29 +72,30 @@ abstract class GameStage<T>(
             uiTable,
             newLineAfter,
             span = span,
-            topPadding = topPadding
+            topPadding = topPadding.toFloat(),
+            scale = scale
         )
         return button
     }
 
-    fun addButtonToTable(
+    private fun addButtonToTable(
         button: Button,
         onClick: ClickListener,
         uiTable: Table,
         newLineAfter: Boolean = true,
-        size: Float = 0F,
         span: Int = 1,
-        topPadding: Float
+        topPadding: Float,
+        scale: Float
     ) {
         button.addListener(onClick)
-        val add = uiTable.add(button).pad(
+        val row = uiTable.add(button).pad(
             topPadding,
-            BUTTON_PADDING,
-            BUTTON_PADDING,
-            BUTTON_PADDING
+            BUTTON_PADDING.toFloat(),
+            BUTTON_PADDING.toFloat(),
+            BUTTON_PADDING.toFloat()
         ).colspan(span)
-        if (size > 0) {
-            add.size(size)
+        if (scale != 1F) {
+            row.size(button.width * scale, button.height * scale)
         }
         if (newLineAfter) {
             uiTable.row()
@@ -219,7 +221,7 @@ abstract class GameStage<T>(
         private const val DIALOG_FADE_DURATION = 1F
         private const val DIALOG_BUTTON_OK_TEXT = "סבבה"
         private val BUTTON_FONT_COLOR_DISABLED = Color.LIGHT_GRAY
-        const val BUTTON_PADDING = 20F
+        const val BUTTON_PADDING = 20
     }
 
 }

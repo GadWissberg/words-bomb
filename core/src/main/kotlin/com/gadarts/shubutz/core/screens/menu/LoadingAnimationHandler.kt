@@ -45,7 +45,7 @@ class LoadingAnimationHandler {
         }
     }
 
-    fun onLoadingAnimationReady() {
+    fun flyOutBricks() {
         if (oneOfBricksMissing()) return
         flyOutBrick(brick1!!)
         flyOutBrick(brick2!!)

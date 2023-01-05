@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.SoundPlayer
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenViewEventsSubscriber
@@ -45,6 +46,7 @@ class MenuScreen(
     }
 
     override fun hide() {
+        menuScreenView.clearScreen()
     }
 
     override fun dispose() {
@@ -53,9 +55,13 @@ class MenuScreen(
 
     override fun onLoadingAnimationReady() {
         gameLifeCycleManager.loadingDone = true
-        menuScreenView.onLoadingAnimationReady(goToPlayScreenOnClick())
+        menuScreenView.finishLoadingAnimationAndDisplayMenu(goToPlayScreenOnClick())
     }
 
-    private fun goToPlayScreenOnClick() = Runnable { gameLifeCycleManager.goToPlayScreen() }
+    private fun goToPlayScreenOnClick() = object : BeginGameAction {
+        override fun begin(selectedDifficulty: Difficulties) {
+            gameLifeCycleManager.goToPlayScreen(selectedDifficulty)
+        }
+    }
 
 }
