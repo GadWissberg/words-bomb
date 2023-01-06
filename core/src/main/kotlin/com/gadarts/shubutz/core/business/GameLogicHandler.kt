@@ -1,20 +1,17 @@
 package com.gadarts.shubutz.core.business
 
 import com.gadarts.shubutz.core.AndroidInterface
-import com.gadarts.shubutz.core.DebugSettings
-import com.gadarts.shubutz.core.DebugSettings.FORCE_TEST_WORD
 import com.gadarts.shubutz.core.DebugSettings.TEST_WORD
 import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
-import java.util.HashMap
 
 /**
  * Responsible to take care of the actual game's rules.
  */
 class GameLogicHandler(
     private val words: HashMap<String, ArrayList<String>>,
-    private val androidInterface: AndroidInterface
+    private val androidInterface: AndroidInterface,
 ) :
     Notifier<GameLogicHandlerEventsSubscriber> {
 
@@ -26,10 +23,24 @@ class GameLogicHandler(
      * letters array.
      */
     fun beginGame(gameModel: GameModel) {
+        unusedWords = words
+        unusedWords.forEach {
+            unusedWords[it.key] = ArrayList(it.value.filter { p ->
+                p.length >= gameModel.selectedDifficulty.minimumAmountOfLettersForRegularPhrases
+            })
+        }
+        beginRound(gameModel)
+    }
+
+    /**
+     * Initializes the bomb's counter, decide the letter to be hidden and initialize the options
+     * letters array.
+     */
+    fun beginRound(gameModel: GameModel) {
         if (unusedWords.isEmpty()) {
             unusedWords = words
         }
-        gameModel.triesLeft = DebugSettings.NUMBER_OF_TRIES
+        gameModel.triesLeft = gameModel.selectedDifficulty.tries
         chooseTarget(gameModel)
         decideHiddenLetters(gameModel)
         gameModel.options = allowedLetters.toMutableList()
@@ -49,7 +60,7 @@ class GameLogicHandler(
             val gameWin = gameModel.hiddenLettersIndices.isEmpty()
             var coinsAmount = 0
             if (gameWin) {
-                coinsAmount = 1
+                coinsAmount = gameModel.selectedDifficulty.winWorth
                 gameModel.coins += coinsAmount
                 androidInterface.saveSharedPreferencesValue(
                     SHARED_PREFERENCES_DATA_KEY_COINS,
@@ -68,7 +79,7 @@ class GameLogicHandler(
     private fun chooseTarget(gameModel: GameModel) {
         val categoryName = unusedWords.keys.random()
         val category = unusedWords[categoryName]
-        val selectedTarget = if (FORCE_TEST_WORD) TEST_WORD else category!!.random()
+        val selectedTarget = TEST_WORD.ifEmpty { category!!.random() }
         gameModel.currentTarget = selectedTarget.reversed()
         gameModel.currentCategory = categoryName
         category!!.remove(selectedTarget)
@@ -78,14 +89,18 @@ class GameLogicHandler(
     }
 
     private fun decideHiddenLetters(model: GameModel) {
-        val listOfIndices = mutableListOf<Int>()
-        for (i in 0 until model.currentTarget.length) {
+        val indices = mutableListOf<Int>()
+        val phraseLength = model.currentTarget.length
+        for (i in 0 until phraseLength) {
             if (model.currentTarget[i] != ' ') {
-                listOfIndices.add(i)
+                indices.add(i)
             }
         }
-        model.hiddenLettersIndices = listOfIndices.shuffled().toMutableList()
-            .drop(model.currentTarget.length - ((model.currentTarget.length / 2F).toInt() + 1))
+        val toDropFromHiddenIndices =
+            (phraseLength - phraseLength * model.selectedDifficulty.lettersToHideFactor).toInt()
+        model.hiddenLettersIndices = indices.shuffled()
+            .toMutableList()
+            .drop(toDropFromHiddenIndices)
             .toMutableList()
     }
 

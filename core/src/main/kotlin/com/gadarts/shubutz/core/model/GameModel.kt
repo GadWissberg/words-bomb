@@ -2,9 +2,10 @@ package com.gadarts.shubutz.core.model
 
 import com.gadarts.shubutz.core.DebugSettings
 
-class GameModel(var coins: Int) {
+class GameModel(var coins: Int, val selectedDifficulty: Difficulties) {
     lateinit var currentCategory: String
-    var triesLeft = DebugSettings.NUMBER_OF_TRIES
+    var triesLeft =
+        if (DebugSettings.NUMBER_OF_TRIES > 0) DebugSettings.NUMBER_OF_TRIES else selectedDifficulty.tries
     lateinit var currentTarget: String
     var hiddenLettersIndices = mutableListOf<Int>()
     lateinit var options: MutableList<Char>

@@ -2,7 +2,6 @@ package com.gadarts.shubutz.core
 
 import com.badlogic.gdx.*
 import com.badlogic.gdx.utils.viewport.FitViewport
-import com.gadarts.shubutz.core.business.GameLogicHandler
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.MusicDefinitions
@@ -62,16 +61,16 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
 
     override fun goToPlayScreen(selectedDifficulty: Difficulties) {
         soundPlayer.playMusic(assetsManager.getMusic(MusicDefinitions.IN_GAME))
-        setScreen(createGamePlayScreen())
+        setScreen(createGamePlayScreen(selectedDifficulty))
     }
 
-    private fun createGamePlayScreen() = GamePlayScreenImpl(
+    private fun createGamePlayScreen(selectedDifficulty: Difficulties) = GamePlayScreenImpl(
         assetsManager,
         this,
-        android.getSharedPreferencesValue(GameLogicHandler.SHARED_PREFERENCES_DATA_KEY_COINS),
         android,
         stage,
-        soundPlayer
+        soundPlayer,
+        selectedDifficulty
     )
 
 }

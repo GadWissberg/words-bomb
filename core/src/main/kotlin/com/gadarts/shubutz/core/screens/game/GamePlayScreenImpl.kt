@@ -8,6 +8,7 @@ import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.business.GameLogicHandler
 import com.gadarts.shubutz.core.business.GameLogicHandlerEventsSubscriber
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenView
@@ -16,19 +17,23 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 class GamePlayScreenImpl(
     private val assetsManager: GameAssetManager,
     private val lifeCycleManager: GameLifeCycleManager,
-    coins: Int,
-    private val androidInterface: AndroidInterface,
+    private val android: AndroidInterface,
     private val stage: GameStage,
     private val soundPlayer: SoundPlayer,
+    selectedDifficulty: Difficulties,
 ) : Screen, GameLogicHandlerEventsSubscriber, GamePlayScreen {
 
 
-    private val gameModel = GameModel(coins)
+    private val gameModel =
+        GameModel(
+            android.getSharedPreferencesValue(GameLogicHandler.SHARED_PREFERENCES_DATA_KEY_COINS),
+            selectedDifficulty
+        )
     private lateinit var gameLogicHandler: GameLogicHandler
     private lateinit var gamePlayScreenView: GamePlayScreenView
 
     override fun show() {
-        gameLogicHandler = GameLogicHandler(assetsManager.words, androidInterface)
+        gameLogicHandler = GameLogicHandler(assetsManager.words, android)
         gameLogicHandler.beginGame(gameModel)
         gameLogicHandler.subscribeForEvents(this)
         gamePlayScreenView = createGamePlayScreenView()
@@ -73,7 +78,7 @@ class GamePlayScreenImpl(
 
     override fun onScreenEmpty() {
         if (gameModel.hiddenLettersIndices.isNotEmpty()) return
-        gameLogicHandler.beginGame(gameModel)
+        gameLogicHandler.beginRound(gameModel)
         gamePlayScreenView.onGameBegin()
     }
 

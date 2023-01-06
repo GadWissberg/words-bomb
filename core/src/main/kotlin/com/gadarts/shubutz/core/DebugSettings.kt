@@ -6,19 +6,14 @@ package com.gadarts.shubutz.core
 object DebugSettings {
 
     /**
-     * Force the given word to be played.
-     */
-    const val FORCE_TEST_WORD = false
-
-    /**
      * The given word to be forced.
      */
-    const val TEST_WORD = "הכוכבים של שלומי"
+    const val TEST_WORD = ""
 
     /**
      * Number of tries 'till game over.
      */
-    const val NUMBER_OF_TRIES = 6
+    const val NUMBER_OF_TRIES = 0
 
     /**
      * Whether to display the UI components borders.
