@@ -12,19 +12,20 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
+import com.gadarts.shubutz.core.model.Phrase
 
 /**
  * Responsible to load the assets.
  */
 open class GameAssetManager : AssetManager() {
-    lateinit var words: HashMap<String, ArrayList<String>>
-    private val wordsLoader = WordsLoader()
+    lateinit var phrases: HashMap<String, ArrayList<Phrase>>
+    private val phrasesLoader = PhrasesLoader()
 
     /**
      * Loads all assets sync.
      */
     fun loadAssets() {
-        words = wordsLoader.load()
+        phrases = phrasesLoader.load()
         initializeFontLoaders()
         AssetsTypes.values().forEach { type ->
             if (type.isLoadedUsingLoader()) {

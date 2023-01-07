@@ -1,21 +1,22 @@
 package com.gadarts.shubutz.core.business
 
 import com.gadarts.shubutz.core.AndroidInterface
-import com.gadarts.shubutz.core.DebugSettings.TEST_WORD
+import com.gadarts.shubutz.core.DebugSettings.TEST_PHRASE
 import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
+import com.gadarts.shubutz.core.model.Phrase
 
 /**
  * Responsible to take care of the actual game's rules.
  */
 class GameLogicHandler(
-    private val words: HashMap<String, ArrayList<String>>,
+    private val phrases: HashMap<String, ArrayList<Phrase>>,
     private val androidInterface: AndroidInterface,
 ) :
     Notifier<GameLogicHandlerEventsSubscriber> {
 
-    private var unusedWords: HashMap<String, ArrayList<String>> = HashMap(words)
+    private var unusedPhrases: HashMap<String, ArrayList<Phrase>> = HashMap(phrases)
     override val subscribers = HashSet<GameLogicHandlerEventsSubscriber>()
 
     /**
@@ -23,10 +24,11 @@ class GameLogicHandler(
      * letters array.
      */
     fun beginGame(gameModel: GameModel) {
-        unusedWords = words
-        unusedWords.forEach {
-            unusedWords[it.key] = ArrayList(it.value.filter { p ->
-                p.length >= gameModel.selectedDifficulty.minimumAmountOfLettersForRegularPhrases
+        unusedPhrases = phrases
+        unusedPhrases.forEach {
+            unusedPhrases[it.key] = ArrayList(it.value.filter { p ->
+                p.value.length >= gameModel.selectedDifficulty.regularPhrasesMinimumLength
+                        && (!p.esoteric || gameModel.selectedDifficulty.allowEsoteric)
             })
         }
         beginRound(gameModel)
@@ -37,8 +39,8 @@ class GameLogicHandler(
      * letters array.
      */
     fun beginRound(gameModel: GameModel) {
-        if (unusedWords.isEmpty()) {
-            unusedWords = words
+        if (unusedPhrases.isEmpty()) {
+            unusedPhrases = phrases
         }
         gameModel.triesLeft = gameModel.selectedDifficulty.tries
         chooseTarget(gameModel)
@@ -77,14 +79,14 @@ class GameLogicHandler(
     }
 
     private fun chooseTarget(gameModel: GameModel) {
-        val categoryName = unusedWords.keys.random()
-        val category = unusedWords[categoryName]
-        val selectedTarget = TEST_WORD.ifEmpty { category!!.random() }
-        gameModel.currentTarget = selectedTarget.reversed()
+        val categoryName = unusedPhrases.keys.random()
+        val category = unusedPhrases[categoryName]
+        val selected = if (TEST_PHRASE.value.isNotEmpty()) TEST_PHRASE else category!!.random()
+        gameModel.currentTarget = selected.value.reversed()
         gameModel.currentCategory = categoryName
-        category!!.remove(selectedTarget)
+        category!!.remove(selected)
         if (category.isEmpty()) {
-            unusedWords.remove(categoryName)
+            unusedPhrases.remove(categoryName)
         }
     }
 

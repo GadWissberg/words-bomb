@@ -5,8 +5,8 @@ enum class Difficulties(
     val lettersToHideFactor: Float,
     val tries: Int,
     val winWorth: Int,
-    val minimumAmountOfLettersForRegularPhrases: Int = 2,
-    val allowLessKnownPhrases: Boolean = false,
+    val regularPhrasesMinimumLength: Int = 2,
+    val allowEsoteric: Boolean = false,
 ) {
 
 

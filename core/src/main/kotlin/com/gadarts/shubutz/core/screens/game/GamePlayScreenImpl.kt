@@ -33,7 +33,7 @@ class GamePlayScreenImpl(
     private lateinit var gamePlayScreenView: GamePlayScreenView
 
     override fun show() {
-        gameLogicHandler = GameLogicHandler(assetsManager.words, android)
+        gameLogicHandler = GameLogicHandler(assetsManager.phrases, android)
         gameLogicHandler.beginGame(gameModel)
         gameLogicHandler.subscribeForEvents(this)
         gamePlayScreenView = createGamePlayScreenView()

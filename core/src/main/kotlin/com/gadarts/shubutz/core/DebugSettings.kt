@@ -1,14 +1,16 @@
 package com.gadarts.shubutz.core
 
+import com.gadarts.shubutz.core.model.Phrase
+
 /**
  * Default flags values.
  */
 object DebugSettings {
 
     /**
-     * The given word to be forced.
+     * The given phrase to be forced.
      */
-    const val TEST_WORD = ""
+    val TEST_PHRASE = Phrase("")
 
     /**
      * Number of tries 'till game over.
