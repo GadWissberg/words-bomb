@@ -21,7 +21,7 @@ import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.game.view.actors.BrickCell
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class TargetWordsHandler(
+class TargetPhrasesView(
     private val letterSize: Vector2,
     private val font80: BitmapFont,
     private val soundPlayer: SoundPlayer,
@@ -31,6 +31,7 @@ class TargetWordsHandler(
     private lateinit var targetTable: Table
     var maxBricksPerLine: Int = 0
     private var targetWordLines = ArrayList<Table>()
+
     fun calculateMaxBricksPerLine(assetsManager: GameAssetManager) {
         val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
         maxBricksPerLine = Gdx.graphics.width / brickTexture.width - 1
@@ -262,7 +263,7 @@ class TargetWordsHandler(
         private const val GAME_WIN_ANIMATION_DISTANCE = 50F
         private const val GAME_WIN_ANIMATION_LETTER_MOVE_DURATION = 0.25F
         private const val WIN_DELAY = 2F
-        private const val TARGET_LETTER_PADDING = 10F
+        private const val TARGET_LETTER_PADDING = 5F
         private val auxVector = Vector2()
 
     }

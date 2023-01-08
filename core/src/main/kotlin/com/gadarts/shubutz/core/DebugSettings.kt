@@ -25,12 +25,12 @@ object DebugSettings {
     /**
      * Whether to play music.
      */
-    const val ENABLE_MUSIC = true
+    const val ENABLE_MUSIC = false
 
     /**
      * Whether to play sounds.
      */
-    const val ENABLE_SOUNDS = true
+    const val ENABLE_SOUNDS = false
 
 }
 

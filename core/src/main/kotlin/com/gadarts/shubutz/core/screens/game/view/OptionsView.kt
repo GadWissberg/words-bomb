@@ -1,8 +1,6 @@
 package com.gadarts.shubutz.core.screens.game.view
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -11,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
+import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
@@ -19,7 +18,7 @@ import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import kotlin.math.min
 
-class OptionsHandler(
+class OptionsView(
     private val stage: GameStage,
     private val soundPlayer: SoundPlayer,
     private val assetsManager: GameAssetManager
@@ -33,15 +32,15 @@ class OptionsHandler(
         assetsManager: GameAssetManager,
         maxBricksPerLine: Int,
         letterSize: Vector2,
-        font80: BitmapFont,
-        gamePlayScreen: GamePlayScreen
+        gamePlayScreen: GamePlayScreen,
+        model: GameModel
     ) {
         lettersOptionsTable = Table()
         lettersOptionsTable.setSize(uiTable.width, uiTable.prefHeight)
         uiTable.add(lettersOptionsTable)
         val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
         for (row in 0..GameModel.allowedLetters.length / (maxBricksPerLine - 1)) {
-            addOptionsRow(row, brickTexture, maxBricksPerLine, letterSize, font80, gamePlayScreen)
+            addOptionsRow(row, brickTexture, maxBricksPerLine, letterSize, gamePlayScreen, model)
         }
     }
 
@@ -50,8 +49,8 @@ class OptionsHandler(
         brickTexture: Texture,
         maxBricksPerLine: Int,
         letterSize: Vector2,
-        font80: BitmapFont,
-        gamePlayScreen: GamePlayScreen
+        gamePlayScreen: GamePlayScreen,
+        gameModel: GameModel
     ) {
         val startIndex = row * (maxBricksPerLine - 1)
         val endIndex =
@@ -59,12 +58,14 @@ class OptionsHandler(
                 startIndex + (maxBricksPerLine - 1),
                 GameModel.allowedLetters.length
             )
+        val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
         GameModel.allowedLetters.subSequence(startIndex, endIndex)
             .reversed()
             .forEach {
                 val brick = Brick(it.toString(), brickTexture, letterSize, font80)
                 brick.addListener(object : ClickListener() {
                     override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                        if (gameModel.triesLeft == 0) return
                         super.clicked(event, x, y)
                         selectedBrick = brick
                         gamePlayScreen.onBrickClicked(brick.letter[0])

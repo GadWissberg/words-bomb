@@ -10,15 +10,15 @@ import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class GamePlayScreenViewHandlers(
+class GamePlayScreenViews(
     private val assetsManager: GameAssetManager,
     private val soundPlayer: SoundPlayer
 ) : Disposable {
 
-    lateinit var targetWordsHandler: TargetWordsHandler
+    lateinit var targetPhrasesView: TargetPhrasesView
     val bombHandler = BombHandler(soundPlayer, assetsManager)
-    lateinit var optionsHandler: OptionsHandler
-    val topBarHandler = TopBarHandler(soundPlayer)
+    lateinit var optionsView: OptionsView
+    val topBarView = TopBarView(soundPlayer)
 
     fun onShow(
         letterSize: Vector2,
@@ -28,10 +28,10 @@ class GamePlayScreenViewHandlers(
         gameModel: GameModel,
         gamePlayScreen: GamePlayScreen,
     ) {
-        topBarHandler.addTopBar(assetsManager, gameModel, gamePlayScreen, stage)
-        targetWordsHandler = TargetWordsHandler(letterSize, font80, soundPlayer, assetsManager)
-        targetWordsHandler.calculateMaxBricksPerLine(assetsManager)
-        optionsHandler = OptionsHandler(stage, soundPlayer, assetsManager)
+        topBarView.addTopBar(assetsManager, gameModel, gamePlayScreen, stage)
+        targetPhrasesView = TargetPhrasesView(letterSize, font80, soundPlayer, assetsManager)
+        targetPhrasesView.calculateMaxBricksPerLine(assetsManager)
+        optionsView = OptionsView(stage, soundPlayer, assetsManager)
     }
 
     fun onGameBegin(
@@ -43,51 +43,51 @@ class GamePlayScreenViewHandlers(
         stage: GameStage
     ) {
         bombHandler.addBomb(assetsManager, stage, uiTable, gameModel)
-        targetWordsHandler.onGameBegin(gameModel, assetsManager, uiTable)
-        optionsHandler.addLettersOptionsTable(
+        targetPhrasesView.onGameBegin(gameModel, assetsManager, uiTable)
+        optionsView.addLettersOptionsTable(
             uiTable,
             assetsManager,
-            targetWordsHandler.maxBricksPerLine,
+            targetPhrasesView.maxBricksPerLine,
             letterSize,
-            font80,
-            gamePlayScreen
+            gamePlayScreen,
+            gameModel
         )
-        topBarHandler.onGameBegin(gameModel.currentCategory)
+        topBarView.onGameBegin(gameModel.currentCategory)
     }
 
     fun onGameWinAnimation(stage: GameStage, actionOnGameWinAnimationFinish: Runnable) {
         bombHandler.onGameWinAnimation()
-        targetWordsHandler.onGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
+        targetPhrasesView.onGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
     }
 
     fun onScreenClear() {
         bombHandler.onScreenClear {
-            optionsHandler.onScreenClear()
-            targetWordsHandler.onScreenClear()
+            optionsView.onScreenClear()
+            targetPhrasesView.onScreenClear()
         }
     }
 
     fun onIncorrectGuess() {
         bombHandler.onIncorrectGuess()
-        optionsHandler.onIncorrectGuess()
+        optionsView.onIncorrectGuess()
     }
 
     fun onGameOverAnimation(stage: GameStage) {
         bombHandler.onGameOverAnimation(assetsManager, stage)
-        optionsHandler.clearAllOptions()
+        optionsView.clearAllOptions()
     }
 
     override fun dispose() {
-        topBarHandler.dispose()
+        topBarView.dispose()
     }
 
-    fun onHide() {
-        topBarHandler.onHide()
-        bombHandler.onHide()
+    fun clear() {
+        topBarView.clear()
+        bombHandler.clear()
     }
 
     fun onCorrectGuess(coinsAmount: Int) {
-        topBarHandler.onCorrectGuess(coinsAmount, assetsManager)
+        topBarView.onCorrectGuess(coinsAmount, assetsManager)
     }
 
 }

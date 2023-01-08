@@ -124,7 +124,7 @@ class BombHandler(
         )
     }
 
-    fun onHide() {
+    fun clear() {
         fireParticleEffectActor.remove()
     }
 

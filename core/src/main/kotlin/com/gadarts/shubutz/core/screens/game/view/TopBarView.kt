@@ -1,5 +1,6 @@
 package com.gadarts.shubutz.core.screens.game.view
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
@@ -14,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.SoundPlayer
@@ -25,11 +27,12 @@ import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
+class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
 
+    private lateinit var table: Table
     private lateinit var categoryLabel: Label
-    private lateinit var topBarTable: Table
-    private lateinit var topBarTexture: Texture
+    private lateinit var topPartTable: Table
+    private lateinit var topPartTexture: Texture
     lateinit var coinsLabel: Label
 
     fun addTopBar(
@@ -38,14 +41,39 @@ class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
         gamePlayScreen: GamePlayScreen,
         stage: GameStage
     ) {
-        createTopBarTexture(stage)
-        topBarTable = Table()
-        topBarTable.background = TextureRegionDrawable(topBarTexture)
-        topBarTable.setSize(stage.width, TOP_BAR_HEIGHT.toFloat())
-        topBarTable.debug = DebugSettings.SHOW_UI_BORDERS
-        stage.addActor(topBarTable)
-        topBarTable.setPosition(0F, stage.height - topBarTable.height)
-        addTopBarComponents(topBarTable, assetsManager, gamePlayScreen, gameModel)
+        table = Table()
+        stage.addActor(table)
+        addTopPart(stage, assetsManager, gamePlayScreen, gameModel)
+        addCategoryLabel(gameModel, assetsManager)
+        table.setPosition(stage.width / 2F, stage.height - table.prefHeight / 2F)
+        table.setDebug(DebugSettings.SHOW_UI_BORDERS, true)
+    }
+
+    private fun addCategoryLabel(
+        gameModel: GameModel,
+        assetsManager: GameAssetManager
+    ) {
+        categoryLabel = Label(
+            gameModel.currentCategory,
+            Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.WHITE)
+        )
+        categoryLabel.setAlignment(Align.center)
+        table.add(categoryLabel).size(Gdx.graphics.width.toFloat(), categoryLabel.height.toFloat())
+    }
+
+    private fun addTopPart(
+        stage: GameStage,
+        assetsManager: GameAssetManager,
+        gamePlayScreen: GamePlayScreen,
+        gameModel: GameModel
+    ) {
+        createTopPartTexture(stage)
+        topPartTable = Table()
+        topPartTable.background = TextureRegionDrawable(topPartTexture)
+        topPartTable.debug = DebugSettings.SHOW_UI_BORDERS
+        topPartTable.setSize(Gdx.graphics.width.toFloat(), TOP_PART_HEIGHT.toFloat())
+        addTopPartComponents(topPartTable, assetsManager, gamePlayScreen, gameModel)
+        table.add(topPartTable).row()
     }
 
     private fun addBackButton(
@@ -62,21 +90,16 @@ class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
                 soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
             }
         })
-        table.add(button).expandX().pad(40F).left()
+        table.add(button).expandX().pad(10F, 80F, 10F, 20F).left()
     }
 
-    private fun addTopBarComponents(
+    private fun addTopPartComponents(
         table: Table,
         assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
         gameModel: GameModel
     ) {
         addBackButton(table, assetsManager, gamePlayScreen)
-        categoryLabel = Label(
-            gameModel.currentCategory,
-            Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
-        )
-        table.add(categoryLabel).pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
         addCoinsLabel(gameModel, font80, table, assetsManager)
     }
@@ -91,28 +114,27 @@ class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
         table.add(coinsLabel).pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
         table.add(Image(assetsManager.getTexture(TexturesDefinitions.COINS_ICON)))
             .size(
-                topBarTexture.height.toFloat(),
-                topBarTexture.height.toFloat()
-            ).pad(40F)
+                topPartTexture.height.toFloat(),
+                topPartTexture.height.toFloat()
+            ).pad(10F).row()
     }
 
-    private fun createTopBarTexture(stage: GameStage) {
-        val pixmap =
-            Pixmap(stage.width.toInt(), TOP_BAR_HEIGHT, Pixmap.Format.RGBA8888)
+    private fun createTopPartTexture(stage: GameStage) {
+        val pixmap = Pixmap(stage.width.toInt(), TOP_PART_HEIGHT, Pixmap.Format.RGBA8888)
         val color = Color.valueOf(TOP_BAR_COLOR)
         color.a /= 2F
         pixmap.setColor(color)
         pixmap.fill()
-        topBarTexture = Texture(pixmap)
+        topPartTexture = Texture(pixmap)
         pixmap.dispose()
     }
 
     override fun dispose() {
-        topBarTexture.dispose()
+        topPartTexture.dispose()
     }
 
-    fun onHide() {
-        topBarTable.remove()
+    fun clear() {
+        table.remove()
     }
 
     fun onGameBegin(currentCategory: String) {
@@ -146,17 +168,17 @@ class TopBarHandler(private val soundPlayer: SoundPlayer) : Disposable {
             "+$coinsAmount",
             Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.GOLD)
         )
-        topBarTable.stage.addActor(winCoinLabel)
+        topPartTable.stage.addActor(winCoinLabel)
         val coinsLabelPosition = coinsLabel.localToScreenCoordinates(auxVector.setZero())
         winCoinLabel.setPosition(
             coinsLabelPosition.x,
-            topBarTable.stage.height - coinsLabelPosition.y
+            topPartTable.stage.height - coinsLabelPosition.y
         )
         return winCoinLabel
     }
 
     companion object {
-        private const val TOP_BAR_HEIGHT = 150
+        private const val TOP_PART_HEIGHT = 150
         private val auxVector = Vector2()
         private const val TOP_BAR_COLOR = "#85adb0"
         private const val COINS_LABEL_PADDING_RIGHT = 40F

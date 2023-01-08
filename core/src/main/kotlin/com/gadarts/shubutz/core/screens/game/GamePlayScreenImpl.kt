@@ -65,7 +65,7 @@ class GamePlayScreenImpl(
     }
 
     override fun hide() {
-        gamePlayScreenView.onHide()
+        gamePlayScreenView.clear()
     }
 
     override fun dispose() {

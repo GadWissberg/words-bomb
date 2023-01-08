@@ -53,6 +53,7 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     }
 
     override fun goToMenu() {
+        if (getScreen() is MenuScreen) return
         soundPlayer.playMusic(assetsManager.getMusic(MusicDefinitions.MENU))
         screen?.dispose()
         val menuScreen = MenuScreen(assetsManager, android, this, stage, soundPlayer)
