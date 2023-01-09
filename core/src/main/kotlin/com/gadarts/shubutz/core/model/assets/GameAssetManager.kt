@@ -49,13 +49,6 @@ open class GameAssetManager : AssetManager() {
         }
     }
 
-    private fun initializeFontLoaders() {
-        val resolver: FileHandleResolver = InternalFileHandleResolver()
-        setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
-        val loader = FreetypeFontLoader(resolver)
-        setLoader(BitmapFont::class.java, "ttf", loader)
-    }
-
     fun getShader(shader: ShaderDefinitions): String? {
         return get(shader.getPath(), String::class.java)
     }
@@ -78,6 +71,13 @@ open class GameAssetManager : AssetManager() {
 
     fun getSound(sound: SoundsDefinitions): Sound {
         return get(sound.getPath(), Sound::class.java)
+    }
+
+    private fun initializeFontLoaders() {
+        val resolver: FileHandleResolver = InternalFileHandleResolver()
+        setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
+        val loader = FreetypeFontLoader(resolver)
+        setLoader(BitmapFont::class.java, "ttf", loader)
     }
 
 }

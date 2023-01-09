@@ -52,7 +52,7 @@ class GamePlayScreenViews(
             gamePlayScreen,
             gameModel
         )
-        topBarView.onGameBegin(gameModel.currentCategory)
+        topBarView.setCategoryLabelText(gameModel.currentCategory)
     }
 
     fun onGameWinAnimation(stage: GameStage, actionOnGameWinAnimationFinish: Runnable) {
@@ -87,7 +87,7 @@ class GamePlayScreenViews(
     }
 
     fun onCorrectGuess(coinsAmount: Int) {
-        topBarView.onCorrectGuess(coinsAmount, assetsManager)
+        topBarView.applyWinCoinEffect(coinsAmount, assetsManager)
     }
 
 }

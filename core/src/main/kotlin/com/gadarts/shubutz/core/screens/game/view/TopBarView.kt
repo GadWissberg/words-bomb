@@ -27,14 +27,24 @@ import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
+/**
+ * Handle the in-game UI top-bar's view.
+ */
 class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
 
     private lateinit var table: Table
     private lateinit var categoryLabel: Label
     private lateinit var topPartTable: Table
     private lateinit var topPartTexture: Texture
+
+    /**
+     * Displays the current coins the player has.
+     */
     lateinit var coinsLabel: Label
 
+    /**
+     * Creates and adds the top bar table to the given stage.
+     */
     fun addTopBar(
         assetsManager: GameAssetManager,
         gameModel: GameModel,
@@ -58,7 +68,7 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
             Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.WHITE)
         )
         categoryLabel.setAlignment(Align.center)
-        table.add(categoryLabel).size(Gdx.graphics.width.toFloat(), categoryLabel.height.toFloat())
+        table.add(categoryLabel).size(Gdx.graphics.width.toFloat(), categoryLabel.height)
     }
 
     private fun addTopPart(
@@ -133,18 +143,23 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         topPartTexture.dispose()
     }
 
+    /**
+     * Removes the top-bar's table from the stage.
+     */
     fun clear() {
         table.remove()
     }
 
-    fun onGameBegin(currentCategory: String) {
+    fun setCategoryLabelText(currentCategory: String) {
         categoryLabel.setText(currentCategory.reversed())
     }
 
-    fun onCorrectGuess(coinsAmount: Int, assetsManager: GameAssetManager) {
+    /**
+     * Creates a label flying off the coins label to show the player won coins.
+     */
+    fun applyWinCoinEffect(coinsAmount: Int, assetsManager: GameAssetManager) {
         if (coinsAmount > 0) {
             val winCoinLabel = addWinCoinLabel(coinsAmount, assetsManager)
-
             winCoinLabel.addAction(
                 Actions.sequence(
                     Actions.moveBy(
@@ -169,11 +184,8 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
             Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.GOLD)
         )
         topPartTable.stage.addActor(winCoinLabel)
-        val coinsLabelPosition = coinsLabel.localToScreenCoordinates(auxVector.setZero())
-        winCoinLabel.setPosition(
-            coinsLabelPosition.x,
-            topPartTable.stage.height - coinsLabelPosition.y
-        )
+        val coinsLabelPos = coinsLabel.localToScreenCoordinates(auxVector.setZero())
+        winCoinLabel.setPosition(coinsLabelPos.x, topPartTable.stage.height - coinsLabelPos.y)
         return winCoinLabel
     }
 

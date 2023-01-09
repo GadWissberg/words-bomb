@@ -1,6 +1,5 @@
 package com.gadarts.shubutz.core
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 

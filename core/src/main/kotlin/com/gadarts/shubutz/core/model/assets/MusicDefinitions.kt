@@ -3,7 +3,7 @@ package com.gadarts.shubutz.core.model.assets
 import com.badlogic.gdx.assets.AssetLoaderParameters
 import com.badlogic.gdx.audio.Music
 
-enum class MusicDefinitions() : AssetDefinition<Music> {
+enum class MusicDefinitions : AssetDefinition<Music> {
     MENU,
     IN_GAME;
 

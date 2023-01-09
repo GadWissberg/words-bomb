@@ -3,7 +3,6 @@ package com.gadarts.shubutz.core
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
-import java.io.OutputStreamWriter
 
 class GeneralUtils {
     companion object {
