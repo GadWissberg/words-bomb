@@ -1,5 +1,6 @@
 package com.gadarts.shubutz.core.screens.game.view
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
@@ -18,7 +19,7 @@ import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import kotlin.math.min
 
-class OptionsView(
+class OptionsComponent(
     private val stage: GameStage,
     private val soundPlayer: SoundPlayer,
     private val assetsManager: GameAssetManager
@@ -88,9 +89,9 @@ class OptionsView(
             }
     }
 
-    fun onSelectionSuccessful() {
+    fun clearSelectedBrick() {
         selectedBrick!!.listeners.clear()
-        selectedBrick!!.remove()
+        markBrick(selectedBrick!!, true)
         selectedBrick = null
     }
 
@@ -99,14 +100,13 @@ class OptionsView(
     }
 
     fun onIncorrectGuess() {
-        animateBrickFall(selectedBrick!!)
+        markBrick(selectedBrick!!, false)
         selectedBrick!!.listeners.clear()
         selectedBrick = null
     }
 
     fun clearAllOptions() {
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.FLYBY))
-        val lastIndex = lettersOptionsTable.cells.size - 1
         for (i in 0 until lettersOptionsTable.cells.size) {
             if (lettersOptionsTable.cells[i].actor != null) {
                 animateBrickFall(lettersOptionsTable.cells[i].actor as Brick)
@@ -135,7 +135,22 @@ class OptionsView(
         )
     }
 
+    private fun markBrick(brick: Brick, correct: Boolean) {
+        brick.addAction(
+            Actions.sequence(
+                Actions.color(
+                    if (correct) BRICK_MARK_COLOR_CORRECT else BRICK_MARK_COLOR_INCORRECT,
+                    1F,
+                    Interpolation.slowFast
+                ),
+                Actions.run { brick.disable() }
+            ),
+        )
+    }
+
     companion object {
+        private val BRICK_MARK_COLOR_INCORRECT = Color.valueOf("#7D0000")
+        private val BRICK_MARK_COLOR_CORRECT = Color.valueOf("#007D00")
         private const val BRICK_FAIL_ANIMATION_DURATION = 1F
     }
 

@@ -10,14 +10,14 @@ import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class GamePlayScreenViews(
+class GamePlayScreenComponents(
     private val assetsManager: GameAssetManager,
     private val soundPlayer: SoundPlayer
 ) : Disposable {
 
     lateinit var targetPhrasesView: TargetPhrasesView
     val bombHandler = BombHandler(soundPlayer, assetsManager)
-    lateinit var optionsView: OptionsView
+    lateinit var optionsComponent: OptionsComponent
     val topBarView = TopBarView(soundPlayer)
 
     fun onShow(
@@ -31,20 +31,19 @@ class GamePlayScreenViews(
         topBarView.addTopBar(assetsManager, gameModel, gamePlayScreen, stage)
         targetPhrasesView = TargetPhrasesView(letterSize, font80, soundPlayer, assetsManager)
         targetPhrasesView.calculateMaxBricksPerLine(assetsManager)
-        optionsView = OptionsView(stage, soundPlayer, assetsManager)
+        optionsComponent = OptionsComponent(stage, soundPlayer, assetsManager)
     }
 
-    fun onGameBegin(
+    fun init(
         uiTable: Table,
         gameModel: GameModel,
         letterSize: Vector2,
-        font80: BitmapFont,
         gamePlayScreen: GamePlayScreen,
         stage: GameStage
     ) {
         bombHandler.addBomb(assetsManager, stage, uiTable, gameModel)
         targetPhrasesView.onGameBegin(gameModel, assetsManager, uiTable)
-        optionsView.addLettersOptionsTable(
+        optionsComponent.addLettersOptionsTable(
             uiTable,
             assetsManager,
             targetPhrasesView.maxBricksPerLine,
@@ -62,19 +61,19 @@ class GamePlayScreenViews(
 
     fun onScreenClear() {
         bombHandler.onScreenClear {
-            optionsView.onScreenClear()
+            optionsComponent.onScreenClear()
             targetPhrasesView.onScreenClear()
         }
     }
 
     fun onIncorrectGuess() {
         bombHandler.onIncorrectGuess()
-        optionsView.onIncorrectGuess()
+        optionsComponent.onIncorrectGuess()
     }
 
     fun onGameOverAnimation(stage: GameStage) {
         bombHandler.onGameOverAnimation(assetsManager, stage)
-        optionsView.clearAllOptions()
+        optionsComponent.clearAllOptions()
     }
 
     override fun dispose() {

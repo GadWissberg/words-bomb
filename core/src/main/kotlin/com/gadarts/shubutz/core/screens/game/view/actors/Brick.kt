@@ -17,6 +17,7 @@ open class Brick(
 ) :
     Image(brickTexture) {
 
+
     override fun draw(batch: Batch?, parentAlpha: Float) {
         super.draw(batch, parentAlpha)
         drawLetter(batch, x, y, font80)
@@ -44,6 +45,10 @@ open class Brick(
         if (batch != null && color.a == 1F) {
             bitmapFont.draw(batch, text, position.x, position.y)
         }
+    }
+
+    fun disable() {
+        listeners.clear()
     }
 
     companion object {

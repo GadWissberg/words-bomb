@@ -27,7 +27,7 @@ class GamePlayScreenView(
 ) :
     Disposable {
 
-    private val gamePlayScreenViews = GamePlayScreenViews(assetsManager, soundPlayer)
+    private val gamePlayScreenComponents = GamePlayScreenComponents(assetsManager, soundPlayer)
     private lateinit var uiTable: Table
     private var font80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
     private lateinit var letterSize: Vector2
@@ -41,7 +41,7 @@ class GamePlayScreenView(
 
     private fun createInterface() {
         addUiTable()
-        gamePlayScreenViews.onShow(
+        gamePlayScreenComponents.onShow(
             letterSize,
             font80,
             assetsManager,
@@ -54,11 +54,10 @@ class GamePlayScreenView(
 
     fun onGameBegin() {
         stage.root.clearActions()
-        gamePlayScreenViews.onGameBegin(
+        gamePlayScreenComponents.init(
             uiTable,
             gameModel,
             letterSize,
-            font80,
             gamePlayScreen,
             stage
         )
@@ -82,23 +81,23 @@ class GamePlayScreenView(
     }
 
     override fun dispose() {
-        gamePlayScreenViews.dispose()
+        gamePlayScreenComponents.dispose()
     }
 
     fun clear() {
         uiTable.remove()
-        gamePlayScreenViews.clear()
+        gamePlayScreenComponents.clear()
     }
 
     fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
-        gamePlayScreenViews.onCorrectGuess(coinsAmount)
+        gamePlayScreenComponents.onCorrectGuess(coinsAmount)
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.CORRECT))
-        if (gamePlayScreenViews.optionsView.selectedBrick != null) {
+        if (gamePlayScreenComponents.optionsComponent.selectedBrick != null) {
             val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
             indices.forEach {
                 animateBrickSuccess(it, gameWin, brickTexture)
             }
-            gamePlayScreenViews.optionsView.onSelectionSuccessful()
+            gamePlayScreenComponents.optionsComponent.clearSelectedBrick()
         }
     }
 
@@ -114,10 +113,10 @@ class GamePlayScreenView(
                 letterIndexInWord++
             }
         }
-        val wordTable = gamePlayScreenViews.targetPhrasesView.wordsTables[wordCount]
+        val wordTable = gamePlayScreenComponents.targetPhrasesView.wordsTables[wordCount]
         val cell = wordTable.cells[letterIndexInWord]
         val selectedBrickScreenCoords =
-            gamePlayScreenViews.optionsView.selectedBrick!!.localToStageCoordinates(
+            gamePlayScreenComponents.optionsComponent.selectedBrick!!.localToStageCoordinates(
                 auxVector.setZero()
             )
         val brick =
@@ -140,7 +139,7 @@ class GamePlayScreenView(
 
         if (gameWin) {
             sequence.addAction(Actions.run { animateGameWin(stage) })
-            gamePlayScreenViews.topBarView.coinsLabel.setText(gameModel.coins.toString())
+            gamePlayScreenComponents.topBarView.coinsLabel.setText(gameModel.coins.toString())
             val particleEffectActor = ParticleEffectActor(
                 assetsManager.getParticleEffect(
                     ParticleEffectsDefinitions.STARS
@@ -151,12 +150,12 @@ class GamePlayScreenView(
             )
             particleEffectActor.start()
             val localToScreenCoordinates =
-                gamePlayScreenViews.topBarView.coinsLabel.localToStageCoordinates(
+                gamePlayScreenComponents.topBarView.coinsLabel.localToStageCoordinates(
                     auxVector.setZero()
                 )
             particleEffectActor.setPosition(
-                localToScreenCoordinates.x + gamePlayScreenViews.topBarView.coinsLabel.width / 2F,
-                localToScreenCoordinates.y + gamePlayScreenViews.topBarView.coinsLabel.height / 2F
+                localToScreenCoordinates.x + gamePlayScreenComponents.topBarView.coinsLabel.width / 2F,
+                localToScreenCoordinates.y + gamePlayScreenComponents.topBarView.coinsLabel.height / 2F
             )
         }
         brick.addAction(sequence)
@@ -168,11 +167,11 @@ class GamePlayScreenView(
     }
 
     private fun animateGameWin(stage: GameStage) {
-        gamePlayScreenViews.onGameWinAnimation(stage) { clearScreen() }
+        gamePlayScreenComponents.onGameWinAnimation(stage) { clearScreen() }
     }
 
     private fun clearScreen() {
-        gamePlayScreenViews.onScreenClear()
+        gamePlayScreenComponents.onScreenClear()
         stage.addAction(Actions.delay(2F, Actions.run {
             uiTable.clear()
             gamePlayScreen.onScreenEmpty()
@@ -182,16 +181,16 @@ class GamePlayScreenView(
 
     fun onIncorrectGuess(gameOver: Boolean) {
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.INCORRECT))
-        gamePlayScreenViews.bombHandler.updateLabel(gameModel)
+        gamePlayScreenComponents.bombHandler.updateLabel(gameModel)
         if (gameOver) {
             animateGameOver()
-        } else if (gamePlayScreenViews.optionsView.selectedBrick != null) {
-            gamePlayScreenViews.onIncorrectGuess()
+        } else if (gamePlayScreenComponents.optionsComponent.selectedBrick != null) {
+            gamePlayScreenComponents.onIncorrectGuess()
         }
     }
 
     private fun animateGameOver() {
-        gamePlayScreenViews.onGameOverAnimation(stage)
+        gamePlayScreenComponents.onGameOverAnimation(stage)
         stage.addAction(Actions.delay(5F, Actions.run { gamePlayScreen.onGameOverAnimationDone() }))
     }
 
