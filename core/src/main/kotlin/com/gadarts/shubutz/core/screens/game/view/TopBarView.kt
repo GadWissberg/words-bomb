@@ -93,14 +93,22 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
     ) {
         val texture = assetsManager.getTexture(TexturesDefinitions.BACK_BUTTON)
         val button = ImageButton(TextureRegionDrawable(texture))
+        addClickListener(button, { gamePlayScreen.onClickedBackButton() }, assetsManager)
+        table.add(button).pad(10F, 80F, 10F, 40F).left()
+    }
+
+    private fun addClickListener(
+        button: ImageButton,
+        runnable: Runnable,
+        assetsManager: GameAssetManager
+    ) {
         button.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 super.clicked(event, x, y)
-                gamePlayScreen.onClickedBackButton()
+                runnable.run()
                 soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
             }
         })
-        table.add(button).expandX().pad(10F, 80F, 10F, 20F).left()
     }
 
     private fun addTopPartComponents(
@@ -109,9 +117,22 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         gamePlayScreen: GamePlayScreen,
         gameModel: GameModel
     ) {
-        addBackButton(table, assetsManager, gamePlayScreen)
+        val leftSideTable = Table()
+        leftSideTable.debug = DebugSettings.SHOW_UI_BORDERS
+        addBackButton(leftSideTable, assetsManager, gamePlayScreen)
+        addBuyCoinsButton(leftSideTable, assetsManager)
+        table.add(leftSideTable).expandX().left()
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
         addCoinsLabel(gameModel, font80, table, assetsManager)
+    }
+
+    private fun addBuyCoinsButton(table: Table, assetsManager: GameAssetManager) {
+        val coinsButton = ImageButton(
+            TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.COINS_BUTTON_UP)),
+            TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.COINS_BUTTON_DOWN))
+        )
+        addClickListener(coinsButton, { }, assetsManager)
+        table.add(coinsButton).pad(60F, 20F, 20F, 20F)
     }
 
     private fun addCoinsLabel(
