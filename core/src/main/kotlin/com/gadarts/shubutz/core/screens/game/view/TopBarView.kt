@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.NinePatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -14,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
@@ -131,7 +133,31 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
             TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.COINS_BUTTON_UP)),
             TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.COINS_BUTTON_DOWN))
         )
-        addClickListener(coinsButton, { }, assetsManager)
+        addClickListener(coinsButton, {
+            val popupTable = Table()
+            popupTable.background =
+                NinePatchDrawable(
+                    NinePatch(
+                        assetsManager.getTexture(TexturesDefinitions.POPUP),
+                        200,
+                        200,
+                        200,
+                        200
+                    )
+                )
+            val headerLabel =
+                Label(
+                    "מטבעות",
+                    Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
+                )
+            popupTable.setSize(720F, 480F)
+            popupTable.add(headerLabel)
+            table.stage.addActor(popupTable)
+            popupTable.setPosition(
+                table.stage.width / 2F - popupTable.width / 2F,
+                table.stage.height / 2F - popupTable.height / 2F
+            )
+        }, assetsManager)
         table.add(coinsButton).pad(60F, 20F, 20F, 20F)
     }
 
