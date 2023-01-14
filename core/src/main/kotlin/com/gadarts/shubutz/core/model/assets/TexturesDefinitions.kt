@@ -4,33 +4,36 @@ import com.badlogic.gdx.assets.AssetLoaderParameters
 import com.badlogic.gdx.graphics.Texture
 import java.util.Locale.ROOT
 
-enum class TexturesDefinitions(ninepatch: Boolean) : AssetDefinition<Texture> {
+enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Texture> {
     HUD(true),
-    BACK_BUTTON(false),
-    BUTTON_UP(false),
-    BUTTON_DOWN(false),
-    CELL(false),
-    BRICK(false),
+    BACK_BUTTON,
+    BUTTON_UP,
+    BUTTON_DOWN,
+    CELL,
+    BRICK,
     LIST(true),
     POPUP(true),
     POPUP_BUTTON_UP(true),
     POPUP_BUTTON_DOWN(true),
-    CLOUD_1(false),
-    CLOUD_2(false),
-    CLOUD_3(false),
-    CLOUD_4(false),
-    GO_BUTTON_UP(false),
-    GO_BUTTON_DOWN(false),
-    GO_BUTTON_DISABLED(false),
-    LOGO_SHIN(false),
-    LOGO_VAV1(false),
-    LOGO_BET(false),
-    LOGO_VAV2(false),
-    LOGO_LAST(false),
-    BOMB(false),
-    COINS_ICON(false),
-    COINS_BUTTON_UP(false),
-    COINS_BUTTON_DOWN(false);
+    CLOUD_1,
+    CLOUD_2,
+    CLOUD_3,
+    CLOUD_4,
+    GO_BUTTON_UP,
+    GO_BUTTON_DOWN,
+    GO_BUTTON_DISABLED,
+    LOGO_SHIN,
+    LOGO_VAV1,
+    LOGO_BET,
+    LOGO_VAV2,
+    LOGO_LAST,
+    BOMB,
+    COINS_ICON,
+    COINS_BUTTON_UP,
+    COINS_BUTTON_DOWN,
+    ICON_PACK_1,
+    ICON_PACK_2,
+    ICON_PACK_3;
 
     private var path: String =
         "textures/${(if (ninepatch) "$name.9" else name).lowercase(ROOT)}.png"

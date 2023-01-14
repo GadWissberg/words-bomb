@@ -12,7 +12,10 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton.ImageTextButtonStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
@@ -26,6 +29,7 @@ import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
+import com.gadarts.shubutz.core.model.assets.TexturesDefinitions.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
@@ -93,7 +97,7 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen
     ) {
-        val texture = assetsManager.getTexture(TexturesDefinitions.BACK_BUTTON)
+        val texture = assetsManager.getTexture(BACK_BUTTON)
         val button = ImageButton(TextureRegionDrawable(texture))
         addClickListener(button, { gamePlayScreen.onClickedBackButton() }, assetsManager)
         table.add(button).pad(10F, 80F, 10F, 40F).left()
@@ -130,35 +134,97 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
 
     private fun addBuyCoinsButton(table: Table, assetsManager: GameAssetManager) {
         val coinsButton = ImageButton(
-            TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.COINS_BUTTON_UP)),
-            TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.COINS_BUTTON_DOWN))
+            TextureRegionDrawable(assetsManager.getTexture(COINS_BUTTON_UP)),
+            TextureRegionDrawable(assetsManager.getTexture(COINS_BUTTON_DOWN))
         )
-        addClickListener(coinsButton, {
-            val popupTable = Table()
-            popupTable.background =
-                NinePatchDrawable(
-                    NinePatch(
-                        assetsManager.getTexture(TexturesDefinitions.POPUP),
-                        200,
-                        200,
-                        200,
-                        200
-                    )
-                )
-            val headerLabel =
-                Label(
-                    "מטבעות",
-                    Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
-                )
-            popupTable.setSize(720F, 480F)
-            popupTable.add(headerLabel)
-            table.stage.addActor(popupTable)
-            popupTable.setPosition(
-                table.stage.width / 2F - popupTable.width / 2F,
-                table.stage.height / 2F - popupTable.height / 2F
-            )
-        }, assetsManager)
+        addClickListener(coinsButton, { addCoinsWindow(assetsManager, table) }, assetsManager)
         table.add(coinsButton).pad(60F, 20F, 20F, 20F)
+    }
+
+    private fun addCoinsWindow(
+        assets: GameAssetManager,
+        table: Table
+    ): Table {
+        val popup = Table()
+        addCoinsWindowComponents(assets, popup)
+        initCoinsWindow(assets, popup, table)
+        table.stage.addActor(popup)
+        return popup
+    }
+
+    private fun addCoinsWindowComponents(
+        assets: GameAssetManager,
+        popup: Table
+    ) {
+        addHeaderToCoinsWindow(assets, popup)
+        addCoinsWindowDescription(assets, popup)
+        addPackButton(assets, popup, FIRST_PACK_LABEL, ICON_PACK_1, GameModel.AMOUNT_PACK_FIRST)
+        addPackButton(assets, popup, SECOND_PACK_LABEL, ICON_PACK_2, GameModel.AMOUNT_PACK_SECOND)
+        addPackButton(assets, popup, THIRD_PACK_LABEL, ICON_PACK_3, GameModel.AMOUNT_PACK_THIRD)
+    }
+
+    private fun addCoinsWindowDescription(assetsManager: GameAssetManager, popup: Table) {
+        val style = LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
+        val text = Label(COINS_POPUP_DESCRIPTION.reversed(), style)
+        popup.add(text).pad(0F, 0F, COINS_WINDOW_DESCRIPTION_PADDING_BOTTOM, 0F).row()
+    }
+
+    private fun addPackButton(
+        assetsManager: GameAssetManager,
+        popup: Table,
+        label: String,
+        texturesDefinition: TexturesDefinitions,
+        amount: Int
+    ) {
+        val packButton = ImageTextButton(
+            label.format(amount.toString().reversed()).reversed(), ImageTextButtonStyle(
+                TextureRegionDrawable(assetsManager.getTexture(POPUP_BUTTON_UP)),
+                TextureRegionDrawable(assetsManager.getTexture(POPUP_BUTTON_DOWN)),
+                null,
+                assetsManager.getFont(FontsDefinitions.VARELA_40)
+            )
+        )
+        packButton.add(Image(assetsManager.getTexture(texturesDefinition)))
+        popup.add(packButton).pad(COINS_POPUP_BUTTON_PADDING).row()
+    }
+
+    private fun addHeaderToCoinsWindow(
+        assetsManager: GameAssetManager,
+        popup: Table
+    ) {
+        val font = assetsManager.getFont(FontsDefinitions.VARELA_80)
+        val headerStyle = Label.LabelStyle(font, Color.WHITE)
+        popup.add(Label(COINS_POPUP_HEADER.reversed(), headerStyle))
+            .pad(0F, 0F, COINS_POPUP_HEADER_PADDING_BOTTOM, 0F)
+            .row()
+    }
+
+    private fun initCoinsWindow(
+        assetsManager: GameAssetManager,
+        popup: Table,
+        table: Table
+    ) {
+        val popupTexture = assetsManager.getTexture(POPUP)
+        applyCoinsWindowBackground(popupTexture, popup)
+        popup.pack()
+        popup.setPosition(
+            table.stage.width / 2F - popup.width / 2F,
+            table.stage.height / 2F - popup.height / 2F
+        )
+    }
+
+    private fun applyCoinsWindowBackground(
+        popupTexture: Texture,
+        popup: Table
+    ) {
+        val ninePatch = NinePatch(
+            popupTexture,
+            COINS_POPUP_PADDING,
+            COINS_POPUP_PADDING,
+            COINS_POPUP_PADDING,
+            COINS_POPUP_PADDING
+        )
+        popup.background = NinePatchDrawable(ninePatch)
     }
 
     private fun addCoinsLabel(
@@ -169,7 +235,7 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
     ) {
         coinsLabel = Label(gameModel.coins.toString(), Label.LabelStyle(font80, Color.WHITE))
         table.add(coinsLabel).pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
-        table.add(Image(assetsManager.getTexture(TexturesDefinitions.COINS_ICON)))
+        table.add(Image(assetsManager.getTexture(COINS_ICON)))
             .size(
                 topPartTexture.height.toFloat(),
                 topPartTexture.height.toFloat()
@@ -242,5 +308,14 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         private const val TOP_BAR_COLOR = "#85adb0"
         private const val COINS_LABEL_PADDING_RIGHT = 40F
         private const val WIN_COIN_LABEL_ANIMATION_DURATION = 4F
+        private const val COINS_POPUP_HEADER = "קבל עוד מטבעות"
+        private const val COINS_POPUP_PADDING = 64
+        private const val COINS_POPUP_HEADER_PADDING_BOTTOM = 64F
+        private const val COINS_POPUP_BUTTON_PADDING = 32F
+        private const val COINS_POPUP_DESCRIPTION = "כל רכישה תסיר את כל הפרסומות!"
+        private const val COINS_WINDOW_DESCRIPTION_PADDING_BOTTOM = 64F
+        private const val FIRST_PACK_LABEL = "%s מטבעות"
+        private const val SECOND_PACK_LABEL = "שק של %s מטבעות"
+        private const val THIRD_PACK_LABEL = "תיבה של %s מטבעות"
     }
 }
