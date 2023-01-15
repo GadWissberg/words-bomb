@@ -71,7 +71,7 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
     ) {
         categoryLabel = Label(
             gameModel.currentCategory,
-            Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.WHITE)
+            LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.WHITE)
         )
         categoryLabel.setAlignment(Align.center)
         table.add(categoryLabel).size(Gdx.graphics.width.toFloat(), categoryLabel.height)
@@ -99,11 +99,11 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
     ) {
         val texture = assetsManager.getTexture(BACK_BUTTON)
         val button = ImageButton(TextureRegionDrawable(texture))
-        addClickListener(button, { gamePlayScreen.onClickedBackButton() }, assetsManager)
+        addClickListenerToButton(button, { gamePlayScreen.onClickedBackButton() }, assetsManager)
         table.add(button).pad(10F, 80F, 10F, 40F).left()
     }
 
-    private fun addClickListener(
+    private fun addClickListenerToButton(
         button: ImageButton,
         runnable: Runnable,
         assetsManager: GameAssetManager
@@ -133,22 +133,43 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
     }
 
     private fun addBuyCoinsButton(table: Table, assetsManager: GameAssetManager) {
+        val coinsButton = createBuyCoinsButton(assetsManager, table)
+        table.add(coinsButton).pad(
+            COINS_BUTTON_PAD_TOP,
+            COINS_BUTTON_PAD_LEFT,
+            COINS_BUTTON_PAD_BOTTOM,
+            COINS_BUTTON_PAD_RIGHT
+        )
+    }
+
+    private fun createBuyCoinsButton(
+        assetsManager: GameAssetManager,
+        table: Table
+    ): ImageButton {
         val coinsButton = ImageButton(
             TextureRegionDrawable(assetsManager.getTexture(COINS_BUTTON_UP)),
             TextureRegionDrawable(assetsManager.getTexture(COINS_BUTTON_DOWN))
         )
-        addClickListener(coinsButton, { addCoinsWindow(assetsManager, table) }, assetsManager)
-        table.add(coinsButton).pad(60F, 20F, 20F, 20F)
+        addClickListenerToButton(
+            coinsButton,
+            {
+                (table.stage as GameStage).addPopup(
+                    addCoinsPopup(assetsManager, table),
+                    COINS_POPUP_NAME
+                )
+            },
+            assetsManager
+        )
+        return coinsButton
     }
 
-    private fun addCoinsWindow(
+    private fun addCoinsPopup(
         assets: GameAssetManager,
         table: Table
     ): Table {
         val popup = Table()
         addCoinsWindowComponents(assets, popup)
         initCoinsWindow(assets, popup, table)
-        table.stage.addActor(popup)
         return popup
     }
 
@@ -166,7 +187,7 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
     private fun addCoinsWindowDescription(assetsManager: GameAssetManager, popup: Table) {
         val style = LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
         val text = Label(COINS_POPUP_DESCRIPTION.reversed(), style)
-        popup.add(text).pad(0F, 0F, COINS_WINDOW_DESCRIPTION_PADDING_BOTTOM, 0F).row()
+        popup.add(text).pad(0F, 0F, COINS_POPUP_DESCRIPTION_PADDING_BOTTOM, 0F).row()
     }
 
     private fun addPackButton(
@@ -193,7 +214,7 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         popup: Table
     ) {
         val font = assetsManager.getFont(FontsDefinitions.VARELA_80)
-        val headerStyle = Label.LabelStyle(font, Color.WHITE)
+        val headerStyle = LabelStyle(font, Color.WHITE)
         popup.add(Label(COINS_POPUP_HEADER.reversed(), headerStyle))
             .pad(0F, 0F, COINS_POPUP_HEADER_PADDING_BOTTOM, 0F)
             .row()
@@ -233,7 +254,7 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         table: Table,
         assetsManager: GameAssetManager
     ) {
-        coinsLabel = Label(gameModel.coins.toString(), Label.LabelStyle(font80, Color.WHITE))
+        coinsLabel = Label(gameModel.coins.toString(), LabelStyle(font80, Color.WHITE))
         table.add(coinsLabel).pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
         table.add(Image(assetsManager.getTexture(COINS_ICON)))
             .size(
@@ -294,7 +315,7 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
     ): Label {
         val winCoinLabel = Label(
             "+$coinsAmount",
-            Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.GOLD)
+            LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.GOLD)
         )
         topPartTable.stage.addActor(winCoinLabel)
         val coinsLabelPos = coinsLabel.localToScreenCoordinates(auxVector.setZero())
@@ -313,9 +334,14 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         private const val COINS_POPUP_HEADER_PADDING_BOTTOM = 64F
         private const val COINS_POPUP_BUTTON_PADDING = 32F
         private const val COINS_POPUP_DESCRIPTION = "כל רכישה תסיר את כל הפרסומות!"
-        private const val COINS_WINDOW_DESCRIPTION_PADDING_BOTTOM = 64F
+        private const val COINS_POPUP_DESCRIPTION_PADDING_BOTTOM = 64F
+        private const val COINS_POPUP_NAME = "coins"
         private const val FIRST_PACK_LABEL = "%s מטבעות"
         private const val SECOND_PACK_LABEL = "שק של %s מטבעות"
         private const val THIRD_PACK_LABEL = "תיבה של %s מטבעות"
+        private const val COINS_BUTTON_PAD_TOP = 60F
+        private const val COINS_BUTTON_PAD_RIGHT = 20F
+        private const val COINS_BUTTON_PAD_LEFT = 20F
+        private const val COINS_BUTTON_PAD_BOTTOM = 20F
     }
 }

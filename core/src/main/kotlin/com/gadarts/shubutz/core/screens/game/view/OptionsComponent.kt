@@ -66,7 +66,7 @@ class OptionsComponent(
                 val brick = Brick(it.toString(), brickTexture, letterSize, font80)
                 brick.addListener(object : ClickListener() {
                     override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                        if (gameModel.triesLeft == 0) return
+                        if (gameModel.triesLeft == 0 || stage.openPopups.isNotEmpty()) return
                         super.clicked(event, x, y)
                         selectedBrick = brick
                         gamePlayScreen.onBrickClicked(brick.letter[0])

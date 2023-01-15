@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gadarts.shubutz.core.GameStage
 import com.gadarts.shubutz.core.GeneralUtils
@@ -20,6 +21,7 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) :
         assetsManager
     ) {
 
+    val openPopups = HashMap<String, Table>()
     override val subscribers = HashSet<MenuStageEventsSubscriber>()
 
     init {
@@ -80,6 +82,21 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) :
     override fun draw() {
         GeneralUtils.resetDisplay(BACKGROUND_COLOR)
         super.draw()
+    }
+
+    fun addPopup(popup: Table, name: String) {
+        if (openPopups.containsKey(name)) return
+
+        popup.addAction(
+            Actions.sequence(
+                Actions.fadeOut(0F),
+                Actions.fadeIn(1F, Interpolation.swingOut)
+            )
+        )
+
+        popup.name = name
+        addActor(popup)
+        openPopups[name] = popup
     }
 
     companion object {

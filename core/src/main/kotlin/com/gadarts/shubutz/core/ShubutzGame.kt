@@ -35,6 +35,8 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     }
 
     override fun setScreen(screen: Screen?) {
+        stage.openPopups.forEach { it.value.remove() }
+        stage.openPopups.clear()
         val currentScreen = this.screen
         super.setScreen(screen)
         currentScreen?.dispose()
