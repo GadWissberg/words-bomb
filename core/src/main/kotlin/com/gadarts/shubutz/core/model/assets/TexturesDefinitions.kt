@@ -12,7 +12,7 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     CELL,
     BRICK,
     LIST(true),
-    POPUP(true),
+    DIALOG(true),
     POPUP_BUTTON_UP(true),
     POPUP_BUTTON_DOWN(true),
     CLOUD_1,
@@ -33,7 +33,8 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     COINS_BUTTON_DOWN,
     ICON_PACK_1,
     ICON_PACK_2,
-    ICON_PACK_3;
+    ICON_PACK_3,
+    DIALOG_CLOSE_BUTTON;
 
     private var path: String =
         "textures/${(if (ninepatch) "$name.9" else name).lowercase(ROOT)}.png"

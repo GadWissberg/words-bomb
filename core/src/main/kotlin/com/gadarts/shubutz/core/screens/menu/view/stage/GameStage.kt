@@ -1,13 +1,21 @@
 package com.gadarts.shubutz.core.screens.menu.view.stage
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.NinePatch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gadarts.shubutz.core.GameStage
 import com.gadarts.shubutz.core.GeneralUtils
@@ -21,7 +29,7 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) :
         assetsManager
     ) {
 
-    val openPopups = HashMap<String, Table>()
+    val openDialogs = HashMap<String, Table>()
     override val subscribers = HashSet<MenuStageEventsSubscriber>()
 
     init {
@@ -84,19 +92,79 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) :
         super.draw()
     }
 
-    fun addPopup(popup: Table, name: String) {
-        if (openPopups.containsKey(name)) return
+    private fun applyDialogBackground(
+        popupTexture: Texture,
+        popup: Table
+    ) {
+        val ninePatch = NinePatch(
+            popupTexture,
+            COINS_DIALOG_PADDING,
+            COINS_DIALOG_PADDING,
+            COINS_DIALOG_PADDING,
+            COINS_DIALOG_PADDING
+        )
+        popup.background = NinePatchDrawable(ninePatch)
+    }
 
-        popup.addAction(
+    private fun initDialog(
+        assetsManager: GameAssetManager,
+        dialog: Table,
+        name: String,
+    ) {
+        dialog.name = name
+        addCloseButtonToDialog(assetsManager, dialog)
+        val dialogTexture = assetsManager.getTexture(TexturesDefinitions.DIALOG)
+        applyDialogBackground(dialogTexture, dialog)
+        openDialogs[name] = dialog
+    }
+
+    fun addDialog(dialogView: Table, name: String, assetsManager: GameAssetManager) {
+        if (openDialogs.containsKey(name)) return
+        val dialog = Table()
+
+        dialog.addAction(
             Actions.sequence(
                 Actions.fadeOut(0F),
                 Actions.fadeIn(1F, Interpolation.swingOut)
             )
         )
 
-        popup.name = name
-        addActor(popup)
-        openPopups[name] = popup
+        initDialog(assetsManager, dialog, name)
+        dialog.add(dialogView)
+        dialog.pack()
+        dialog.setPosition(width / 2F - dialog.width / 2F, height / 2F - dialog.height / 2F)
+        addActor(dialog)
+    }
+
+    fun closeAllDialogs() {
+        openDialogs.forEach { closeDialog(it.value) }
+    }
+
+    private fun addCloseButtonToDialog(
+        assetsManager: GameAssetManager,
+        dialog: Table
+    ) {
+        val closeButtonTexture = assetsManager.getTexture(TexturesDefinitions.DIALOG_CLOSE_BUTTON)
+        val closeButton = ImageButton(TextureRegionDrawable(closeButtonTexture))
+        dialog.add(closeButton).expandX().right().row()
+        closeButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                if (dialog.hasActions()) return
+                closeDialog(dialog)
+            }
+        })
+    }
+
+    private fun closeDialog(dialog: Table) {
+        dialog.addAction(
+            Actions.sequence(
+                Actions.fadeOut(1F, Interpolation.swingOut),
+                Actions.run {
+                    openDialogs.remove(dialog.name)
+                    dialog.remove()
+                }
+            ),
+        )
     }
 
     companion object {
@@ -107,5 +175,6 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) :
         const val CLOUDS_SCALE_DURATION_MAX = 25F
         const val CLOUDS_MOVEMENT_DUR_MIN = 25F
         const val CLOUDS_MOVEMENT_DUR_MAX = 35F
+        private const val COINS_DIALOG_PADDING = 64
     }
 }

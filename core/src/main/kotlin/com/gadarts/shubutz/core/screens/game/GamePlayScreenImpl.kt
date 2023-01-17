@@ -51,7 +51,11 @@ class GamePlayScreenImpl(
     override fun render(delta: Float) {
         gamePlayScreenView.render(delta)
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK)) {
-            lifeCycleManager.goToMenu()
+            if (stage.openDialogs.isEmpty()) {
+                lifeCycleManager.goToMenu()
+            } else {
+                stage.closeAllDialogs()
+            }
         }
     }
 

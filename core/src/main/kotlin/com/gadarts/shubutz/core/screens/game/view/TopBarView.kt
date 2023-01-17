@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.NinePatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -18,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
@@ -153,9 +151,10 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         addClickListenerToButton(
             coinsButton,
             {
-                (table.stage as GameStage).addPopup(
-                    addCoinsPopup(assetsManager, table),
-                    COINS_POPUP_NAME
+                (table.stage as GameStage).addDialog(
+                    addCoinsDialog(assetsManager, table),
+                    COINS_DIALOG_NAME,
+                    assetsManager
                 )
             },
             assetsManager
@@ -163,14 +162,13 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         return coinsButton
     }
 
-    private fun addCoinsPopup(
+    private fun addCoinsDialog(
         assets: GameAssetManager,
         table: Table
     ): Table {
-        val popup = Table()
-        addCoinsWindowComponents(assets, popup)
-        initCoinsWindow(assets, popup, table)
-        return popup
+        val dialog = Table()
+        addCoinsWindowComponents(assets, dialog)
+        return dialog
     }
 
     private fun addCoinsWindowComponents(
@@ -220,33 +218,7 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
             .row()
     }
 
-    private fun initCoinsWindow(
-        assetsManager: GameAssetManager,
-        popup: Table,
-        table: Table
-    ) {
-        val popupTexture = assetsManager.getTexture(POPUP)
-        applyCoinsWindowBackground(popupTexture, popup)
-        popup.pack()
-        popup.setPosition(
-            table.stage.width / 2F - popup.width / 2F,
-            table.stage.height / 2F - popup.height / 2F
-        )
-    }
 
-    private fun applyCoinsWindowBackground(
-        popupTexture: Texture,
-        popup: Table
-    ) {
-        val ninePatch = NinePatch(
-            popupTexture,
-            COINS_POPUP_PADDING,
-            COINS_POPUP_PADDING,
-            COINS_POPUP_PADDING,
-            COINS_POPUP_PADDING
-        )
-        popup.background = NinePatchDrawable(ninePatch)
-    }
 
     private fun addCoinsLabel(
         gameModel: GameModel,
@@ -330,12 +302,11 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         private const val COINS_LABEL_PADDING_RIGHT = 40F
         private const val WIN_COIN_LABEL_ANIMATION_DURATION = 4F
         private const val COINS_POPUP_HEADER = "קבל עוד מטבעות"
-        private const val COINS_POPUP_PADDING = 64
         private const val COINS_POPUP_HEADER_PADDING_BOTTOM = 64F
         private const val COINS_POPUP_BUTTON_PADDING = 32F
         private const val COINS_POPUP_DESCRIPTION = "כל רכישה תסיר את כל הפרסומות!"
         private const val COINS_POPUP_DESCRIPTION_PADDING_BOTTOM = 64F
-        private const val COINS_POPUP_NAME = "coins"
+        private const val COINS_DIALOG_NAME = "coins"
         private const val FIRST_PACK_LABEL = "%s מטבעות"
         private const val SECOND_PACK_LABEL = "שק של %s מטבעות"
         private const val THIRD_PACK_LABEL = "תיבה של %s מטבעות"

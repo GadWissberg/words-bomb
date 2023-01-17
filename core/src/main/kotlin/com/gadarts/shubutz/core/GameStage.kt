@@ -103,7 +103,7 @@ abstract class GameStage<T>(
     }
 
     private fun createDialogNinePatches(am: GameAssetManager) {
-        val bgNinePatch = NinePatch(am.getTexture(POPUP), DLG_PAD, DLG_PAD, DLG_PAD, DLG_PAD)
+        val bgNinePatch = NinePatch(am.getTexture(DIALOG), DLG_PAD, DLG_PAD, DLG_PAD, DLG_PAD)
         dialogBackground = NinePatchDrawable(bgNinePatch)
         dialogButtonUp = NinePatchDrawable(createDialogButtonNinePatch(am, POPUP_BUTTON_UP))
         dialogButtonDown = NinePatchDrawable(createDialogButtonNinePatch(am, POPUP_BUTTON_DOWN))
