@@ -56,35 +56,7 @@
         "שמש נצחית בראש צלול",
         "האזרח קיין",
         "נהג מונית",
-        "קזבלנקה",
-        {
-          "phrase": "שנים עשר המושבעים",
-          "esoteric": true
-        },
-        {
-          "phrase": "אילו חיים נפלאים",
-          "esoteric": true
-        },
-        {
-          "phrase": "אמדאוס",
-          "esoteric": true
-        },
-        {
-          "phrase": "פרידה",
-          "esoteric": true
-        },
-        {
-          "phrase": "ורטיגו",
-          "esoteric": true
-        },
-        {
-          "phrase": "מות הזמיר",
-          "esoteric": true
-        },
-        {
-          "phrase": "תיקי קשמיר",
-          "esoteric": true
-        }
+        "קזבלנקה"
       ]
     },
     {
@@ -113,31 +85,7 @@
         "נמלטים",
         "המגן",
         "אוזרק",
-        "הלוטוס הלבן",
-        {
-          "phrase": "את",
-          "esoteric": true
-        },
-        {
-          "phrase": "בלוז לכחולי המדים",
-          "esoteric": true
-        },
-        {
-          "phrase": "איי זומבי",
-          "esoteric": true
-        },
-        {
-          "phrase": "המובסים",
-          "esoteric": true
-        },
-        {
-          "phrase": "מחשבות פליליות",
-          "esoteric": true
-        },
-        {
-          "phrase": "סיפור פשע אמריקאי",
-          "esoteric": true
-        }
+        "הלוטוס הלבן"
       ]
     },
     {
@@ -165,27 +113,7 @@
         "חולדה",
         "חסידה",
         "אריה",
-        "אתון",
-        {
-          "phrase": "אוטריים",
-          "esoteric": true
-        },
-        {
-          "phrase": "בובאל",
-          "esoteric": true
-        },
-        {
-          "phrase": "ברוזן",
-          "esoteric": true
-        },
-        {
-          "phrase": "גירית",
-          "esoteric": true
-        },
-        {
-          "phrase": "חורפן",
-          "esoteric": true
-        }
+        "אתון"
       ]
     },
     {
@@ -207,27 +135,7 @@
         "סלט קיסר",
         "פבלובה",
         "סביח",
-        "טוסט",
-        {
-          "phrase": "טאקויאקי",
-          "esoteric": true
-        },
-        {
-          "phrase": "לנגוש",
-          "esoteric": true
-        },
-        {
-          "phrase": "סופלי",
-          "esoteric": true
-        },
-        {
-          "phrase": "סמוסה",
-          "esoteric": true
-        },
-        {
-          "phrase": "ביף סטרוגנוף",
-          "esoteric": true
-        }
+        "טוסט"
       ]
     },
     {
@@ -246,27 +154,13 @@
         "אירלנד",
         "אלבניה",
         "ישראל",
-        "איראן",
-        {
-          "phrase": "איי קוק",
-          "esoteric": true
-        },
-        {
-          "phrase": "איי מרשל",
-          "esoteric": true
-        },
-        {
-          "phrase": "איי בהאמה",
-          "esoteric": true
-        },
-        {
-          "phrase": "איי קומורו",
-          "esoteric": true
-        },
-        {
-          "phrase": "איי שלמה",
-          "esoteric": true
-        }
+        "אנגולה",
+        "אסטוניה",
+        "אפגניסטן",
+        "אקוודור",
+        "ארגנטינה",
+        "אריתריאה",
+        "איראן"
       ]
     },
     {
@@ -342,27 +236,7 @@
         "אניס",
         "אננס",
         "בגוניה",
-        "אקליפטוס",
-        {
-          "phrase": "אבגר",
-          "esoteric": true
-        },
-        {
-          "phrase": "אבפטוריון",
-          "esoteric": true
-        },
-        {
-          "phrase": "אברש",
-          "esoteric": true
-        },
-        {
-          "phrase": "אגרופירון",
-          "esoteric": true
-        },
-        {
-          "phrase": "אגרטון",
-          "esoteric": true
-        }
+        "אקליפטוס"
       ]
     },
     {
@@ -376,31 +250,7 @@
         "קאבול",
         "בואנוס איירס",
         "וושינגטון די סי",
-        "רומא",
-        {
-          "phrase": "טשקנט",
-          "esoteric": true
-        },
-        {
-          "phrase": "קנברה",
-          "esoteric": true
-        },
-        {
-          "phrase": "מונטווידאו",
-          "esoteric": true
-        },
-        {
-          "phrase": "באקו",
-          "esoteric": true
-        },
-        {
-          "phrase": "טורסהאבן",
-          "esoteric": true
-        },
-        {
-          "phrase": "הוניארה",
-          "esoteric": true
-        }
+        "רומא"
       ]
     },
     {
@@ -419,27 +269,7 @@
         "סאלח שבתי",
         "חתונה מאוחרת",
         "האושפיזין",
-        "סוף העולם שמאלה",
-        {
-          "phrase": "ביקור התזמורת",
-          "esoteric": true
-        },
-        {
-          "phrase": "גן עדן עכשיו",
-          "esoteric": true
-        },
-        {
-          "phrase": "עלטה",
-          "esoteric": true
-        },
-        {
-          "phrase": "אור",
-          "esoteric": true
-        },
-        {
-          "phrase": "כנפיים שבורות",
-          "esoteric": true
-        }
+        "סוף העולם שמאלה"
       ]
     },
     {
@@ -458,27 +288,7 @@
         "המדרשה",
         "זינזאנה",
         "טהרן",
-        "חטופים",
-        {
-          "phrase": "אגדת דשא",
-          "esoteric": true
-        },
-        {
-          "phrase": "אננדה",
-          "esoteric": true
-        },
-        {
-          "phrase": "אלנבי",
-          "esoteric": true
-        },
-        {
-          "phrase": "יש לה את זה",
-          "esoteric": true
-        },
-        {
-          "phrase": "תעשה לי ילד",
-          "esoteric": true
-        }
+        "חטופים"
       ]
     },
     {
@@ -498,6 +308,25 @@
         "טיפקס",
         "תיסלם",
         "משינה"
+      ]
+    },
+    {
+      "category": "כלי עבודה",
+      "phrases": [
+        "אום",
+        "אזיקון",
+        "בורג",
+        "בריח",
+        "גומייה",
+        "דיבל",
+        "וו",
+        "מסמר",
+        "נעץ",
+        "גרזן",
+        "מסור",
+        "דיסק חיתוך",
+        "סכין יפנית",
+        "סקלפל"
       ]
     }
   ]

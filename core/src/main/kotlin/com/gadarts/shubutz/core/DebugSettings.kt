@@ -23,11 +23,6 @@ object DebugSettings {
     const val SHOW_UI_BORDERS = false
 
     /**
-     * Whether to play music.
-     */
-    const val ENABLE_MUSIC = true
-
-    /**
      * Whether to play sounds.
      */
     const val ENABLE_SOUNDS = true

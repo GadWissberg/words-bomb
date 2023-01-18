@@ -4,7 +4,6 @@ import com.badlogic.gdx.*
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.model.assets.MusicDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreenImpl
 import com.gadarts.shubutz.core.screens.menu.MenuScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
@@ -56,14 +55,12 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
 
     override fun goToMenu() {
         if (getScreen() is MenuScreen) return
-        soundPlayer.playMusic(assetsManager.getMusic(MusicDefinitions.MENU))
         screen?.dispose()
         val menuScreen = MenuScreen(assetsManager, android, this, stage, soundPlayer)
         setScreen(menuScreen)
     }
 
     override fun goToPlayScreen(selectedDifficulty: Difficulties) {
-        soundPlayer.playMusic(assetsManager.getMusic(MusicDefinitions.IN_GAME))
         setScreen(createGamePlayScreen(selectedDifficulty))
     }
 

@@ -28,7 +28,6 @@ class GameLogicHandler(
         unusedPhrases.forEach {
             unusedPhrases[it.key] = ArrayList(it.value.filter { p ->
                 p.value.length >= gameModel.selectedDifficulty.regularPhrasesMinimumLength
-                        && (!p.esoteric || gameModel.selectedDifficulty.allowEsoteric)
             })
         }
         beginRound(gameModel)

@@ -23,7 +23,7 @@ class PhrasesLoader {
                         list.add(Phrase(phraseJsonElement.asString))
                     } else {
                         val phraseJsonObject = phraseJsonElement.asJsonObject
-                        list.add(Phrase(phraseJsonObject.get(JSON_KEY_PHRASE).asString, true))
+                        list.add(Phrase(phraseJsonObject.get(JSON_KEY_PHRASE).asString))
                     }
                 }
             result[category] = list

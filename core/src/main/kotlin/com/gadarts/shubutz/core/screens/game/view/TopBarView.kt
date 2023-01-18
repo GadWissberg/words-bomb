@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
+import com.gadarts.shubutz.core.model.GameModel.Companion.AMOUNT_PACK_THIRD
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
@@ -152,7 +153,7 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
             coinsButton,
             {
                 (table.stage as GameStage).addDialog(
-                    addCoinsDialog(assetsManager, table),
+                    addCoinsDialog(assetsManager),
                     COINS_DIALOG_NAME,
                     assetsManager
                 )
@@ -164,28 +165,35 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
 
     private fun addCoinsDialog(
         assets: GameAssetManager,
-        table: Table
     ): Table {
         val dialog = Table()
-        addCoinsWindowComponents(assets, dialog)
+        addCoinsDialogComponents(assets, dialog)
         return dialog
     }
 
-    private fun addCoinsWindowComponents(
+    private fun addCoinsDialogComponents(
         assets: GameAssetManager,
         popup: Table
     ) {
         addHeaderToCoinsWindow(assets, popup)
-        addCoinsWindowDescription(assets, popup)
+        addCoinsDialogDescription(assets, popup)
         addPackButton(assets, popup, FIRST_PACK_LABEL, ICON_PACK_1, GameModel.AMOUNT_PACK_FIRST)
         addPackButton(assets, popup, SECOND_PACK_LABEL, ICON_PACK_2, GameModel.AMOUNT_PACK_SECOND)
-        addPackButton(assets, popup, THIRD_PACK_LABEL, ICON_PACK_3, GameModel.AMOUNT_PACK_THIRD)
+        addPackButton(assets, popup, THIRD_PACK_LABEL, ICON_PACK_3, AMOUNT_PACK_THIRD, true)
     }
 
-    private fun addCoinsWindowDescription(assetsManager: GameAssetManager, popup: Table) {
+    private fun addCoinsDialogDescription(assetsManager: GameAssetManager, dialog: Table) {
         val style = LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
-        val text = Label(COINS_POPUP_DESCRIPTION.reversed(), style)
-        popup.add(text).pad(0F, 0F, COINS_POPUP_DESCRIPTION_PADDING_BOTTOM, 0F).row()
+        val text = Label(fixHebrewDescription(COINS_DIALOG_DESCRIPTION), style)
+        text.setAlignment(Align.right)
+        dialog.add(text).pad(0F, 0F, COINS_DIALOG_DESCRIPTION_PADDING_BOTTOM, 0F).row()
+    }
+
+    private fun fixHebrewDescription(text: String): CharSequence {
+        val reversed = text.reversed()
+        val result = java.lang.StringBuilder()
+        reversed.split("\n").forEach { result.insert(0, "\n").insert(0, it) }
+        return result.toString()
     }
 
     private fun addPackButton(
@@ -193,19 +201,46 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         popup: Table,
         label: String,
         texturesDefinition: TexturesDefinitions,
-        amount: Int
+        amount: Int,
+        applyAnimation: Boolean = false
     ) {
-        val packButton = ImageTextButton(
-            label.format(amount.toString().reversed()).reversed(), ImageTextButtonStyle(
-                TextureRegionDrawable(assetsManager.getTexture(POPUP_BUTTON_UP)),
-                TextureRegionDrawable(assetsManager.getTexture(POPUP_BUTTON_DOWN)),
-                null,
-                assetsManager.getFont(FontsDefinitions.VARELA_40)
+        val style = createPackButtonStyle(assetsManager)
+        val text = label.format(amount.toString().reversed()).reversed()
+        val button = ImageTextButton(text, style)
+        val image = Image(assetsManager.getTexture(texturesDefinition))
+        button.add(image)
+        popup.add(button).pad(COINS_POPUP_BUTTON_PADDING).row()
+
+        if (applyAnimation) {
+            image.addAction(
+                Actions.forever(
+                    Actions.sequence(
+                        Actions.sizeBy(
+                            20F,
+                            20F,
+                            1F,
+                            Interpolation.swingIn
+                        ),
+                        Actions.sizeBy(
+                            -20F,
+                            -20F,
+                            1F,
+                            Interpolation.swingIn
+                        ),
+                        Actions.delay(2F)
+                    ),
+                )
             )
-        )
-        packButton.add(Image(assetsManager.getTexture(texturesDefinition)))
-        popup.add(packButton).pad(COINS_POPUP_BUTTON_PADDING).row()
+        }
     }
+
+    private fun createPackButtonStyle(assetsManager: GameAssetManager) =
+        ImageTextButtonStyle(
+            TextureRegionDrawable(assetsManager.getTexture(POPUP_BUTTON_UP)),
+            TextureRegionDrawable(assetsManager.getTexture(POPUP_BUTTON_DOWN)),
+            null,
+            assetsManager.getFont(FontsDefinitions.VARELA_40)
+        )
 
     private fun addHeaderToCoinsWindow(
         assetsManager: GameAssetManager,
@@ -217,7 +252,6 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
             .pad(0F, 0F, COINS_POPUP_HEADER_PADDING_BOTTOM, 0F)
             .row()
     }
-
 
 
     private fun addCoinsLabel(
@@ -304,8 +338,9 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         private const val COINS_POPUP_HEADER = "קבל עוד מטבעות"
         private const val COINS_POPUP_HEADER_PADDING_BOTTOM = 64F
         private const val COINS_POPUP_BUTTON_PADDING = 32F
-        private const val COINS_POPUP_DESCRIPTION = "כל רכישה תסיר את כל הפרסומות!"
-        private const val COINS_POPUP_DESCRIPTION_PADDING_BOTTOM = 64F
+        private const val COINS_DIALOG_DESCRIPTION =
+            "לרשותך מס' אפשרויות להשיג\nעוד מטבעות.\nכל רכישה תסיר את כל הפרסומות!"
+        private const val COINS_DIALOG_DESCRIPTION_PADDING_BOTTOM = 64F
         private const val COINS_DIALOG_NAME = "coins"
         private const val FIRST_PACK_LABEL = "%s מטבעות"
         private const val SECOND_PACK_LABEL = "שק של %s מטבעות"

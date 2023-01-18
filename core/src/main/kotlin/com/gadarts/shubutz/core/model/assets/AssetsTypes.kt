@@ -5,7 +5,6 @@ enum class AssetsTypes(
     private val loadedUsingLoader: Boolean
 ) {
     TEXTURES(TexturesDefinitions.values(), true),
-    MUSIC(MusicDefinitions.values(), true),
     SFX(SoundsDefinitions.values(), true),
     SHADERS(ShaderDefinitions.values(), false),
     FONTS(FontsDefinitions.values(), true),
