@@ -43,11 +43,11 @@ class GamePlayScreenView(
         addUiTable()
         gamePlayScreenComponents.onShow(
             letterSize,
-            font80,
             assetsManager,
             stage,
             gameModel,
-            gamePlayScreen
+            gamePlayScreen,
+            uiTable
         )
     }
 
@@ -59,7 +59,6 @@ class GamePlayScreenView(
             gameModel,
             letterSize,
             gamePlayScreen,
-            stage
         )
     }
 
@@ -92,12 +91,12 @@ class GamePlayScreenView(
     fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
         gamePlayScreenComponents.onCorrectGuess(coinsAmount)
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.CORRECT))
-        if (gamePlayScreenComponents.optionsComponent.selectedBrick != null) {
+        if (gamePlayScreenComponents.optionsView.selectedBrick != null) {
             val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
             indices.forEach {
                 animateBrickSuccess(it, gameWin, brickTexture)
             }
-            gamePlayScreenComponents.optionsComponent.clearSelectedBrick()
+            gamePlayScreenComponents.optionsView.clearSelectedBrick()
         }
     }
 
@@ -116,7 +115,7 @@ class GamePlayScreenView(
         val wordTable = gamePlayScreenComponents.targetPhrasesView.wordsTables[wordCount]
         val cell = wordTable.cells[letterIndexInWord]
         val selectedBrickScreenCoords =
-            gamePlayScreenComponents.optionsComponent.selectedBrick!!.localToStageCoordinates(
+            gamePlayScreenComponents.optionsView.selectedBrick!!.localToStageCoordinates(
                 auxVector.setZero()
             )
         val brick =
@@ -181,10 +180,10 @@ class GamePlayScreenView(
 
     fun onIncorrectGuess(gameOver: Boolean) {
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.INCORRECT))
-        gamePlayScreenComponents.bombHandler.updateLabel(gameModel)
+        gamePlayScreenComponents.bombView.updateLabel(gameModel)
         if (gameOver) {
             animateGameOver()
-        } else if (gamePlayScreenComponents.optionsComponent.selectedBrick != null) {
+        } else if (gamePlayScreenComponents.optionsView.selectedBrick != null) {
             gamePlayScreenComponents.onIncorrectGuess()
         }
     }

@@ -1,5 +1,4 @@
 package com.gadarts.shubutz
-
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast

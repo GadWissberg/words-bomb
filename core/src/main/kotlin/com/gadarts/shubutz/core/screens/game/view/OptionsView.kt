@@ -19,7 +19,7 @@ import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import kotlin.math.min
 
-class OptionsComponent(
+class OptionsView(
     private val stage: GameStage,
     private val soundPlayer: SoundPlayer,
     private val assetsManager: GameAssetManager

@@ -9,7 +9,7 @@ import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.*
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class BombHandler(
+class BombView(
     private val soundPlayer: SoundPlayer,
     private val assetsManager: GameAssetManager
 ) {
@@ -28,8 +28,8 @@ class BombHandler(
                 ParticleEffectsDefinitions.FIRE
             )
         )
-        createBomb(assetsManager, gameModel)
         stage.addActor(fireParticleEffectActor)
+        createBomb(assetsManager, gameModel)
         val bombTexture = assetsManager.getTexture(TexturesDefinitions.BOMB)
         uiTable.add(bomb).size(bombTexture.width.toFloat(), bombTexture.height.toFloat())
             .pad(BOMB_PADDING).row()

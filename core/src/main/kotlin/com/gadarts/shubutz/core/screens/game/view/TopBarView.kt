@@ -98,8 +98,9 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
     ) {
         val texture = assetsManager.getTexture(BACK_BUTTON)
         val button = ImageButton(TextureRegionDrawable(texture))
+        button.pad(10F, 80F, 10F, 40F)
         addClickListenerToButton(button, { gamePlayScreen.onClickedBackButton() }, assetsManager)
-        table.add(button).pad(10F, 80F, 10F, 40F).left()
+        table.add(button).left()
     }
 
     private fun addClickListenerToButton(
