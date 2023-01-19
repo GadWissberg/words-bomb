@@ -114,7 +114,7 @@ class BombView(
         bomb.hideLabel()
     }
 
-    fun onScreenClear(postAction: Runnable) {
+    fun animateBombVanish(postAction: Runnable) {
         bomb.addAction(
             Actions.sequence(
                 Actions.fadeOut(1F, swingIn),

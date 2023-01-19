@@ -41,13 +41,12 @@ class GamePlayScreenView(
 
     private fun createInterface() {
         addUiTable()
-        gamePlayScreenComponents.onShow(
+        gamePlayScreenComponents.createViews(
             letterSize,
             assetsManager,
             stage,
             gameModel,
             gamePlayScreen,
-            uiTable
         )
     }
 
@@ -59,6 +58,7 @@ class GamePlayScreenView(
             gameModel,
             letterSize,
             gamePlayScreen,
+            stage
         )
     }
 
@@ -170,7 +170,7 @@ class GamePlayScreenView(
     }
 
     private fun clearScreen() {
-        gamePlayScreenComponents.onScreenClear()
+        gamePlayScreenComponents.clearBombView()
         stage.addAction(Actions.delay(2F, Actions.run {
             uiTable.clear()
             gamePlayScreen.onScreenEmpty()

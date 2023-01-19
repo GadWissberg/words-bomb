@@ -20,15 +20,13 @@ class GamePlayScreenComponents(
     lateinit var optionsView: OptionsView
     val topBarView = TopBarView(soundPlayer)
 
-    fun onShow(
+    fun createViews(
         letterSize: Vector2,
         assetsManager: GameAssetManager,
         stage: GameStage,
         gameModel: GameModel,
         gamePlayScreen: GamePlayScreen,
-        uiTable: Table,
     ) {
-        bombView.addBomb(assetsManager, stage, uiTable, gameModel)
         topBarView.addTopBar(assetsManager, gameModel, gamePlayScreen, stage)
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
         targetPhrasesView = TargetPhrasesView(letterSize, font80, soundPlayer, assetsManager)
@@ -41,7 +39,9 @@ class GamePlayScreenComponents(
         gameModel: GameModel,
         letterSize: Vector2,
         gamePlayScreen: GamePlayScreen,
+        stage: GameStage,
     ) {
+        bombView.addBomb(assetsManager, stage, uiTable, gameModel)
         targetPhrasesView.onGameBegin(gameModel, assetsManager, uiTable)
         optionsView.addLettersOptionsTable(
             uiTable,
@@ -59,8 +59,8 @@ class GamePlayScreenComponents(
         targetPhrasesView.onGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
     }
 
-    fun onScreenClear() {
-        bombView.onScreenClear {
+    fun clearBombView() {
+        bombView.animateBombVanish {
             optionsView.onScreenClear()
             targetPhrasesView.onScreenClear()
         }

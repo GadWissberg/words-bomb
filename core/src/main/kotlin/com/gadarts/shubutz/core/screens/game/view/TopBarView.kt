@@ -293,6 +293,7 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
 
     fun setCategoryLabelText(currentCategory: String) {
         categoryLabel.setText(currentCategory.reversed())
+        categoryLabel.toFront()
     }
 
     /**
