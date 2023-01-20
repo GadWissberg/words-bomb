@@ -91,7 +91,7 @@ class GamePlayScreenImpl(
     }
 
     override fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
-        gamePlayScreenView.onCorrectGuess(indices, gameWin, coinsAmount)
+        gamePlayScreenView.displayCorrectGuess(indices, gameWin, coinsAmount)
     }
 
     override fun onIncorrectGuess(gameOver: Boolean) {

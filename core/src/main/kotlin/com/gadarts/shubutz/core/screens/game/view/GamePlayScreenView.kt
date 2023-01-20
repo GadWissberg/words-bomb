@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.math.Interpolation.circle
+import com.badlogic.gdx.math.Interpolation.smoother
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
@@ -88,7 +89,7 @@ class GamePlayScreenView(
         gamePlayScreenComponents.clear()
     }
 
-    fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
+    fun displayCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
         gamePlayScreenComponents.onCorrectGuess(coinsAmount)
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.CORRECT))
         if (gamePlayScreenComponents.optionsView.selectedBrick != null) {
@@ -135,7 +136,7 @@ class GamePlayScreenView(
             ),
             Actions.run { (cell as Cell<*>).setActor(brick) }
         )
-
+        val actions = Actions.parallel(sequence, Actions.fadeOut(1F, smoother))
         if (gameWin) {
             sequence.addAction(Actions.run { animateGameWin(stage) })
             gamePlayScreenComponents.topBarView.coinsLabel.setText(gameModel.coins.toString())
@@ -157,7 +158,7 @@ class GamePlayScreenView(
                 localToScreenCoordinates.y + gamePlayScreenComponents.topBarView.coinsLabel.height / 2F
             )
         }
-        brick.addAction(sequence)
+        brick.addAction(actions)
     }
 
     private fun switchBrickToStage(brick: Brick) {

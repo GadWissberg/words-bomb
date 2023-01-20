@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.ParticleEffect
-import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Touchable
@@ -20,6 +19,7 @@ import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.game.view.actors.BrickCell
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
+import ktx.actors.alpha
 
 class TargetPhrasesView(
     private val letterSize: Vector2,
@@ -32,23 +32,16 @@ class TargetPhrasesView(
     var maxBricksPerLine: Int = 0
     private var targetWordLines = ArrayList<Table>()
 
+
     fun calculateMaxBricksPerLine(assetsManager: GameAssetManager) {
         val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
         maxBricksPerLine = Gdx.graphics.width / brickTexture.width - 1
     }
 
     private fun addBrickCell(texture: Texture, wordTable: Table) {
-        val brickCell = BrickCell(texture)
-        wordTable.add(brickCell).pad(TARGET_LETTER_PADDING)
+        val brickCell = BrickCell(texture, letterSize, font80)
+        wordTable.add(brickCell).size(letterSize.x).pad(LETTER_PADDING)
         brickCell.touchable = Touchable.enabled
-        brickCell.addAction(
-            Actions.sequence(
-                Actions.fadeOut(0F), Actions.fadeIn(
-                    0.5F,
-                    Interpolation.smooth2
-                )
-            )
-        )
     }
 
     private fun addGivenLetter(
@@ -65,19 +58,8 @@ class TargetPhrasesView(
             font80
         )
         brick.isVisible = isLetter
-        wordTable.add(brick).pad(TARGET_LETTER_PADDING)
-        fadeIn(brick)
-    }
-
-    private fun fadeIn(brick: Brick) {
-        brick.addAction(
-            Actions.sequence(
-                Actions.fadeOut(0F), Actions.fadeIn(
-                    0.5F,
-                    Interpolation.smooth2
-                )
-            )
-        )
+        brick.alpha = 0F
+        wordTable.add(brick).size(letterSize.x).pad(LETTER_PADDING)
     }
 
     private fun addLetterToTarget(
@@ -262,8 +244,8 @@ class TargetPhrasesView(
         private const val TARGET_WORD_LINE_VERTICAL_PADDING = 15F
         private const val GAME_WIN_ANIMATION_DISTANCE = 50F
         private const val GAME_WIN_ANIMATION_LETTER_MOVE_DURATION = 0.25F
+        private const val LETTER_PADDING = 10F
         private const val WIN_DELAY = 2F
-        private const val TARGET_LETTER_PADDING = 5F
         private val auxVector = Vector2()
 
     }

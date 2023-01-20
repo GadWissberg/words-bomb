@@ -42,7 +42,7 @@ open class Brick(
     private fun drawChar(
         batch: Batch?, position: Vector2, bitmapFont: BitmapFont, text: String
     ) {
-        if (batch != null && color.a == 1F) {
+        if (batch != null) {
             bitmapFont.draw(batch, text, position.x, position.y)
         }
     }
