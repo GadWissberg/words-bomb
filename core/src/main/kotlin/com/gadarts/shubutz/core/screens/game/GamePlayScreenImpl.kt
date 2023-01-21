@@ -83,7 +83,7 @@ class GamePlayScreenImpl(
     override fun onScreenEmpty() {
         if (gameModel.hiddenLettersIndices.isNotEmpty()) return
         gameLogicHandler.beginRound(gameModel)
-        gamePlayScreenView.onGameBegin()
+        gamePlayScreenView.initializeForGameBegin()
     }
 
     override fun onClickedBackButton() {

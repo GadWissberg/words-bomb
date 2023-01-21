@@ -89,4 +89,16 @@ class GamePlayScreenComponents(
         topBarView.applyWinCoinEffect(coinsAmount, assetsManager)
     }
 
+    fun resizeComponentsIfNeeded(uiTable: Table) {
+        if (optionsView.lettersOptionsTable.y < 0F) {
+            val cell = uiTable.getCell(bombView.bomb)
+            val delta = optionsView.lettersOptionsTable.y * 2F
+            cell.size(
+                cell.prefWidth + delta,
+                cell.prefHeight + delta
+            )
+            uiTable.pack()
+        }
+    }
+
 }

@@ -25,7 +25,7 @@ object DebugSettings {
     /**
      * Whether to play sounds.
      */
-    const val ENABLE_SOUNDS = false
+    const val ENABLE_SOUNDS = true
 
 }
 

@@ -26,7 +26,7 @@ class OptionsView(
 ) {
 
     var selectedBrick: Brick? = null
-    private lateinit var lettersOptionsTable: Table
+    lateinit var lettersOptionsTable: Table
 
     fun addLettersOptionsTable(
         uiTable: Table,
@@ -43,6 +43,7 @@ class OptionsView(
         for (row in 0..GameModel.allowedLetters.length / (maxBricksPerLine - 1)) {
             addOptionsRow(row, brickTexture, maxBricksPerLine, letterSize, gamePlayScreen, model)
         }
+        lettersOptionsTable.pack()
     }
 
     private fun addOptionsRow(

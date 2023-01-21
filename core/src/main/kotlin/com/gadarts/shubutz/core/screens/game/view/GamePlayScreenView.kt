@@ -37,7 +37,7 @@ class GamePlayScreenView(
         val letterGlyphLayout = GlyphLayout(font80, "א")
         letterSize = Vector2(letterGlyphLayout.width, letterGlyphLayout.height)
         createInterface()
-        onGameBegin()
+        initializeForGameBegin()
     }
 
     private fun createInterface() {
@@ -52,15 +52,11 @@ class GamePlayScreenView(
     }
 
 
-    fun onGameBegin() {
+    fun initializeForGameBegin() {
         stage.root.clearActions()
-        gamePlayScreenComponents.init(
-            uiTable,
-            gameModel,
-            letterSize,
-            gamePlayScreen,
-            stage
-        )
+        gamePlayScreenComponents.init(uiTable, gameModel, letterSize, gamePlayScreen, stage)
+        uiTable.pack()
+        gamePlayScreenComponents.resizeComponentsIfNeeded(uiTable)
     }
 
     private fun addUiTable() {

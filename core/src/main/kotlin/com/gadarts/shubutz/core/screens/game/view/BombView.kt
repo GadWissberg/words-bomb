@@ -13,7 +13,7 @@ class BombView(
     private val soundPlayer: SoundPlayer,
     private val assetsManager: GameAssetManager
 ) {
-    private lateinit var bomb: Bomb
+    lateinit var bomb: Bomb
     private lateinit var fireParticleEffectActor: ParticleEffectActor
     private lateinit var explosionParticleEffectActor: ParticleEffectActor
 
@@ -126,6 +126,10 @@ class BombView(
 
     fun clear() {
         fireParticleEffectActor.remove()
+    }
+
+    fun resizeBy(y: Float) {
+        bomb.sizeBy(y)
     }
 
     companion object {
