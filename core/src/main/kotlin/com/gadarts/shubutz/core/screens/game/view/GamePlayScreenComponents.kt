@@ -18,7 +18,7 @@ class GamePlayScreenComponents(
     lateinit var targetPhrasesView: TargetPhrasesView
     val bombView = BombView(soundPlayer, assetsManager)
     lateinit var optionsView: OptionsView
-    val topBarView = TopBarView(soundPlayer)
+    val topBarView = TopBarView(soundPlayer, assetsManager)
 
     fun createViews(
         letterSize: Vector2,

@@ -35,7 +35,10 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 /**
  * Handle the in-game UI top-bar's view.
  */
-class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
+class TopBarView(
+    private val soundPlayer: SoundPlayer,
+    private val assetsManager: GameAssetManager
+) : Disposable {
 
     private lateinit var table: Table
     private lateinit var categoryLabel: Label
@@ -178,9 +181,28 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
     ) {
         addHeaderToCoinsWindow(assets, popup)
         addCoinsDialogDescription(assets, popup)
-        addPackButton(assets, popup, FIRST_PACK_LABEL, ICON_PACK_1, GameModel.AMOUNT_PACK_FIRST)
-        addPackButton(assets, popup, SECOND_PACK_LABEL, ICON_PACK_2, GameModel.AMOUNT_PACK_SECOND)
-        addPackButton(assets, popup, THIRD_PACK_LABEL, ICON_PACK_3, AMOUNT_PACK_THIRD, true)
+        addPackButton(
+            popup,
+            FIRST_PACK_LABEL,
+            ICON_PACK_1,
+            GameModel.AMOUNT_PACK_FIRST,
+            stage = table.stage as GameStage
+        )
+        addPackButton(
+            popup,
+            SECOND_PACK_LABEL,
+            ICON_PACK_2,
+            GameModel.AMOUNT_PACK_SECOND,
+            stage = table.stage as GameStage
+        )
+        addPackButton(
+            popup,
+            THIRD_PACK_LABEL,
+            ICON_PACK_3,
+            AMOUNT_PACK_THIRD,
+            true,
+            table.stage as GameStage
+        )
     }
 
     private fun addCoinsDialogDescription(assetsManager: GameAssetManager, dialog: Table) {
@@ -198,14 +220,14 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
     }
 
     private fun addPackButton(
-        assetsManager: GameAssetManager,
         popup: Table,
         label: String,
         texturesDefinition: TexturesDefinitions,
         amount: Int,
-        applyAnimation: Boolean = false
+        applyAnimation: Boolean = false,
+        stage: GameStage
     ) {
-        val style = createPackButtonStyle(assetsManager)
+        val style = createPackButtonStyle(stage)
         val text = label.format(amount.toString().reversed()).reversed()
         val button = ImageTextButton(text, style)
         val image = Image(assetsManager.getTexture(texturesDefinition))
@@ -235,10 +257,10 @@ class TopBarView(private val soundPlayer: SoundPlayer) : Disposable {
         }
     }
 
-    private fun createPackButtonStyle(assetsManager: GameAssetManager) =
+    private fun createPackButtonStyle(stage: GameStage) =
         ImageTextButtonStyle(
-            TextureRegionDrawable(assetsManager.getTexture(POPUP_BUTTON_UP)),
-            TextureRegionDrawable(assetsManager.getTexture(POPUP_BUTTON_DOWN)),
+            stage.dialogButtonUp,
+            stage.dialogButtonDown,
             null,
             assetsManager.getFont(FontsDefinitions.VARELA_40)
         )

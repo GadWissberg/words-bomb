@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
-import com.gadarts.shubutz.core.GameStage.Companion.BUTTON_PADDING
 import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.Difficulties
@@ -25,6 +24,7 @@ import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.BeginGameAction
 import com.gadarts.shubutz.core.screens.menu.LoadingAnimationHandler
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
+import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage.Companion.BUTTON_PADDING
 
 /**
  * Handles the menu's display.
