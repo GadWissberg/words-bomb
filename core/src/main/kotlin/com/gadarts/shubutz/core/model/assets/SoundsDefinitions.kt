@@ -11,6 +11,7 @@ enum class SoundsDefinitions : AssetDefinition<Sound> {
     EXPLOSION,
     BUTTON,
     FLYBY,
+    BUBBLE,
     CORRECT;
 
     private var path: String =

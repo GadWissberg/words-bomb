@@ -52,10 +52,7 @@ class MenuScreenView(
      */
     fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: BeginGameAction) {
         if (!loadingDone) {
-            loadingAnimationRenderer.addLoadingAnimation(
-                assetsManager,
-                stage
-            )
+            loadingAnimationRenderer.addLoadingAnimation(assetsManager, stage)
         } else {
             finishLoadingAnimationAndDisplayMenu(goToPlayScreenOnClick)
         }
@@ -74,7 +71,10 @@ class MenuScreenView(
      * Handles loading animation finish and calls to add an interface.
      */
     fun finishLoadingAnimationAndDisplayMenu(beginGameAction: BeginGameAction) {
-        loadingAnimationRenderer.flyOutBricks()
+        loadingAnimationRenderer.flyOutBricks(
+            assetsManager.getSound(SoundsDefinitions.FLYBY),
+            soundPlayer
+        )
         Gdx.app.postRunnable {
             addUserInterface(beginGameAction)
             stage.addActor(mainMenuTable)
@@ -184,6 +184,9 @@ class MenuScreenView(
             Actions.sequence(
                 Actions.scaleTo(0F, 0F),
                 Actions.delay(0.2F * index),
+                Actions.run {
+                    soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUBBLE), true)
+                },
                 Actions.scaleTo(1F, 1F, 0.5F, Interpolation.exp10),
                 Actions.forever(
                     Actions.sequence(
