@@ -64,13 +64,14 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         setScreen(createGamePlayScreen(selectedDifficulty))
     }
 
-    private fun createGamePlayScreen(selectedDifficulty: Difficulties) = GamePlayScreenImpl(
-        assetsManager,
-        this,
-        android,
-        stage,
-        soundPlayer,
-        selectedDifficulty
-    )
+    private fun createGamePlayScreen(selectedDifficulty: Difficulties) =
+        GamePlayScreenImpl(
+            assetsManager,
+            this,
+            this.android,
+            stage,
+            soundPlayer,
+            selectedDifficulty
+        )
 
 }

@@ -28,7 +28,8 @@ class GamePlayScreenView(
 ) :
     Disposable {
 
-    private val gamePlayScreenComponents = GamePlayScreenComponents(assetsManager, soundPlayer)
+    private val gamePlayScreenComponents =
+        GamePlayScreenComponents(assetsManager, soundPlayer, gamePlayScreen)
     private lateinit var uiTable: Table
     private var font80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
     private lateinit var letterSize: Vector2

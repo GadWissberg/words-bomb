@@ -9,13 +9,9 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
-import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton.ImageTextButtonStyle
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
-import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
@@ -37,7 +33,8 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
  */
 class TopBarView(
     private val soundPlayer: SoundPlayer,
-    private val assetsManager: GameAssetManager
+    private val assetsManager: GameAssetManager,
+    private val gamePlayScreen: GamePlayScreen
 ) : Disposable {
 
     private lateinit var table: Table
@@ -107,7 +104,7 @@ class TopBarView(
     }
 
     private fun addClickListenerToButton(
-        button: ImageButton,
+        button: Button,
         runnable: Runnable,
         assetsManager: GameAssetManager
     ) {
@@ -135,7 +132,10 @@ class TopBarView(
         addCoinsLabel(gameModel, font80, table, assetsManager)
     }
 
-    private fun addBuyCoinsButton(table: Table, assetsManager: GameAssetManager) {
+    private fun addBuyCoinsButton(
+        table: Table,
+        assetsManager: GameAssetManager,
+    ) {
         val coinsButton = createBuyCoinsButton(assetsManager, table)
         table.add(coinsButton).pad(
             COINS_BUTTON_PAD_TOP,
@@ -147,7 +147,7 @@ class TopBarView(
 
     private fun createBuyCoinsButton(
         assetsManager: GameAssetManager,
-        table: Table
+        table: Table,
     ): ImageButton {
         val coinsButton = ImageButton(
             TextureRegionDrawable(assetsManager.getTexture(COINS_BUTTON_UP)),
@@ -177,7 +177,7 @@ class TopBarView(
 
     private fun addCoinsDialogComponents(
         assets: GameAssetManager,
-        popup: Table
+        popup: Table,
     ) {
         addHeaderToCoinsWindow(assets, popup)
         addCoinsDialogDescription(assets, popup)
@@ -186,14 +186,14 @@ class TopBarView(
             FIRST_PACK_LABEL,
             ICON_PACK_1,
             GameModel.AMOUNT_PACK_FIRST,
-            stage = table.stage as GameStage
+            stage = table.stage as GameStage,
         )
         addPackButton(
             popup,
             SECOND_PACK_LABEL,
             ICON_PACK_2,
             GameModel.AMOUNT_PACK_SECOND,
-            stage = table.stage as GameStage
+            stage = table.stage as GameStage,
         )
         addPackButton(
             popup,
@@ -201,7 +201,7 @@ class TopBarView(
             ICON_PACK_3,
             AMOUNT_PACK_THIRD,
             true,
-            table.stage as GameStage
+            table.stage as GameStage,
         )
     }
 
@@ -225,12 +225,12 @@ class TopBarView(
         texturesDefinition: TexturesDefinitions,
         amount: Int,
         applyAnimation: Boolean = false,
-        stage: GameStage
+        stage: GameStage,
     ) {
-        val style = createPackButtonStyle(stage)
         val text = label.format(amount.toString().reversed()).reversed()
-        val button = ImageTextButton(text, style)
+        val button = ImageTextButton(text, createPackButtonStyle(stage))
         val image = Image(assetsManager.getTexture(texturesDefinition))
+        addClickListenerToButton(button, { gamePlayScreen.onClickedPurchase() }, assetsManager)
         button.add(image)
         popup.add(button).pad(COINS_POPUP_BUTTON_PADDING).row()
 

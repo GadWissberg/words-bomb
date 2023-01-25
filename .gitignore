@@ -30,7 +30,7 @@ www-test/
 *.iml
 /android/out/
 com_crashlytics_export_strings.xml
-
+/materials/releases
 ## Eclipse
 
 .classpath
@@ -116,3 +116,4 @@ Thumbs.db
 *.bat
 *.blend1
 /android/debug
+/android/release/

@@ -5,5 +5,6 @@ interface GamePlayScreen {
     fun onClickedBackButton()
     fun onBrickClicked(letter: Char)
     fun onScreenEmpty()
+    fun onClickedPurchase()
 
 }

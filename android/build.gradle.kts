@@ -5,7 +5,7 @@ plugins {
 
 android {
     buildToolsVersion = "30.0.3"
-    compileSdk = 32
+    compileSdk = 33
     sourceSets {
         named("main") {
             res.srcDir("res")
@@ -17,7 +17,7 @@ android {
         val appVersion: String by project
         applicationId = "com.gadarts.shubutz"
         minSdk = 22
-        targetSdk = 32
+        targetSdk = 33
         versionCode = appVersion.split('.').joinToString("") { it.padStart(2, '0') }.toInt()
         versionName = appVersion
     }
@@ -26,7 +26,7 @@ android {
             isDebuggable = false
         }
         debug {
-            isDebuggable = true
+            isDebuggable = false
         }
         named("release") {
             isMinifyEnabled = false
@@ -53,7 +53,7 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
-
+    implementation("com.android.billingclient:billing:5.1.0")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a")

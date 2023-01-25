@@ -12,13 +12,14 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class GamePlayScreenComponents(
     private val assetsManager: GameAssetManager,
-    private val soundPlayer: SoundPlayer
+    private val soundPlayer: SoundPlayer,
+    private val gamePlayScreen: GamePlayScreen
 ) : Disposable {
 
     lateinit var targetPhrasesView: TargetPhrasesView
     val bombView = BombView(soundPlayer, assetsManager)
     lateinit var optionsView: OptionsView
-    val topBarView = TopBarView(soundPlayer, assetsManager)
+    val topBarView = TopBarView(soundPlayer, assetsManager, gamePlayScreen)
 
     fun createViews(
         letterSize: Vector2,
