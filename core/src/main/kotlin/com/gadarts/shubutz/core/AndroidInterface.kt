@@ -5,5 +5,5 @@ interface AndroidInterface {
     fun versionName(): String
     fun getSharedPreferencesValue(key: String): Int
     fun saveSharedPreferencesValue(key: String, value: Int)
-    fun startConnection()
+    fun initializeInAppPurchases(postAction: (products: List<String>) -> Unit)
 }

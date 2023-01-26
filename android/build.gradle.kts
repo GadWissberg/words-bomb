@@ -23,10 +23,10 @@ android {
     }
     buildTypes {
         release {
-            isDebuggable = false
+            isDebuggable = true
         }
         debug {
-            isDebuggable = false
+            isDebuggable = true
         }
         named("release") {
             isMinifyEnabled = false

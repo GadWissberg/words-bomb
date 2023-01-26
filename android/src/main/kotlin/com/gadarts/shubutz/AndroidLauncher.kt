@@ -3,15 +3,13 @@ package com.gadarts.shubutz
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
-import com.android.billingclient.api.BillingClient
-import com.android.billingclient.api.BillingClientStateListener
-import com.android.billingclient.api.BillingResult
-import com.android.billingclient.api.PurchasesUpdatedListener
+import com.android.billingclient.api.*
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.ShubutzGame
+import com.gadarts.shubutz.core.model.InAppPacks
 
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
@@ -19,17 +17,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     private val purchasesUpdatedListener =
         PurchasesUpdatedListener { billingResult, purchases ->
             // To be implemented in a later section.
-        }
-    private val billingClientStateListener: BillingClientStateListener =
-        object : BillingClientStateListener {
-            override fun onBillingServiceDisconnected() {
-                Gdx.app.log("BillingClientState", "Disconnected!")
-            }
-
-            override fun onBillingSetupFinished(p0: BillingResult) {
-                Gdx.app.log("BillingClientState", "${p0.responseCode} - ${p0.debugMessage}")
-            }
-
         }
     private lateinit var billingClient: BillingClient
 
@@ -76,8 +63,39 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         editor.apply()
     }
 
-    override fun startConnection() {
-        billingClient.startConnection(billingClientStateListener)
+    override fun initializeInAppPurchases(postAction: (products: List<String>) -> Unit) {
+        billingClient.startConnection(object : BillingClientStateListener {
+            override fun onBillingServiceDisconnected() {
+                Gdx.app.log("BillingClientState", "Disconnected!")
+            }
+
+            override fun onBillingSetupFinished(p0: BillingResult) {
+                Gdx.app.log("BillingClientState", "${p0.responseCode} - ${p0.debugMessage}")
+                if (billingClient.connectionState == BillingClient.ConnectionState.CONNECTED) {
+                    fetchProducts(postAction)
+                }
+            }
+        }
+        )
+
+    }
+
+    private fun fetchProducts(postAction: (products: List<String>) -> Unit) {
+        val newBuilder = QueryProductDetailsParams.Product.newBuilder()
+        val queryProductDetailsParams = QueryProductDetailsParams.newBuilder().setProductList(
+            InAppPacks.values().map {
+                newBuilder
+                    .setProductId(it.name.lowercase())
+                    .setProductType(BillingClient.ProductType.INAPP)
+                    .build()
+            }
+        ).build()
+        billingClient.queryProductDetailsAsync(queryProductDetailsParams) { billingResult,
+                                                                            productDetailsList ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                postAction.invoke(productDetailsList.map { it.name })
+            }
+        }
     }
 
     companion object {

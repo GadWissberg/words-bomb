@@ -117,3 +117,4 @@ Thumbs.db
 *.blend1
 /android/debug
 /android/release/
+*.hprof

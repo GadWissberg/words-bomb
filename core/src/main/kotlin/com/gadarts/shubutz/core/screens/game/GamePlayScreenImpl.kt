@@ -86,9 +86,10 @@ class GamePlayScreenImpl(
         gamePlayScreenView.initializeForGameBegin()
     }
 
-    override fun onClickedPurchase() {
-        android.startConnection()
+    override fun onOpenProductsMenu(postAction: (products: List<String>) -> Unit) {
+        android.initializeInAppPurchases(postAction)
     }
+
 
     override fun onClickedBackButton() {
         lifeCycleManager.goToMenu()

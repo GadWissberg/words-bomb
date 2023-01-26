@@ -5,6 +5,6 @@ interface GamePlayScreen {
     fun onClickedBackButton()
     fun onBrickClicked(letter: Char)
     fun onScreenEmpty()
-    fun onClickedPurchase()
+    fun onOpenProductsMenu(postAction: (products: List<String>) -> Unit)
 
 }
