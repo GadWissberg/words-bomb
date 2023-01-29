@@ -11,7 +11,7 @@ class GameModel(var coins: Int, val selectedDifficulty: Difficulties) {
     lateinit var options: MutableList<Char>
 
     companion object {
-        const val LETTERS = "-/:םןףץך?!אבגדהוזחטיכלמנסעפצקרשת"
+        const val LETTERS = "₪-/:םןףץך?!אבגדהוזחטיכלמנסעפצקרשת"
         val allowedLetters = LETTERS.subSequence(10, LETTERS.length)
     }
 }

@@ -4,19 +4,31 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
 import com.android.billingclient.api.*
+import com.android.billingclient.api.BillingClient.BillingResponseCode
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.InAppPacks
+import com.gadarts.shubutz.core.model.Product
 
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
     private var versionName = "0.0.0"
     private val purchasesUpdatedListener =
         PurchasesUpdatedListener { billingResult, purchases ->
-            // To be implemented in a later section.
+            if (billingResult.responseCode == BillingResponseCode.OK && purchases != null) {
+                for (purchase in purchases) {
+                    toast(billingResult.debugMessage)
+                }
+            } else if (billingResult.responseCode == BillingResponseCode.USER_CANCELED) {
+                toast(billingResult.debugMessage)
+                // Handle an error caused by a user cancelling the purchase flow.
+            } else {
+                toast(billingResult.debugMessage)
+                // Handle any other error codes.
+            }
         }
     private lateinit var billingClient: BillingClient
 
@@ -63,7 +75,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         editor.apply()
     }
 
-    override fun initializeInAppPurchases(postAction: (products: List<String>) -> Unit) {
+    override fun initializeInAppPurchases(postAction: (products: Map<String, Product>) -> Unit) {
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingServiceDisconnected() {
                 Gdx.app.log("BillingClientState", "Disconnected!")
@@ -80,7 +92,22 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
     }
 
-    private fun fetchProducts(postAction: (products: List<String>) -> Unit) {
+    override fun launchBillingFlow(selectedProduct: Product, postAction: () -> String) {
+        val productDetailsParamsList = listOf(
+            BillingFlowParams.ProductDetailsParams.newBuilder()
+                .setProductDetails(selectedProduct.productDetails as ProductDetails)
+                .build()
+        )
+        val billingFlowParams = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(productDetailsParamsList)
+            .build()
+        val billingResult = billingClient.launchBillingFlow(this, billingFlowParams)
+        if (billingResult.responseCode != BillingResponseCode.OK) {
+            toast(billingResult.debugMessage)
+        }
+    }
+
+    private fun fetchProducts(postAction: (products: Map<String, Product>) -> Unit) {
         val newBuilder = QueryProductDetailsParams.Product.newBuilder()
         val queryProductDetailsParams = QueryProductDetailsParams.newBuilder().setProductList(
             InAppPacks.values().map {
@@ -93,7 +120,14 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         billingClient.queryProductDetailsAsync(queryProductDetailsParams) { billingResult,
                                                                             productDetailsList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                postAction.invoke(productDetailsList.map { it.name })
+                postAction.invoke(productDetailsList.associate {
+                    it.productId to Product(
+                        it.productId,
+                        it.name,
+                        it.oneTimePurchaseOfferDetails?.formattedPrice ?: "(?)",
+                        it
+                    )
+                })
             }
         }
     }

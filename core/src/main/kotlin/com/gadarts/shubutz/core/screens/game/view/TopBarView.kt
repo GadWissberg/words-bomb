@@ -20,12 +20,14 @@ import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.InAppPacks
+import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.TexturesDefinitions.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
+import java.util.*
 
 /**
  * Handle the in-game UI top-bar's view.
@@ -172,7 +174,7 @@ class TopBarView(
         val dialogLayout = Table()
         gamePlayScreen.onOpenProductsMenu {
             if (it.isNotEmpty()) {
-                addCoinsDialogComponents(assets, dialogLayout)
+                addCoinsDialogComponents(assets, dialogLayout, it)
             }
         }
         return dialogLayout
@@ -181,15 +183,20 @@ class TopBarView(
     private fun addCoinsDialogComponents(
         assets: GameAssetManager,
         layout: Table,
+        products: Map<String, Product>,
     ) {
         addHeaderToCoinsWindow(assets, layout)
         addCoinsDialogDescription(assets, layout)
         InAppPacks.values().forEach {
-            addPackButton(
-                layout,
-                it,
-                stage = table.stage as GameStage,
-            )
+            val id = it.name.lowercase(Locale.ROOT)
+            if (products.containsKey(id)) {
+                addPackButton(
+                    layout,
+                    products[id],
+                    stage = table.stage as GameStage,
+                    definition = it
+                )
+            }
         }
         layout.pack()
         (layout.parent as Table).pack()
@@ -215,18 +222,13 @@ class TopBarView(
 
     private fun addPackButton(
         popup: Table,
-        packDef: InAppPacks,
+        product: Product?,
         applyAnimation: Boolean = false,
         stage: GameStage,
+        definition: InAppPacks,
     ) {
-        val text = packDef.label.format(packDef.amount.toString().reversed()).reversed()
-        val button = ImageTextButton(text, createPackButtonStyle(stage))
-        val image = Image(assetsManager.getTexture(packDef.icon))
-        addClickListenerToButton(button, {
-            gamePlayScreen.onOpenProductsMenu {
-
-            }
-        }, assetsManager)
+        val image = Image(assetsManager.getTexture(definition.icon))
+        val button = createPackButton(definition, product, stage)
         button.add(image)
         popup.add(button).pad(COINS_POPUP_BUTTON_PADDING).row()
 
@@ -251,6 +253,27 @@ class TopBarView(
                 )
             )
         }
+    }
+
+    private fun createPackButton(
+        definition: InAppPacks,
+        product: Product?,
+        stage: GameStage
+    ): ImageTextButton {
+        val button = ImageTextButton(
+            definition.label.format(
+                definition.amount.toString().reversed(),
+                product?.formattedPrice?.reversed() ?: "(?)"
+            ).reversed(), createPackButtonStyle(stage)
+        )
+        addClickListenerToButton(button, {
+            if (product != null) {
+                gamePlayScreen.onPackPurchaseButtonClicked(product) {
+                    definition.name.lowercase()
+                }
+            }
+        }, assetsManager)
+        return button
     }
 
     private fun createPackButtonStyle(stage: GameStage) =

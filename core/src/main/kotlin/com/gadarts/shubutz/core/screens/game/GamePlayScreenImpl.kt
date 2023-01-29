@@ -10,6 +10,7 @@ import com.gadarts.shubutz.core.business.GameLogicHandler
 import com.gadarts.shubutz.core.business.GameLogicHandlerEventsSubscriber
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
+import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenView
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
@@ -86,10 +87,13 @@ class GamePlayScreenImpl(
         gamePlayScreenView.initializeForGameBegin()
     }
 
-    override fun onOpenProductsMenu(postAction: (products: List<String>) -> Unit) {
+    override fun onOpenProductsMenu(postAction: (products: Map<String, Product>) -> Unit) {
         android.initializeInAppPurchases(postAction)
     }
 
+    override fun onPackPurchaseButtonClicked(selectedProduct: Product, postAction: () -> String) {
+        android.launchBillingFlow(selectedProduct, postAction)
+    }
 
     override fun onClickedBackButton() {
         lifeCycleManager.goToMenu()
