@@ -62,11 +62,7 @@ class GameLogicHandler(
             var coinsAmount = 0
             if (gameWin) {
                 coinsAmount = gameModel.selectedDifficulty.winWorth
-                gameModel.coins += coinsAmount
-                androidInterface.saveSharedPreferencesValue(
-                    SHARED_PREFERENCES_DATA_KEY_COINS,
-                    gameModel.coins
-                )
+                addCoinsValueAndSave(gameModel, gameModel.coins + coinsAmount)
             }
             subscribers.forEach {
                 it.onCorrectGuess(indices, gameWin, coinsAmount)
@@ -75,6 +71,17 @@ class GameLogicHandler(
             gameModel.triesLeft--
             subscribers.forEach { it.onIncorrectGuess(gameModel.triesLeft <= 0) }
         }
+    }
+
+    private fun addCoinsValueAndSave(
+        gameModel: GameModel,
+        coinsAmount: Int
+    ) {
+        gameModel.coins += coinsAmount
+        androidInterface.saveSharedPreferencesValue(
+            SHARED_PREFERENCES_DATA_KEY_COINS,
+            gameModel.coins
+        )
     }
 
     private fun chooseTarget(gameModel: GameModel) {
@@ -103,6 +110,10 @@ class GameLogicHandler(
             .toMutableList()
             .drop(toDropFromHiddenIndices)
             .toMutableList()
+    }
+
+    fun onPurchasedCoins(gameModel: GameModel, amount: Int) {
+        addCoinsValueAndSave(gameModel, amount)
     }
 
     companion object {

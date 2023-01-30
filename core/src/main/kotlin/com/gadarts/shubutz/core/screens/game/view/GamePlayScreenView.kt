@@ -191,6 +191,10 @@ class GamePlayScreenView(
         stage.addAction(Actions.delay(5F, Actions.run { gamePlayScreen.onGameOverAnimationDone() }))
     }
 
+    fun onPurchasedCoins() {
+        gamePlayScreenComponents.topBarView.coinsLabel.setText(gameModel.coins)
+    }
+
 
     companion object {
         private const val BRICK_SUCCESS_ANIMATION_DURATION = 1F

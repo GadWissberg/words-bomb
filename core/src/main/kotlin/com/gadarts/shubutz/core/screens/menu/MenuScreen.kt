@@ -2,12 +2,12 @@ package com.gadarts.shubutz.core.screens.menu
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.Screen
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.screens.GameScreen
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenViewEventsSubscriber
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
@@ -19,10 +19,14 @@ class MenuScreen(
     stage: GameStage,
     soundPlayer: SoundPlayer,
 ) :
-    Screen, MenuScreenViewEventsSubscriber {
+    GameScreen(), MenuScreenViewEventsSubscriber {
 
     private val menuScreenView =
         MenuScreenView(assetsManager, androidInterface.versionName(), stage, soundPlayer)
+
+    override fun onSuccessfulPurchase(products: MutableList<String>) {
+
+    }
 
     override fun show() {
         menuScreenView.subscribeForEvents(this)

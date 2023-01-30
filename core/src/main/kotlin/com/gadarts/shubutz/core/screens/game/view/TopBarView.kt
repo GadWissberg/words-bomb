@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
-import com.gadarts.shubutz.core.model.InAppPacks
+import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -187,7 +187,7 @@ class TopBarView(
     ) {
         addHeaderToCoinsWindow(assets, layout)
         addCoinsDialogDescription(assets, layout)
-        InAppPacks.values().forEach {
+        InAppProducts.values().forEach {
             val id = it.name.lowercase(Locale.ROOT)
             if (products.containsKey(id)) {
                 addPackButton(
@@ -225,7 +225,7 @@ class TopBarView(
         product: Product?,
         applyAnimation: Boolean = false,
         stage: GameStage,
-        definition: InAppPacks,
+        definition: InAppProducts,
     ) {
         val image = Image(assetsManager.getTexture(definition.icon))
         val button = createPackButton(definition, product, stage)
@@ -256,7 +256,7 @@ class TopBarView(
     }
 
     private fun createPackButton(
-        definition: InAppPacks,
+        definition: InAppProducts,
         product: Product?,
         stage: GameStage
     ): ImageTextButton {
@@ -268,9 +268,7 @@ class TopBarView(
         )
         addClickListenerToButton(button, {
             if (product != null) {
-                gamePlayScreen.onPackPurchaseButtonClicked(product) {
-                    definition.name.lowercase()
-                }
+                gamePlayScreen.onPackPurchaseButtonClicked(product)
             }
         }, assetsManager)
         return button

@@ -8,6 +8,6 @@ interface GamePlayScreen {
     fun onBrickClicked(letter: Char)
     fun onScreenEmpty()
     fun onOpenProductsMenu(postAction: (products: Map<String, Product>) -> Unit)
-    fun onPackPurchaseButtonClicked(selectedProduct: Product, postAction: () -> String)
+    fun onPackPurchaseButtonClicked(selectedProduct: Product)
 
 }

@@ -10,28 +10,56 @@ import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.ShubutzGame
-import com.gadarts.shubutz.core.model.InAppPacks
+import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
 
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
+    private lateinit var game: ShubutzGame
     private var versionName = "0.0.0"
+    private val acknowledgePurchaseResponseListener: AcknowledgePurchaseResponseListener =
+        AcknowledgePurchaseResponseListener { }
     private val purchasesUpdatedListener =
         PurchasesUpdatedListener { billingResult, purchases ->
             if (billingResult.responseCode == BillingResponseCode.OK && purchases != null) {
                 for (purchase in purchases) {
-                    toast(billingResult.debugMessage)
+                    if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+//                        acknowledgePurchase(purchase)
+                        consumePurchase(purchase)
+                    }
                 }
-            } else if (billingResult.responseCode == BillingResponseCode.USER_CANCELED) {
+            } else if (billingResult.responseCode != BillingResponseCode.USER_CANCELED) {
                 toast(billingResult.debugMessage)
-                // Handle an error caused by a user cancelling the purchase flow.
-            } else {
-                toast(billingResult.debugMessage)
-                // Handle any other error codes.
             }
         }
+
+    private fun consumePurchase(purchase: Purchase) {
+        val consumeParams = ConsumeParams.newBuilder()
+            .setPurchaseToken(purchase.purchaseToken)
+            .build()
+        billingClient.consumeAsync(consumeParams) { billingResult, s ->
+            if (billingResult.responseCode == BillingResponseCode.OK) {
+                game.onSuccessfulPurchase(purchase.products)
+            } else {
+                toast(billingResult.responseCode.toString())
+            }
+        }
+    }
+
+    private fun acknowledgePurchase(purchase: Purchase) {
+        if (!purchase.isAcknowledged) {
+            val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+                .setPurchaseToken(purchase.purchaseToken)
+            billingClient.acknowledgePurchase(
+                acknowledgePurchaseParams.build(),
+                acknowledgePurchaseResponseListener
+            )
+        }
+    }
+
     private lateinit var billingClient: BillingClient
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
@@ -42,7 +70,8 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         }
         val config = AndroidApplicationConfiguration()
         config.numSamples = 2
-        initialize(ShubutzGame(this), config)
+        game = ShubutzGame(this)
+        initialize(game, config)
         createBillingClient()
     }
 
@@ -92,7 +121,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
     }
 
-    override fun launchBillingFlow(selectedProduct: Product, postAction: () -> String) {
+    override fun launchBillingFlow(selectedProduct: Product) {
         val productDetailsParamsList = listOf(
             BillingFlowParams.ProductDetailsParams.newBuilder()
                 .setProductDetails(selectedProduct.productDetails as ProductDetails)
@@ -110,7 +139,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     private fun fetchProducts(postAction: (products: Map<String, Product>) -> Unit) {
         val newBuilder = QueryProductDetailsParams.Product.newBuilder()
         val queryProductDetailsParams = QueryProductDetailsParams.newBuilder().setProductList(
-            InAppPacks.values().map {
+            InAppProducts.values().map {
                 newBuilder
                     .setProductId(it.name.lowercase())
                     .setProductType(BillingClient.ProductType.INAPP)
@@ -119,7 +148,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         ).build()
         billingClient.queryProductDetailsAsync(queryProductDetailsParams) { billingResult,
                                                                             productDetailsList ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+            if (billingResult.responseCode == BillingResponseCode.OK) {
                 postAction.invoke(productDetailsList.associate {
                     it.productId to Product(
                         it.productId,

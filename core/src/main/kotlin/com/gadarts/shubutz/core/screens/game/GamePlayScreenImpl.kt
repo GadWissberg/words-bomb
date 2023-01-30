@@ -2,7 +2,6 @@ package com.gadarts.shubutz.core.screens.game
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.Screen
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.SoundPlayer
@@ -10,8 +9,10 @@ import com.gadarts.shubutz.core.business.GameLogicHandler
 import com.gadarts.shubutz.core.business.GameLogicHandlerEventsSubscriber
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
+import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.screens.GameScreen
 import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenView
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
@@ -22,7 +23,7 @@ class GamePlayScreenImpl(
     private val stage: GameStage,
     private val soundPlayer: SoundPlayer,
     selectedDifficulty: Difficulties,
-) : Screen, GameLogicHandlerEventsSubscriber, GamePlayScreen {
+) : GameScreen(), GameLogicHandlerEventsSubscriber, GamePlayScreen {
 
 
     private val gameModel =
@@ -32,6 +33,15 @@ class GamePlayScreenImpl(
         )
     private lateinit var gameLogicHandler: GameLogicHandler
     private lateinit var gamePlayScreenView: GamePlayScreenView
+    override fun onSuccessfulPurchase(products: MutableList<String>) {
+        products.forEach { product ->
+            val filtered = InAppProducts.values().filter { it.name.lowercase() == product }
+            if (filtered.isNotEmpty()) {
+                gameLogicHandler.onPurchasedCoins(gameModel, filtered.first().amount)
+                gamePlayScreenView.onPurchasedCoins()
+            }
+        }
+    }
 
     override fun show() {
         gameLogicHandler = GameLogicHandler(assetsManager.phrases, android)
@@ -91,8 +101,8 @@ class GamePlayScreenImpl(
         android.initializeInAppPurchases(postAction)
     }
 
-    override fun onPackPurchaseButtonClicked(selectedProduct: Product, postAction: () -> String) {
-        android.launchBillingFlow(selectedProduct, postAction)
+    override fun onPackPurchaseButtonClicked(selectedProduct: Product) {
+        android.launchBillingFlow(selectedProduct)
     }
 
     override fun onClickedBackButton() {

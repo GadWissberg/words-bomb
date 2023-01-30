@@ -4,6 +4,7 @@ import com.badlogic.gdx.*
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.screens.GameScreen
 import com.gadarts.shubutz.core.screens.game.GamePlayScreenImpl
 import com.gadarts.shubutz.core.screens.menu.MenuScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
@@ -62,6 +63,10 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
 
     override fun goToPlayScreen(selectedDifficulty: Difficulties) {
         setScreen(createGamePlayScreen(selectedDifficulty))
+    }
+
+    override fun onSuccessfulPurchase(products: MutableList<String>) {
+        (screen as GameScreen).onSuccessfulPurchase(products)
     }
 
     private fun createGamePlayScreen(selectedDifficulty: Difficulties) =
