@@ -12,6 +12,6 @@ class GameModel(var coins: Int, val selectedDifficulty: Difficulties) {
 
     companion object {
         const val LETTERS = "₪-/:םןףץך?!אבגדהוזחטיכלמנסעפצקרשת"
-        val allowedLetters = LETTERS.subSequence(10, LETTERS.length)
+        val allowedLetters = LETTERS.subSequence(11, LETTERS.length)
     }
 }
