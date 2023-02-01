@@ -14,6 +14,10 @@ import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.*
+import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.ParticleEffectsDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage

@@ -17,10 +17,10 @@ import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.Difficulties
-import com.gadarts.shubutz.core.model.assets.FontsDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
-import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.BeginGameAction
 import com.gadarts.shubutz.core.screens.menu.LoadingAnimationHandler
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage

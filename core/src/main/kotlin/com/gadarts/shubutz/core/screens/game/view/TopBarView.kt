@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -21,10 +23,11 @@ import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
-import com.gadarts.shubutz.core.model.assets.FontsDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.model.assets.SoundsDefinitions
-import com.gadarts.shubutz.core.model.assets.TexturesDefinitions.*
+import com.gadarts.shubutz.core.model.assets.definitions.AtlasesDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import java.util.*
@@ -172,7 +175,12 @@ class TopBarView(
         assets: GameAssetManager,
     ): Table {
         val dialogLayout = Table()
+        val keyFrames = assets.getAtlas(AtlasesDefinitions.LOADING).regions
+        val loadingAnimation = LoadingAnimation(keyFrames)
+        dialogLayout.add(loadingAnimation).row()
         gamePlayScreen.onOpenProductsMenu {
+            loadingAnimation.remove()
+            dialogLayout.pack()
             if (it.isNotEmpty()) {
                 addCoinsDialogComponents(assets, dialogLayout, it)
             }

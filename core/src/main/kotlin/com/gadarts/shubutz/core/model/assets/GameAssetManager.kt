@@ -8,10 +8,12 @@ import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.ParticleEffect
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.gadarts.shubutz.core.model.Phrase
+import com.gadarts.shubutz.core.model.assets.definitions.*
 
 /**
  * Responsible to load the assets.
@@ -66,6 +68,10 @@ open class GameAssetManager : AssetManager() {
 
     fun getSound(sound: SoundsDefinitions): Sound {
         return get(sound.getPath(), Sound::class.java)
+    }
+
+    fun getAtlas(atlas: AtlasesDefinitions): TextureAtlas {
+        return get(atlas.getPath(), TextureAtlas::class.java)
     }
 
     private fun initializeFontLoaders() {

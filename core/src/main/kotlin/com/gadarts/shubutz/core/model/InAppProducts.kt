@@ -1,6 +1,6 @@
 package com.gadarts.shubutz.core.model
 
-import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 
 enum class InAppProducts(val label: String, val icon: TexturesDefinitions, val amount: Int) {
     PACK_0("אוסף של %s מטבעות - %s", TexturesDefinitions.ICON_PACK_1, 8),

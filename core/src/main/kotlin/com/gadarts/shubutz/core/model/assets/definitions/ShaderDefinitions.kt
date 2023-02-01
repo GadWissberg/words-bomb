@@ -1,4 +1,4 @@
-package com.gadarts.shubutz.core.model.assets
+package com.gadarts.shubutz.core.model.assets.definitions
 
 import com.badlogic.gdx.assets.AssetLoaderParameters
 import java.util.*

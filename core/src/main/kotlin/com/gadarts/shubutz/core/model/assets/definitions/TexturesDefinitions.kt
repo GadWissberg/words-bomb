@@ -1,8 +1,8 @@
-package com.gadarts.shubutz.core.model.assets
+package com.gadarts.shubutz.core.model.assets.definitions
 
 import com.badlogic.gdx.assets.AssetLoaderParameters
 import com.badlogic.gdx.graphics.Texture
-import java.util.Locale.ROOT
+import java.util.*
 
 enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Texture> {
     HUD(true),
@@ -37,7 +37,7 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     DIALOG_CLOSE_BUTTON;
 
     private var path: String =
-        "textures/${(if (ninepatch) "$name.9" else name).lowercase(ROOT)}.png"
+        "textures/${(if (ninepatch) "$name.9" else name).lowercase(Locale.ROOT)}.png"
 
     override fun getPath(): String {
         return path

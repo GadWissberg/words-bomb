@@ -18,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gadarts.shubutz.core.GeneralUtils
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.model.assets.TexturesDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 
 class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) : Stage(
     fitViewport,
