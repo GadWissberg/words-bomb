@@ -6,7 +6,8 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect
 enum class ParticleEffectsDefinitions : AssetDefinition<ParticleEffect> {
     FIRE,
     EXP,
-    STARS;
+    STARS,
+    PARTY;
 
     private var path: String =
         "particles/${name.lowercase()}.pe"

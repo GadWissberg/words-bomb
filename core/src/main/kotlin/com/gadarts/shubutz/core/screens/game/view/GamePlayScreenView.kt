@@ -1,5 +1,6 @@
 package com.gadarts.shubutz.core.screens.game.view
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
@@ -197,6 +198,13 @@ class GamePlayScreenView(
 
     fun onPurchasedCoins() {
         gamePlayScreenComponents.topBarView.coinsLabel.setText(gameModel.coins)
+        val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.PARTY)
+        particleEffect.emitters.forEach { it.spawnWidth.highMin = Gdx.graphics.width.toFloat() }
+        val party = ParticleEffectActor(particleEffect)
+        party.setPosition(0F, Gdx.graphics.height.toFloat())
+        stage.addActor(party)
+        party.start()
+        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.PURCHASED))
     }
 
 
