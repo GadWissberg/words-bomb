@@ -69,6 +69,10 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         (screen as GameScreen).onSuccessfulPurchase(products)
     }
 
+    override fun onFailedPurchase(message: String) {
+        (screen as GameScreen).onFailedPurchase(message)
+    }
+
     private fun createGamePlayScreen(selectedDifficulty: Difficulties) =
         GamePlayScreenImpl(
             assetsManager,

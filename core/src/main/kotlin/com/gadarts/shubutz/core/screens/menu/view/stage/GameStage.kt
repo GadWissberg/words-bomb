@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.FitViewport
+import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GeneralUtils
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
@@ -138,6 +139,7 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) : Sta
         name: String,
     ) {
         dialog.name = name
+        dialog.debug = DebugSettings.SHOW_UI_BORDERS
         addCloseButtonToDialog(assetsManager, dialog)
         val dialogTexture = assetsManager.getTexture(TexturesDefinitions.DIALOG)
         applyDialogBackground(dialogTexture, dialog)
@@ -156,7 +158,7 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) : Sta
         )
 
         initDialog(assetsManager, dialog, name)
-        dialog.add(dialogView)
+        dialog.add(dialogView).expand()
         dialog.pack()
         dialog.setPosition(width / 2F - dialog.width / 2F, height / 2F - dialog.height / 2F)
         addActor(dialog)
@@ -172,7 +174,7 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) : Sta
     ) {
         val closeButtonTexture = assetsManager.getTexture(TexturesDefinitions.DIALOG_CLOSE_BUTTON)
         val closeButton = ImageButton(TextureRegionDrawable(closeButtonTexture))
-        dialog.add(closeButton).expandX().right().row()
+        dialog.add(closeButton).expandX().top().right().row()
         closeButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 if (dialog.hasActions()) return

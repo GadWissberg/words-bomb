@@ -8,5 +8,6 @@ interface GameLifeCycleManager {
     fun goToMenu()
     fun goToPlayScreen(selectedDifficulty: Difficulties)
     fun onSuccessfulPurchase(products: MutableList<String>)
+    fun onFailedPurchase(message: String)
 
 }

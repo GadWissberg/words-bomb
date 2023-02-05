@@ -43,6 +43,10 @@ class GamePlayScreenImpl(
         }
     }
 
+    override fun onFailedPurchase(message: String) {
+        gamePlayScreenView.displayFailedPurchase(message)
+    }
+
     override fun show() {
         gameLogicHandler = GameLogicHandler(assetsManager.phrases, android)
         gameLogicHandler.beginGame(gameModel)
@@ -97,9 +101,13 @@ class GamePlayScreenImpl(
         gamePlayScreenView.initializeForGameBegin()
     }
 
-    override fun onOpenProductsMenu(postAction: (products: Map<String, Product>) -> Unit) {
-        android.initializeInAppPurchases(postAction)
+    override fun onOpenProductsMenu(
+        onSuccess: (products: Map<String, Product>) -> Unit,
+        onFailure: (message: String) -> Unit
+    ) {
+        android.initializeInAppPurchases(onSuccess, onFailure)
     }
+
 
     override fun onPackPurchaseButtonClicked(selectedProduct: Product) {
         android.launchBillingFlow(selectedProduct)

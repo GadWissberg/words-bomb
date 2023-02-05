@@ -17,14 +17,11 @@ import com.gadarts.shubutz.core.model.Product
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
     private lateinit var game: ShubutzGame
     private var versionName = "0.0.0"
-    private val acknowledgePurchaseResponseListener: AcknowledgePurchaseResponseListener =
-        AcknowledgePurchaseResponseListener { }
     private val purchasesUpdatedListener =
         PurchasesUpdatedListener { billingResult, purchases ->
             if (billingResult.responseCode == BillingResponseCode.OK && purchases != null) {
                 for (purchase in purchases) {
                     if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-//                        acknowledgePurchase(purchase)
                         consumePurchase(purchase)
                     }
                 }
@@ -37,23 +34,12 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         val consumeParams = ConsumeParams.newBuilder()
             .setPurchaseToken(purchase.purchaseToken)
             .build()
-        billingClient.consumeAsync(consumeParams) { billingResult, s ->
+        billingClient.consumeAsync(consumeParams) { billingResult, _ ->
             if (billingResult.responseCode == BillingResponseCode.OK) {
                 game.onSuccessfulPurchase(purchase.products)
             } else {
-                toast(billingResult.responseCode.toString())
+                game.onFailedPurchase(FAILURE_MESSAGE_IN_APP_PURCHASE)
             }
-        }
-    }
-
-    private fun acknowledgePurchase(purchase: Purchase) {
-        if (!purchase.isAcknowledged) {
-            val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
-                .setPurchaseToken(purchase.purchaseToken)
-            billingClient.acknowledgePurchase(
-                acknowledgePurchaseParams.build(),
-                acknowledgePurchaseResponseListener
-            )
         }
     }
 
@@ -104,7 +90,10 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         editor.apply()
     }
 
-    override fun initializeInAppPurchases(postAction: (products: Map<String, Product>) -> Unit) {
+    override fun initializeInAppPurchases(
+        onSuccess: (products: Map<String, Product>) -> Unit,
+        onFailure: (message: String) -> Unit
+    ) {
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingServiceDisconnected() {
                 Gdx.app.log("BillingClientState", "Disconnected!")
@@ -113,7 +102,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
             override fun onBillingSetupFinished(p0: BillingResult) {
                 Gdx.app.log("BillingClientState", "${p0.responseCode} - ${p0.debugMessage}")
                 if (billingClient.connectionState == BillingClient.ConnectionState.CONNECTED) {
-                    fetchProducts(postAction)
+                    fetchProducts(onSuccess, onFailure)
                 }
             }
         }
@@ -136,7 +125,10 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         }
     }
 
-    private fun fetchProducts(postAction: (products: Map<String, Product>) -> Unit) {
+    private fun fetchProducts(
+        onSuccess: (products: Map<String, Product>) -> Unit,
+        onFailure: (message: String) -> Unit
+    ) {
         val newBuilder = QueryProductDetailsParams.Product.newBuilder()
         val queryProductDetailsParams = QueryProductDetailsParams.newBuilder().setProductList(
             InAppProducts.values().map {
@@ -149,7 +141,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         billingClient.queryProductDetailsAsync(queryProductDetailsParams) { billingResult,
                                                                             productDetailsList ->
             if (billingResult.responseCode == BillingResponseCode.OK) {
-                postAction.invoke(productDetailsList.associate {
+                onSuccess.invoke(productDetailsList.associate {
                     it.productId to Product(
                         it.productId,
                         it.name,
@@ -157,11 +149,14 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
                         it
                     )
                 })
+            } else {
+                onFailure.invoke(FAILURE_MESSAGE_IN_APP_PURCHASE)
             }
         }
     }
 
     companion object {
         private const val SHARED_PREFERENCES_DATA_NAME = "data"
+        private const val FAILURE_MESSAGE_IN_APP_PURCHASE = "אופס! קרתה תקלה..."
     }
 }

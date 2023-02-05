@@ -207,6 +207,11 @@ class GamePlayScreenView(
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.PURCHASED))
     }
 
+    fun displayFailedPurchase(message: String) {
+        val dialogView = Table()
+        dialogView.add(ViewUtils.createDialogLabel(message, assetsManager))
+        stage.addDialog(dialogView, "purchase_failed_dialog", assetsManager)
+    }
 
     companion object {
         private const val BRICK_SUCCESS_ANIMATION_DURATION = 1F

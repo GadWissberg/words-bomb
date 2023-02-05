@@ -28,6 +28,10 @@ class MenuScreen(
 
     }
 
+    override fun onFailedPurchase(message: String) {
+
+    }
+
     override fun show() {
         menuScreenView.subscribeForEvents(this)
         menuScreenView.onShow(gameLifeCycleManager.loadingDone, goToPlayScreenOnClick())
