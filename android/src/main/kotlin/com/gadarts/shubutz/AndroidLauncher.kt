@@ -1,7 +1,10 @@
 package com.gadarts.shubutz
 
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Toast
 import com.android.billingclient.api.*
 import com.android.billingclient.api.BillingClient.BillingResponseCode
@@ -15,6 +18,7 @@ import com.gadarts.shubutz.core.model.Product
 
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
+
     private lateinit var game: ShubutzGame
     private var versionName = "0.0.0"
     private val purchasesUpdatedListener =
@@ -29,7 +33,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
                 toast(billingResult.debugMessage)
             }
         }
-
+    private lateinit var billingClient: BillingClient
     private fun consumePurchase(purchase: Purchase) {
         val consumeParams = ConsumeParams.newBuilder()
             .setPurchaseToken(purchase.purchaseToken)
@@ -43,23 +47,35 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         }
     }
 
-    private lateinit var billingClient: BillingClient
-
-    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         try {
-            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            val pInfo = context.packageManager.getPackageInfoCompat(context.packageName, 0)
             versionName = pInfo.versionName
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }
-        val config = AndroidApplicationConfiguration()
-        config.numSamples = 2
         game = ShubutzGame(this)
-        initialize(game, config)
+        initialize(game, createAndroidApplicationConfig())
         createBillingClient()
     }
+
+    private fun createAndroidApplicationConfig(): AndroidApplicationConfiguration {
+        val config = AndroidApplicationConfiguration()
+        config.numSamples = 2
+        return config
+    }
+
+    private fun PackageManager.getPackageInfoCompat(
+        packageName: String,
+        flags: Int = 0
+    ): PackageInfo =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags.toLong()))
+        } else {
+            @Suppress("DEPRECATION") getPackageInfo(packageName, flags)
+        }
 
     private fun createBillingClient() {
         billingClient = BillingClient.newBuilder(context)

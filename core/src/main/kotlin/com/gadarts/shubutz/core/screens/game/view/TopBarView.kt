@@ -317,7 +317,7 @@ class TopBarView(
             .size(
                 topPartTexture.height.toFloat(),
                 topPartTexture.height.toFloat()
-            ).pad(10F).row()
+            ).pad(COINS_ICON_PAD, COINS_ICON_PAD, COINS_ICON_PAD, COINS_ICON_PAD_RIGHT).row()
     }
 
     private fun createTopPartTexture(stage: GameStage) {
@@ -398,5 +398,7 @@ class TopBarView(
         private const val COINS_BUTTON_PAD_RIGHT = 20F
         private const val COINS_BUTTON_PAD_LEFT = 20F
         private const val COINS_BUTTON_PAD_BOTTOM = 20F
+        private const val COINS_ICON_PAD_RIGHT = 40F
+        private const val COINS_ICON_PAD = 20F
     }
 }

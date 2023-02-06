@@ -62,7 +62,7 @@ class GameLogicHandler(
             var coinsAmount = 0
             if (gameWin) {
                 coinsAmount = gameModel.selectedDifficulty.winWorth
-                addCoinsValueAndSave(gameModel, gameModel.coins + coinsAmount)
+                addCoinsValueAndSave(gameModel, coinsAmount)
             }
             subscribers.forEach {
                 it.onCorrectGuess(indices, gameWin, coinsAmount)
