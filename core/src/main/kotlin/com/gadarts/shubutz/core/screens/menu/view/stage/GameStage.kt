@@ -15,14 +15,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GeneralUtils
+import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 
-class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) : Stage(
-    fitViewport,
+class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManager) : Stage(
+    stretchViewport,
     SpriteBatch(),
 ) {
     lateinit var dialogButtonDown: NinePatchDrawable
@@ -68,9 +69,9 @@ class GameStage(fitViewport: FitViewport, assetsManager: GameAssetManager) : Sta
 
     private fun addCloud(assetsManager: GameAssetManager, texture: TexturesDefinitions, i: Int) {
         val cloud = Image(assetsManager.getTexture(texture))
-        val screenWidth = Gdx.graphics.width.toFloat()
+        val screenWidth = ShubutzGame.RESOLUTION_WIDTH.toFloat()
         val x = MathUtils.random(0F, screenWidth - cloud.width)
-        val heightDivision = Gdx.graphics.height.toFloat() / NUMBER_OF_CLOUDS.toFloat()
+        val heightDivision = ShubutzGame.RESOLUTION_HEIGHT.toFloat() / NUMBER_OF_CLOUDS.toFloat()
         val minY = heightDivision * i
         val maxY = minY + heightDivision - cloud.height
         val y = MathUtils.random(minY, maxY)

@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
+import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.*
@@ -115,7 +116,7 @@ class GamePlayScreenView(
                 letterIndexInWord++
             }
         }
-        val wordTable = gamePlayScreenComponents.targetPhrasesView.wordsTables[wordCount]
+        val wordTable = gamePlayScreenComponents.targetPhraseView.wordsTables[wordCount]
         val cell = wordTable.cells[letterIndexInWord]
         val selectedBrickScreenCoords =
             gamePlayScreenComponents.optionsView.selectedBrick!!.localToStageCoordinates(
@@ -199,9 +200,11 @@ class GamePlayScreenView(
     fun onPurchasedCoins() {
         gamePlayScreenComponents.topBarView.coinsLabel.setText(gameModel.coins)
         val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.PARTY)
-        particleEffect.emitters.forEach { it.spawnWidth.highMin = Gdx.graphics.width.toFloat() }
+        particleEffect.emitters.forEach {
+            it.spawnWidth.highMin = ShubutzGame.RESOLUTION_WIDTH.toFloat()
+        }
         val party = ParticleEffectActor(particleEffect)
-        party.setPosition(0F, Gdx.graphics.height.toFloat())
+        party.setPosition(0F, ShubutzGame.RESOLUTION_HEIGHT.toFloat())
         stage.addActor(party)
         party.start()
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.PURCHASED))

@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.Align
+import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -69,7 +70,7 @@ class LoadingAnimationHandler {
         brick1 == null || brick2 == null || brick3 == null || brick4 == null
 
     private fun flyOutBrick(brickAnimation: MenuScreenView.BrickAnimation) {
-        val yDelta = Gdx.graphics.height.toFloat()
+        val yDelta = ShubutzGame.RESOLUTION_HEIGHT.toFloat()
         brickAnimation.addAction(
             Actions.sequence(
                 Actions.moveBy(0F, yDelta, 2F, Interpolation.exp10),
@@ -96,8 +97,11 @@ class LoadingAnimationHandler {
         brickTable: MenuScreenView.BrickAnimation,
         brickTexture: Texture
     ) {
-        val x = Gdx.graphics.width / 2F + relativeX
-        brickTable.setPosition(x, Gdx.graphics.height.toFloat() + brickTexture.height.toFloat())
+        val x = ShubutzGame.RESOLUTION_WIDTH / 2F + relativeX
+        brickTable.setPosition(
+            x,
+            ShubutzGame.RESOLUTION_HEIGHT.toFloat() + brickTexture.height.toFloat()
+        )
         brickTable.isTransform = true
         addActionsToLoadingAnimationBrick(brickTable, x)
     }
@@ -113,7 +117,7 @@ class LoadingAnimationHandler {
                     Actions.sequence(
                         Actions.moveTo(
                             x,
-                            Gdx.graphics.height / 2F,
+                            ShubutzGame.RESOLUTION_HEIGHT / 2F,
                             MathUtils.random(FALL_MIN_DURATION, FALL_MAX_DURATION),
                             Interpolation.bounce
                         ),

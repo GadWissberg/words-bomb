@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
+import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.InAppProducts
@@ -75,7 +76,7 @@ class TopBarView(
             LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.WHITE)
         )
         categoryLabel.setAlignment(Align.center)
-        table.add(categoryLabel).size(Gdx.graphics.width.toFloat(), categoryLabel.height)
+        table.add(categoryLabel).size(ShubutzGame.RESOLUTION_WIDTH.toFloat(), categoryLabel.height)
     }
 
     private fun addTopPart(
@@ -88,7 +89,7 @@ class TopBarView(
         topPartTable = Table()
         topPartTable.background = TextureRegionDrawable(topPartTexture)
         topPartTable.debug = DebugSettings.SHOW_UI_BORDERS
-        topPartTable.setSize(Gdx.graphics.width.toFloat(), TOP_PART_HEIGHT.toFloat())
+        topPartTable.setSize(ShubutzGame.RESOLUTION_WIDTH.toFloat(), TOP_PART_HEIGHT.toFloat())
         addTopPartComponents(topPartTable, assetsManager, gamePlayScreen, gameModel)
         table.add(topPartTable).row()
     }

@@ -16,7 +16,7 @@ class GamePlayScreenComponents(
     private val gamePlayScreen: GamePlayScreen
 ) : Disposable {
 
-    lateinit var targetPhrasesView: TargetPhrasesView
+    lateinit var targetPhraseView: TargetPhraseView
     val bombView = BombView(soundPlayer, assetsManager)
     lateinit var optionsView: OptionsView
     val topBarView = TopBarView(soundPlayer, assetsManager, gamePlayScreen)
@@ -30,8 +30,8 @@ class GamePlayScreenComponents(
     ) {
         topBarView.addTopBar(assetsManager, gameModel, gamePlayScreen, stage)
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
-        targetPhrasesView = TargetPhrasesView(letterSize, font80, soundPlayer, assetsManager)
-        targetPhrasesView.calculateMaxBricksPerLine(assetsManager)
+        targetPhraseView = TargetPhraseView(letterSize, font80, soundPlayer, assetsManager)
+        targetPhraseView.calculateMaxBricksPerLine(assetsManager)
         optionsView = OptionsView(stage, soundPlayer, assetsManager)
     }
 
@@ -43,11 +43,11 @@ class GamePlayScreenComponents(
         stage: GameStage,
     ) {
         bombView.addBomb(assetsManager, stage, uiTable, gameModel)
-        targetPhrasesView.onGameBegin(gameModel, assetsManager, uiTable)
+        targetPhraseView.onGameBegin(gameModel, assetsManager, uiTable)
         optionsView.addLettersOptionsTable(
             uiTable,
             assetsManager,
-            targetPhrasesView.maxBricksPerLine,
+            targetPhraseView.maxBricksPerLine,
             letterSize,
             gamePlayScreen,
             gameModel
@@ -57,13 +57,13 @@ class GamePlayScreenComponents(
 
     fun onGameWinAnimation(stage: GameStage, actionOnGameWinAnimationFinish: Runnable) {
         bombView.onGameWinAnimation()
-        targetPhrasesView.onGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
+        targetPhraseView.onGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
     }
 
     fun clearBombView() {
         bombView.animateBombVanish {
             optionsView.onScreenClear()
-            targetPhrasesView.onScreenClear()
+            targetPhraseView.onScreenClear()
         }
     }
 

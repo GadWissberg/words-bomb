@@ -28,10 +28,11 @@ open class Brick(
      * Draws a letter inside the brick.
      */
     private fun drawLetter(batch: Batch?, x: Float, y: Float, bitmapFont: BitmapFont) {
+        val bias = if (letter == "ו" || letter == "י") letterSize.x / 4F else 0F
         drawChar(
             batch,
             auxVector.set(
-                x + width / 2F - letterSize.x / 2F,
+                x + width / 2F - letterSize.x / 2F + bias,
                 y + height / 2F + letterSize.y / 2F
             ),
             bitmapFont,

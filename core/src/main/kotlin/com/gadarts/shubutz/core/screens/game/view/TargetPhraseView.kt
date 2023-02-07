@@ -1,6 +1,5 @@
 package com.gadarts.shubutz.core.screens.game.view
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.ParticleEffect
@@ -10,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.gadarts.shubutz.core.DebugSettings
+import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -21,7 +21,7 @@ import com.gadarts.shubutz.core.screens.game.view.actors.BrickCell
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import ktx.actors.alpha
 
-class TargetPhrasesView(
+class TargetPhraseView(
     private val letterSize: Vector2,
     private val font80: BitmapFont,
     private val soundPlayer: SoundPlayer,
@@ -35,7 +35,7 @@ class TargetPhrasesView(
 
     fun calculateMaxBricksPerLine(assetsManager: GameAssetManager) {
         val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-        maxBricksPerLine = Gdx.graphics.width / brickTexture.width - 1
+        maxBricksPerLine = ShubutzGame.RESOLUTION_WIDTH.toInt() / brickTexture.width - 1
     }
 
     private fun addBrickCell(texture: Texture, wordTable: Table) {
@@ -244,7 +244,7 @@ class TargetPhrasesView(
         private const val TARGET_WORD_LINE_VERTICAL_PADDING = 15F
         private const val GAME_WIN_ANIMATION_DISTANCE = 50F
         private const val GAME_WIN_ANIMATION_LETTER_MOVE_DURATION = 0.25F
-        private const val LETTER_PADDING = 10F
+        private const val LETTER_PADDING = 5F
         private const val WIN_DELAY = 2F
         private val auxVector = Vector2()
 

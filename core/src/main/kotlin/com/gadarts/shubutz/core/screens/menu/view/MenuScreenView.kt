@@ -175,7 +175,10 @@ class MenuScreenView(
     ) {
         val texture = assetsManager.getTexture(textureDefinition)
         val image = Image(texture)
-        logoTable.add(image).size(texture.width.toFloat(), texture.height.toFloat())
+        logoTable.add(image).size(
+            texture.width.toFloat(),
+            texture.height.toFloat()
+        )
         addLogoLetterAnimation(image, index)
     }
 

@@ -1,7 +1,7 @@
 package com.gadarts.shubutz.core
 
 import com.badlogic.gdx.*
-import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.GameScreen
@@ -26,10 +26,11 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     }
 
     private fun createStage() {
-        stage = GameStage(
-            FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()),
-            assetsManager
-        )
+        stage =
+            GameStage(
+                StretchViewport(RESOLUTION_WIDTH.toFloat(), RESOLUTION_HEIGHT.toFloat()),
+                assetsManager
+            )
         stage.setDebugInvisible(DebugSettings.SHOW_UI_BORDERS)
         Gdx.input.inputProcessor = stage
     }
@@ -83,4 +84,8 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
             selectedDifficulty
         )
 
+    companion object {
+        const val RESOLUTION_WIDTH = 1080
+        const val RESOLUTION_HEIGHT = 2400
+    }
 }
