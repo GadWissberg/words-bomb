@@ -1,21 +1,23 @@
 package com.gadarts.shubutz.core.screens.game.view
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton.ImageTextButtonStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
+import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.Scaling
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.SoundPlayer
@@ -235,19 +237,21 @@ class TopBarView(
     private fun addPackButton(
         popup: Table,
         product: Product?,
-        applyAnimation: Boolean = false,
         stage: GameStage,
         definition: InAppProducts,
     ) {
-        val image = Image(assetsManager.getTexture(definition.icon))
         val button = createPackButton(definition, product, stage)
-        button.add(image)
+        val stack = Stack()
+        button.add(stack)
+        addFlashEffect(definition, stack)
+        val image = addPurchaseIcon(definition, stack)
         popup.add(button).pad(COINS_POPUP_BUTTON_PADDING).row()
 
-        if (applyAnimation) {
+        if (definition.applyAnimation) {
             image.addAction(
                 Actions.forever(
                     Actions.sequence(
+                        Actions.delay(MathUtils.random(3F, 5F)),
                         Actions.sizeBy(
                             20F,
                             20F,
@@ -264,6 +268,29 @@ class TopBarView(
                     ),
                 )
             )
+        }
+    }
+
+    private fun addPurchaseIcon(
+        definition: InAppProducts,
+        stack: Stack
+    ): Image {
+        val image = Image(assetsManager.getTexture(definition.icon))
+        image.setScaling(Scaling.none)
+        stack.add(image)
+        return image
+    }
+
+    private fun addFlashEffect(
+        definition: InAppProducts,
+        stack: Stack
+    ) {
+        if (definition.flashEffect) {
+            val texture = assetsManager.getTexture(FLASH)
+            val flash = FlashEffect(texture)
+            stack.add(flash)
+            flash.setOrigin(texture.width / 2F, texture.height / 2F)
+            flash.addAction(Actions.forever(Actions.rotateBy(360F, FLASH_EFFECT_DURATION)))
         }
     }
 
@@ -401,5 +428,6 @@ class TopBarView(
         private const val COINS_BUTTON_PAD_BOTTOM = 20F
         private const val COINS_ICON_PAD_RIGHT = 40F
         private const val COINS_ICON_PAD = 20F
+        private const val FLASH_EFFECT_DURATION = 4F
     }
 }

@@ -34,7 +34,8 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     ICON_PACK_1,
     ICON_PACK_2,
     ICON_PACK_3,
-    DIALOG_CLOSE_BUTTON;
+    DIALOG_CLOSE_BUTTON,
+    FLASH;
 
     private var path: String =
         "textures/${(if (ninepatch) "$name.9" else name).lowercase(Locale.ROOT)}.png"

@@ -162,7 +162,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
                         it.productId,
                         it.name,
                         it.oneTimePurchaseOfferDetails?.formattedPrice ?: "(?)",
-                        it
                     )
                 })
             } else {
