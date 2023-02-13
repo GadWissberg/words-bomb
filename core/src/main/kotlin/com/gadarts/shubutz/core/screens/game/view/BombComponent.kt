@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.gadarts.shubutz.core.DebugSettings
 
-class Bomb(
+class BombComponent(
     texture: Texture,
     private val particleEffectActor: ParticleEffectActor,
     font: BitmapFont,

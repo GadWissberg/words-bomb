@@ -17,7 +17,7 @@ class BombView(
     private val soundPlayer: SoundPlayer,
     private val assetsManager: GameAssetManager
 ) {
-    lateinit var bomb: Bomb
+    lateinit var bombComponent: BombComponent
     private lateinit var fireParticleEffectActor: ParticleEffectActor
     private lateinit var explosionParticleEffectActor: ParticleEffectActor
 
@@ -35,19 +35,19 @@ class BombView(
         stage.addActor(fireParticleEffectActor)
         createBomb(assetsManager, gameModel)
         val bombTexture = assetsManager.getTexture(TexturesDefinitions.BOMB)
-        uiTable.add(bomb).size(bombTexture.width.toFloat(), bombTexture.height.toFloat())
+        uiTable.add(bombComponent).size(bombTexture.width.toFloat(), bombTexture.height.toFloat())
             .pad(BOMB_PADDING).row()
     }
 
     private fun createBomb(assetsManager: GameAssetManager, gameModel: GameModel) {
         val bombTexture = assetsManager.getTexture(TexturesDefinitions.BOMB)
-        bomb = Bomb(
+        bombComponent = BombComponent(
             bombTexture,
             fireParticleEffectActor,
             assetsManager.getFont(FontsDefinitions.VARELA_320),
             gameModel.triesLeft
         )
-        bomb.addAction(
+        bombComponent.addAction(
             Actions.forever(
                 Actions.sequence(
                     Actions.moveBy(
@@ -65,22 +65,22 @@ class BombView(
                 )
             )
         )
-        bomb.setOrigin(bombTexture.width / 2F, bombTexture.height / 2F)
-        bomb.toBack()
+        bombComponent.setOrigin(bombTexture.width / 2F, bombTexture.height / 2F)
+        bombComponent.toBack()
     }
 
-    fun onGameWinAnimation() {
+    fun stopFire() {
         fireParticleEffectActor.stop()
     }
 
     fun updateLabel(gameModel: GameModel) {
-        bomb.updateLabel(gameModel.triesLeft)
+        bombComponent.updateLabel(gameModel.triesLeft)
     }
 
     fun onIncorrectGuess() {
         if (!fireParticleEffectActor.started) {
             soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.IGNITE))
-            bomb.startFire()
+            bombComponent.startFire()
         }
     }
 
@@ -90,22 +90,22 @@ class BombView(
     ) {
         fireParticleEffectActor.stop()
         val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.EXP)
-        val bombPosition = bomb.localToScreenCoordinates(auxVector.setZero())
+        val bombPosition = bombComponent.localToScreenCoordinates(auxVector.setZero())
         explosionParticleEffectActor = ParticleEffectActor(particleEffect)
         explosionParticleEffectActor.setPosition(
-            bombPosition.x + bomb.width / 2F,
-            stage.height - bombPosition.y + bomb.height / 5F
+            bombPosition.x + bombComponent.width / 2F,
+            stage.height - bombPosition.y + bombComponent.height / 5F
         )
 
-        bomb.addAction(
+        bombComponent.addAction(
             Actions.parallel(
                 Actions.sequence(
                     Actions.sizeTo(0F, 0F, BOMB_GAME_OVER_ANIMATION_DURATION, linear),
                     Actions.removeActor()
                 ),
                 Actions.moveBy(
-                    bomb.width / 2F,
-                    bomb.height / 2F,
+                    bombComponent.width / 2F,
+                    bombComponent.height / 2F,
                     BOMB_GAME_OVER_ANIMATION_DURATION,
                     linear
                 )
@@ -115,25 +115,21 @@ class BombView(
         stage.addActor(explosionParticleEffectActor)
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.EXPLOSION))
         explosionParticleEffectActor.start()
-        bomb.hideLabel()
+        bombComponent.hideLabel()
     }
 
     fun animateBombVanish(postAction: Runnable) {
-        bomb.addAction(
+        bombComponent.addAction(
             Actions.sequence(
                 Actions.fadeOut(1F, swingIn),
                 Actions.run { postAction.run() },
-                Actions.run { bomb.remove() }
+                Actions.run { bombComponent.remove() }
             )
         )
     }
 
     fun clear() {
         fireParticleEffectActor.remove()
-    }
-
-    fun resizeBy(y: Float) {
-        bomb.sizeBy(y)
     }
 
     companion object {

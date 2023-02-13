@@ -1,19 +1,23 @@
 package com.gadarts.shubutz.core.screens.game.view
 
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class GamePlayScreenComponents(
     private val assetsManager: GameAssetManager,
     private val soundPlayer: SoundPlayer,
-    private val gamePlayScreen: GamePlayScreen
+    gamePlayScreen: GamePlayScreen
 ) : Disposable {
 
     lateinit var targetPhraseView: TargetPhraseView
@@ -55,9 +59,59 @@ class GamePlayScreenComponents(
         topBarView.setCategoryLabelText(gameModel.currentCategory)
     }
 
-    fun onGameWinAnimation(stage: GameStage, actionOnGameWinAnimationFinish: Runnable) {
-        bombView.onGameWinAnimation()
-        targetPhraseView.onGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
+    fun applyGameWinAnimation(
+        stage: GameStage,
+        gameModel: GameModel,
+        actionOnGameWinAnimationFinish: Runnable
+    ) {
+        bombView.stopFire()
+        targetPhraseView.applyGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
+        applyCoinsEffect(gameModel, stage)
+    }
+
+    private fun applyCoinsEffect(
+        gameModel: GameModel,
+        stage: GameStage
+    ) {
+        val coinTexture = assetsManager.getTexture(TexturesDefinitions.COIN)
+        val startPosition = bombView.bombComponent.localToScreenCoordinates(Vector2())
+        startPosition.x += bombView.bombComponent.width / 2F - coinTexture.width / 2F
+        startPosition.y = stage.height - startPosition.y
+        val targetPosition = topBarView.coinsIcon.localToScreenCoordinates(Vector2())
+        targetPosition.y = stage.height - targetPosition.y
+        for (i in 0 until gameModel.selectedDifficulty.winWorth) {
+            val coin = Image(coinTexture)
+            stage.addActor(coin)
+            coin.setPosition(startPosition.x, startPosition.y)
+
+            coin.addAction(
+                Actions.sequence(
+                    Actions.delay(i.toFloat() * 0.25F),
+                    Actions.alpha(0F),
+                    Actions.sizeTo(0F, 0F),
+                    Actions.parallel(
+                        Actions.alpha(1F, 0.5F),
+                        Actions.sequence(
+                            Actions.sizeTo(
+                                coinTexture.width.toFloat(),
+                                coinTexture.height.toFloat(),
+                                0.25F
+                            ),
+                            Actions.delay(0.25F),
+                            Actions.alpha(0F, 1F),
+                        ),
+                        Actions.moveTo(
+                            targetPosition.x,
+                            targetPosition.y,
+                            1F,
+                            Interpolation.smooth2
+                        )
+                    ),
+                    Actions.removeActor()
+                )
+            )
+
+        }
     }
 
     fun clearBombView() {
@@ -92,7 +146,7 @@ class GamePlayScreenComponents(
 
     fun resizeComponentsIfNeeded(uiTable: Table) {
         if (optionsView.lettersOptionsTable.y < 0F) {
-            val cell = uiTable.getCell(bombView.bomb)
+            val cell = uiTable.getCell(bombView.bombComponent)
             val delta = optionsView.lettersOptionsTable.y * 2F
             cell.size(
                 cell.prefWidth + delta,

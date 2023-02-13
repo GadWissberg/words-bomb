@@ -35,6 +35,7 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     ICON_PACK_2,
     ICON_PACK_3,
     DIALOG_CLOSE_BUTTON,
+    COIN,
     FLASH;
 
     private var path: String =

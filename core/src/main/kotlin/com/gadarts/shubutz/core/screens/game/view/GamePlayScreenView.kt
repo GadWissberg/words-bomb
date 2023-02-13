@@ -1,6 +1,5 @@
 package com.gadarts.shubutz.core.screens.game.view
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
@@ -170,7 +169,7 @@ class GamePlayScreenView(
     }
 
     private fun animateGameWin(stage: GameStage) {
-        gamePlayScreenComponents.onGameWinAnimation(stage) { clearScreen() }
+        gamePlayScreenComponents.applyGameWinAnimation(stage, gameModel) { clearScreen() }
     }
 
     private fun clearScreen() {

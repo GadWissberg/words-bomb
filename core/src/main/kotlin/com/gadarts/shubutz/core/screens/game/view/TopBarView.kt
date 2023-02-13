@@ -42,6 +42,7 @@ class TopBarView(
     private val gamePlayScreen: GamePlayScreen
 ) : Disposable {
 
+    lateinit var coinsIcon: Image
     private lateinit var table: Table
     private lateinit var categoryLabel: Label
     private lateinit var topPartTable: Table
@@ -341,7 +342,8 @@ class TopBarView(
     ) {
         coinsLabel = Label(gameModel.coins.toString(), LabelStyle(font80, Color.WHITE))
         table.add(coinsLabel).pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
-        table.add(Image(assetsManager.getTexture(COINS_ICON)))
+        coinsIcon = Image(assetsManager.getTexture(COINS_ICON))
+        table.add(coinsIcon)
             .size(
                 topPartTexture.height.toFloat(),
                 topPartTexture.height.toFloat()

@@ -190,7 +190,7 @@ class TargetPhraseView(
         }
     }
 
-    fun onGameWinAnimation(
+    fun applyGameWinAnimation(
         assetsManager: GameAssetManager,
         stage: GameStage,
         runOnAnimationFinish: Runnable
