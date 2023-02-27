@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.SoundPlayer
@@ -59,6 +60,12 @@ class GamePlayScreenViewComponentsManager(
         targetPhraseView = TargetPhraseView(letterSize, font80, soundPlayer, assetsManager)
         targetPhraseView.calculateMaxBricksPerLine(assetsManager)
         optionsView = OptionsView(stage, soundPlayer, assetsManager, gameModel)
+        val revealLetterButton = Table()
+        val texture = assetsManager.getTexture(TexturesDefinitions.ICON_EYE)
+        revealLetterButton.add(Image(texture))
+            .size(texture.width.toFloat(), texture.height.toFloat())
+        revealLetterButton.setPosition(940F, 1112F)
+        stage.addActor(revealLetterButton)
     }
 
     /**

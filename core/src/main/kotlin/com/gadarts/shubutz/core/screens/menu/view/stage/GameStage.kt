@@ -19,15 +19,16 @@ import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GeneralUtils
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 
 class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManager) : Stage(
     stretchViewport,
     SpriteBatch(),
 ) {
+
     lateinit var dialogButtonDown: NinePatchDrawable
     lateinit var dialogButtonUp: NinePatchDrawable
-
     val openDialogs = HashMap<String, Table>()
 
     init {
@@ -40,6 +41,14 @@ class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManage
     init {
         createDialogNinePatches(assetsManager)
     }
+
+    fun createNinePatchButtonStyle(assetsManager: GameAssetManager) =
+        ImageTextButton.ImageTextButtonStyle(
+            dialogButtonUp,
+            dialogButtonDown,
+            null,
+            assetsManager.getFont(FontsDefinitions.VARELA_40)
+        )
 
     private fun createDialogButtonNinePatch(
         am: GameAssetManager, texture: TexturesDefinitions

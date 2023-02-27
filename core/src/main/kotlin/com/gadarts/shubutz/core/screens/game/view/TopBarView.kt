@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton.ImageTextButtonStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -304,7 +303,7 @@ class TopBarView(
             definition.label.format(
                 definition.amount.toString().reversed(),
                 product?.formattedPrice?.reversed() ?: "(?)"
-            ).reversed(), createPackButtonStyle(stage)
+            ).reversed(), stage.createNinePatchButtonStyle(assetsManager)
         )
         addClickListenerToButton(button, {
             if (product != null) {
@@ -314,13 +313,6 @@ class TopBarView(
         return button
     }
 
-    private fun createPackButtonStyle(stage: GameStage) =
-        ImageTextButtonStyle(
-            stage.dialogButtonUp,
-            stage.dialogButtonDown,
-            null,
-            assetsManager.getFont(FontsDefinitions.VARELA_40)
-        )
 
     private fun addHeaderToCoinsWindow(
         assetsManager: GameAssetManager,
