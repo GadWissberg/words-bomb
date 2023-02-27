@@ -14,17 +14,39 @@ import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-class GamePlayScreenComponents(
+/**
+ * Handles display-related logic of the game-play components.
+ */
+class GamePlayScreenViewComponentsManager(
     private val assetsManager: GameAssetManager,
     private val soundPlayer: SoundPlayer,
     gamePlayScreen: GamePlayScreen
 ) : Disposable {
 
+    /**
+     * The view of the phrase the player needs to discover.
+     */
     lateinit var targetPhraseView: TargetPhraseView
-    val bombView = BombView(soundPlayer, assetsManager)
+
+    /**
+     * The view of all the alphabet letters.
+     */
     lateinit var optionsView: OptionsView
+
+    /**
+     * The view of the bomb with the counter.
+     */
+    val bombView = BombView(soundPlayer, assetsManager)
+
+    /**
+     * The view of the bar on top of the screen.
+     */
     val topBarView = TopBarView(soundPlayer, assetsManager, gamePlayScreen)
 
+
+    /**
+     * Creates the views instances of the components.
+     */
     fun createViews(
         letterSize: Vector2,
         assetsManager: GameAssetManager,
@@ -36,9 +58,12 @@ class GamePlayScreenComponents(
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
         targetPhraseView = TargetPhraseView(letterSize, font80, soundPlayer, assetsManager)
         targetPhraseView.calculateMaxBricksPerLine(assetsManager)
-        optionsView = OptionsView(stage, soundPlayer, assetsManager)
+        optionsView = OptionsView(stage, soundPlayer, assetsManager, gameModel)
     }
 
+    /**
+     * Initializes the components.
+     */
     fun init(
         uiTable: Table,
         gameModel: GameModel,
@@ -54,11 +79,14 @@ class GamePlayScreenComponents(
             targetPhraseView.maxBricksPerLine,
             letterSize,
             gamePlayScreen,
-            gameModel
         )
         topBarView.setCategoryLabelText(gameModel.currentCategory)
     }
 
+    /**
+     * Stops the bomb's fire, plays the winning animation of the targets phrase view and plays
+     * the coins flying animation.
+     */
     fun applyGameWinAnimation(
         stage: GameStage,
         gameModel: GameModel,
@@ -114,6 +142,9 @@ class GamePlayScreenComponents(
         }
     }
 
+    /**
+     * Plays the bomb disappear animation and clears the options and target in the end of it.
+     */
     fun clearBombView() {
         bombView.animateBombVanish {
             optionsView.onScreenClear()
@@ -121,12 +152,18 @@ class GamePlayScreenComponents(
         }
     }
 
-    fun onIncorrectGuess() {
+    /**
+     * Plays the animation for the incorrect guess event.
+     */
+    fun applyIncorrectGuessAnimations() {
         bombView.onIncorrectGuess()
         optionsView.onIncorrectGuess()
     }
 
-    fun onGameOverAnimation(stage: GameStage) {
+    /**
+     * Plays the animation for the game over event and clears all options.
+     */
+    fun applyGameOverAnimation(stage: GameStage) {
         bombView.onGameOverAnimation(assetsManager, stage)
         optionsView.clearAllOptions()
     }
@@ -135,25 +172,19 @@ class GamePlayScreenComponents(
         topBarView.dispose()
     }
 
-    fun clear() {
+    /**
+     * Removes the UI of the top-bar and the bomb.
+     */
+    fun clearTopBarAndBomb() {
         topBarView.clear()
         bombView.clear()
     }
 
-    fun onCorrectGuess(coinsAmount: Int) {
+    /**
+     * Plays the animation for the correct guess event.
+     */
+    fun applyCorrectGuessAnimation(coinsAmount: Int) {
         topBarView.applyWinCoinEffect(coinsAmount, assetsManager)
-    }
-
-    fun resizeComponentsIfNeeded(uiTable: Table) {
-        if (optionsView.lettersOptionsTable.y < 0F) {
-            val cell = uiTable.getCell(bombView.bombComponent)
-            val delta = optionsView.lettersOptionsTable.y * 2F
-            cell.size(
-                cell.prefWidth + delta,
-                cell.prefHeight + delta
-            )
-            uiTable.pack()
-        }
     }
 
 }

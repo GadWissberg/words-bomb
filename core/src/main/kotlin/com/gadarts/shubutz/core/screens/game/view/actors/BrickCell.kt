@@ -3,7 +3,6 @@ package com.gadarts.shubutz.core.screens.game.view.actors
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.scenes.scene2d.Action
 import ktx.actors.alpha
 
 /**

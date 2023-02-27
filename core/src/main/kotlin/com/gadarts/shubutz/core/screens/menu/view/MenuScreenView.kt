@@ -41,9 +41,6 @@ class MenuScreenView(
     private lateinit var versionLabel: Label
     private var mainMenuTable = Table()
     private var difficultySelectionTable = Table()
-    private var varela80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
-    private var varela40: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_40)
-    private var varela35: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_35)
     private var loadingAnimationRenderer = LoadingAnimationHandler()
     override val subscribers = HashSet<MenuScreenViewEventsSubscriber>()
 
@@ -86,7 +83,10 @@ class MenuScreenView(
     private fun addUserInterface(beginGameAction: BeginGameAction) {
         addMainMenuTable()
         addDifficultySelectionTable(beginGameAction)
-        versionLabel = Label("v$versionName", Label.LabelStyle(varela35, Color.BLACK))
+        versionLabel = Label(
+            "v$versionName",
+            Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_35), Color.BLACK)
+        )
         stage.addActor(versionLabel)
     }
 
@@ -112,7 +112,7 @@ class MenuScreenView(
             },
             LABEL_BACK,
             160,
-            varela40,
+            assetsManager.getFont(FontsDefinitions.VARELA_40),
             scale = 0.5F
         )
     }
@@ -121,7 +121,7 @@ class MenuScreenView(
         difficultySelectionTable.add(
             Label(
                 LABEL_DIFFICULTY_SELECT.reversed(),
-                Label.LabelStyle(varela80, Color.WHITE)
+                Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.WHITE)
             )
         ).pad(20F).row()
     }
@@ -132,7 +132,7 @@ class MenuScreenView(
         addButton(mainMenuTable, {
             mainMenuTable.isVisible = false
             difficultySelectionTable.isVisible = true
-        }, LABEL_BEGIN_GAME, font = varela80)
+        }, LABEL_BEGIN_GAME, font = assetsManager.getFont(FontsDefinitions.VARELA_80))
     }
 
     private fun initMenuTable(table: Table) {
@@ -146,7 +146,7 @@ class MenuScreenView(
         onClick: Runnable,
         label: String,
         topPadding: Int = BUTTON_PADDING,
-        font: BitmapFont = varela80,
+        font: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80),
         scale: Float = 1F
     ) {
         stage.addButton(

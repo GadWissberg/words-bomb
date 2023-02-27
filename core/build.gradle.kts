@@ -10,7 +10,7 @@ dependencies {
     implementation("com.badlogicgames.gdx:gdx-freetype:$gdxVersion")
 
     implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.10")
 
     // LibKTX kotlin extensions, optional but recommended.
     // The complete list of modules is available at https://github.com/libktx/ktx
@@ -22,7 +22,7 @@ dependencies {
     implementation("io.github.libktx:ktx-style:$ktxVersion")
     implementation("io.github.libktx:ktx-freetype:$ktxVersion")
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
-    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("com.google.code.gson:gson:2.10.1")
     testImplementation("io.mockk:mockk:1.12.0")
 
 }

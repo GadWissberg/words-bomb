@@ -1,6 +1,5 @@
 package com.gadarts.shubutz.core.screens.menu
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
@@ -13,8 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.Align
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.SoundPlayer
-import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenViewEventsSubscriber

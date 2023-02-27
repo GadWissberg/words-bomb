@@ -35,7 +35,7 @@ class TargetPhraseView(
 
     fun calculateMaxBricksPerLine(assetsManager: GameAssetManager) {
         val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-        maxBricksPerLine = ShubutzGame.RESOLUTION_WIDTH.toInt() / brickTexture.width - 1
+        maxBricksPerLine = ShubutzGame.RESOLUTION_WIDTH / brickTexture.width - 2
     }
 
     private fun addBrickCell(texture: Texture, wordTable: Table) {

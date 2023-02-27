@@ -2,6 +2,7 @@ package com.gadarts.shubutz.core.screens.game.view
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -19,75 +20,44 @@ import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import kotlin.math.min
 
+/**
+ * Displays the alphabet letters for the player to guess.
+ */
 class OptionsView(
     private val stage: GameStage,
     private val soundPlayer: SoundPlayer,
-    private val assetsManager: GameAssetManager
+    private val assetsManager: GameAssetManager,
+    private val gameModel: GameModel
 ) {
 
+    /**
+     * The current brick the player chose as a guess.
+     */
     var selectedBrick: Brick? = null
+
+    /**
+     * The table that holds all the bricks.
+     */
     lateinit var lettersOptionsTable: Table
 
+    /**
+     * Creates the table that holds the bricks and adds to the given table.
+     */
     fun addLettersOptionsTable(
         uiTable: Table,
         assetsManager: GameAssetManager,
         maxBricksPerLine: Int,
         letterSize: Vector2,
         gamePlayScreen: GamePlayScreen,
-        model: GameModel
     ) {
         lettersOptionsTable = Table()
         lettersOptionsTable.setSize(uiTable.width, uiTable.prefHeight)
         uiTable.add(lettersOptionsTable)
         val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-        for (row in 0..GameModel.allowedLetters.length / (maxBricksPerLine - 1)) {
-            addOptionsRow(row, brickTexture, maxBricksPerLine, letterSize, gamePlayScreen, model)
+        for (row in 0..GameModel.allowedLetters.length / (maxBricksPerLine)) {
+            addOptionsRow(row, brickTexture, maxBricksPerLine, letterSize, gamePlayScreen)
         }
         lettersOptionsTable.pack()
-    }
-
-    private fun addOptionsRow(
-        row: Int,
-        brickTexture: Texture,
-        maxBricksPerLine: Int,
-        letterSize: Vector2,
-        gamePlayScreen: GamePlayScreen,
-        gameModel: GameModel
-    ) {
-        val startIndex = row * (maxBricksPerLine - 1)
-        val endIndex =
-            min(
-                startIndex + (maxBricksPerLine - 1),
-                GameModel.allowedLetters.length
-            )
-        val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
-        GameModel.allowedLetters.subSequence(startIndex, endIndex)
-            .reversed()
-            .forEach {
-                val brick = Brick(it.toString(), brickTexture, letterSize, font80)
-                brick.addListener(object : ClickListener() {
-                    override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                        if (gameModel.triesLeft == 0 || stage.openDialogs.isNotEmpty()) return
-                        super.clicked(event, x, y)
-                        selectedBrick = brick
-                        gamePlayScreen.onBrickClicked(brick.letter[0])
-                    }
-                })
-                lettersOptionsTable.add(brick)
-                    .pad(10F)
-                    .size(brickTexture.width.toFloat(), brickTexture.height.toFloat())
-                if (lettersOptionsTable.children.size % (maxBricksPerLine - 1) == 0) {
-                    lettersOptionsTable.row()
-                }
-                brick.addAction(
-                    Actions.sequence(
-                        Actions.fadeOut(0F), Actions.fadeIn(
-                            0.5F,
-                            Interpolation.smooth2
-                        )
-                    )
-                )
-            }
     }
 
     fun clearSelectedBrick() {
@@ -134,6 +104,80 @@ class OptionsView(
                 Actions.removeActor()
             ),
         )
+    }
+
+    private fun addBrick(
+        letter: Char,
+        brickTexture: Texture,
+        letterSize: Vector2,
+        font80: BitmapFont,
+        gamePlayScreen: GamePlayScreen,
+        maxBricksPerLine: Int
+    ) {
+        val brick = Brick(letter.toString(), brickTexture, letterSize, font80)
+        initializeBrick(letter, brick, gamePlayScreen)
+        lettersOptionsTable.add(brick)
+            .pad(10F)
+            .size(brickTexture.width.toFloat(), brickTexture.height.toFloat())
+        if (lettersOptionsTable.children.size % (maxBricksPerLine) == 0) {
+            lettersOptionsTable.row()
+        }
+    }
+
+    private fun initializeBrick(
+        letter: Char,
+        brick: Brick,
+        gamePlayScreen: GamePlayScreen
+    ) {
+        if (letter != ' ') {
+            brick.addListener(object : ClickListener() {
+                override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                    if (gameModel.triesLeft == 0 || stage.openDialogs.isNotEmpty()) return
+                    super.clicked(event, x, y)
+                    selectedBrick = brick
+                    gamePlayScreen.onBrickClicked(brick.letter[0])
+                }
+            })
+            brick.addAction(
+                Actions.sequence(
+                    Actions.fadeOut(0F), Actions.fadeIn(
+                        0.5F,
+                        Interpolation.smooth2
+                    )
+                )
+            )
+        } else {
+            brick.isVisible = false
+        }
+    }
+
+    private fun addOptionsRow(
+        row: Int,
+        brickTexture: Texture,
+        maxBricksPerLine: Int,
+        letterSize: Vector2,
+        gamePlayScreen: GamePlayScreen,
+    ) {
+        val startIndex = row * (maxBricksPerLine)
+        val endIndex =
+            min(
+                startIndex + (maxBricksPerLine),
+                GameModel.allowedLetters.length
+            )
+        val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
+        val chars = mutableListOf<Char>()
+        chars.addAll(
+            GameModel.allowedLetters.subSequence(startIndex, endIndex).asSequence()
+        )
+        if (row == 3) {
+            val blanksToAdd = maxBricksPerLine - chars.size
+            for (i in 0 until blanksToAdd) {
+                chars.add(' ')
+            }
+        }
+        chars.reversed().forEach {
+            addBrick(it, brickTexture, letterSize, font80, gamePlayScreen, maxBricksPerLine)
+        }
     }
 
     private fun markBrick(brick: Brick, correct: Boolean) {
