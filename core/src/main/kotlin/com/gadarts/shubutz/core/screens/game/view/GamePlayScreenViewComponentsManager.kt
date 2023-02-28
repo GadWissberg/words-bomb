@@ -1,17 +1,24 @@
 package com.gadarts.shubutz.core.screens.game.view
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
-import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
-import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
@@ -60,12 +67,62 @@ class GamePlayScreenViewComponentsManager(
         targetPhraseView = TargetPhraseView(letterSize, font80, soundPlayer, assetsManager)
         targetPhraseView.calculateMaxBricksPerLine(assetsManager)
         optionsView = OptionsView(stage, soundPlayer, assetsManager, gameModel)
-        val revealLetterButton = Table()
-        val texture = assetsManager.getTexture(TexturesDefinitions.ICON_EYE)
-        revealLetterButton.add(Image(texture))
-            .size(texture.width.toFloat(), texture.height.toFloat())
-        revealLetterButton.setPosition(940F, 1112F)
+        addRevealLetterButton(assetsManager, stage)
+    }
+
+    private fun addRevealLetterButton(
+        assetsManager: GameAssetManager,
+        stage: GameStage
+    ) {
+        val font = assetsManager.getFont(FontsDefinitions.VARELA_40)
+        val up = assetsManager.getTexture(BUTTON_CIRCLE_UP)
+        val revealLetterButton = createRevealButton(up, assetsManager, font)
+        insertContentInRevealButton(revealLetterButton, up, assetsManager, font)
+        revealLetterButton.setPosition(REVEAL_BUTTON_POSITION_X, REVEAL_BUTTON_POSITION_Y)
         stage.addActor(revealLetterButton)
+        revealLetterButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                super.clicked(event, x, y)
+                Gdx.app.log("!!", "!!")
+            }
+        })
+    }
+
+    private fun createRevealButton(
+        up: Texture,
+        assetsManager: GameAssetManager,
+        font: BitmapFont
+    ): ImageTextButton {
+        val style = ImageTextButton.ImageTextButtonStyle(
+            TextureRegionDrawable(up),
+            TextureRegionDrawable(assetsManager.getTexture(BUTTON_CIRCLE_DOWN)),
+            null,
+            font
+        )
+        return ImageTextButton(REVEAL_BUTTON_LABEL, style)
+    }
+
+    private fun insertContentInRevealButton(
+        revealLetterButton: ImageTextButton,
+        up: Texture,
+        assetsManager: GameAssetManager,
+        font: BitmapFont
+    ) {
+        revealLetterButton.clearChildren()
+        revealLetterButton.removeActor(revealLetterButton.image)
+        revealLetterButton.removeActor(revealLetterButton.label)
+        revealLetterButton.add(revealLetterButton.label).row()
+        revealLetterButton.setSize(up.width.toFloat(), up.height.toFloat())
+        val eye = assetsManager.getTexture(ICON_EYE)
+        revealLetterButton.add(Image(eye)).size(eye.width.toFloat(), eye.height.toFloat()).row()
+        val stack = Stack()
+        val coin = assetsManager.getTexture(COIN)
+        val labelStyle = LabelStyle(font, Color.WHITE)
+        stack.add(Image(coin))
+        val cost = Label("8", labelStyle)
+        cost.setAlignment(Align.center)
+        stack.add(cost)
+        revealLetterButton.add(stack).size(coin.width.toFloat(), coin.height.toFloat())
     }
 
     /**
@@ -108,7 +165,7 @@ class GamePlayScreenViewComponentsManager(
         gameModel: GameModel,
         stage: GameStage
     ) {
-        val coinTexture = assetsManager.getTexture(TexturesDefinitions.COIN)
+        val coinTexture = assetsManager.getTexture(COIN)
         val startPosition = bombView.bombComponent.localToScreenCoordinates(Vector2())
         startPosition.x += bombView.bombComponent.width / 2F - coinTexture.width / 2F
         startPosition.y = stage.height - startPosition.y
@@ -194,4 +251,9 @@ class GamePlayScreenViewComponentsManager(
         topBarView.applyWinCoinEffect(coinsAmount, assetsManager)
     }
 
+    companion object {
+        const val REVEAL_BUTTON_POSITION_X = 800F
+        const val REVEAL_BUTTON_POSITION_Y = 1112F
+        val REVEAL_BUTTON_LABEL = "גלה אות".reversed()
+    }
 }
