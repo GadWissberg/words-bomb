@@ -13,7 +13,8 @@ enum class SoundsDefinitions : AssetDefinition<Sound> {
     FLYBY,
     BUBBLE,
     CORRECT,
-    PURCHASED;
+    PURCHASED,
+    HELP;
 
     private var path: String =
         "sfx/${name.lowercase()}.wav"

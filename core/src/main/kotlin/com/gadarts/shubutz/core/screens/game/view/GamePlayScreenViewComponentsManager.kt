@@ -1,6 +1,5 @@
 package com.gadarts.shubutz.core.screens.game.view
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -18,9 +17,11 @@ import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
+import ktx.actors.alpha
 
 /**
  * Handles display-related logic of the game-play components.
@@ -30,6 +31,8 @@ class GamePlayScreenViewComponentsManager(
     private val soundPlayer: SoundPlayer,
     gamePlayScreen: GamePlayScreen
 ) : Disposable {
+
+    private lateinit var revealLetterButton: ImageTextButton
 
     /**
      * The view of the phrase the player needs to discover.
@@ -67,23 +70,48 @@ class GamePlayScreenViewComponentsManager(
         targetPhraseView = TargetPhraseView(letterSize, font80, soundPlayer, assetsManager)
         targetPhraseView.calculateMaxBricksPerLine(assetsManager)
         optionsView = OptionsView(stage, soundPlayer, assetsManager, gameModel)
-        addRevealLetterButton(assetsManager, stage)
+        addRevealLetterButton(assetsManager, stage, gameModel)
     }
 
     private fun addRevealLetterButton(
         assetsManager: GameAssetManager,
-        stage: GameStage
+        stage: GameStage,
+        gameModel: GameModel
     ) {
         val font = assetsManager.getFont(FontsDefinitions.VARELA_40)
         val up = assetsManager.getTexture(BUTTON_CIRCLE_UP)
-        val revealLetterButton = createRevealButton(up, assetsManager, font)
+        revealLetterButton = createRevealButton(up, assetsManager, font)
         insertContentInRevealButton(revealLetterButton, up, assetsManager, font)
         revealLetterButton.setPosition(REVEAL_BUTTON_POSITION_X, REVEAL_BUTTON_POSITION_Y)
         stage.addActor(revealLetterButton)
         revealLetterButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 super.clicked(event, x, y)
-                Gdx.app.log("!!", "!!")
+                soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.HELP))
+                revealLetterButton.isDisabled = true
+
+                revealLetterButton.addAction(
+                    Actions.parallel(
+                        Actions.fadeOut(1F),
+                        Actions.sequence(Actions.run {
+                            val coinTexture = assetsManager.getTexture(COIN)
+                            val startPosition =
+                                topBarView.coinsIcon.localToScreenCoordinates(Vector2())
+                            startPosition.x += topBarView.coinsIcon.width / 2F - coinTexture.width / 2F
+                            startPosition.y = stage.height - startPosition.y
+                            applyFlyingCoinsAnimation(
+                                stage,
+                                coinTexture,
+                                startPosition,
+                                8,
+                                revealLetterButton.localToScreenCoordinates(Vector2()).add(
+                                    revealLetterButton.width / 2F,
+                                    revealLetterButton.height / 2F
+                                )
+                            )
+                        })
+                    )
+                )
             }
         })
     }
@@ -99,7 +127,10 @@ class GamePlayScreenViewComponentsManager(
             null,
             font
         )
-        return ImageTextButton(REVEAL_BUTTON_LABEL, style)
+        val imageTextButton = ImageTextButton(REVEAL_BUTTON_LABEL, style)
+        imageTextButton.isVisible = false
+        imageTextButton.alpha = 0F
+        return imageTextButton
     }
 
     private fun insertContentInRevealButton(
@@ -158,10 +189,10 @@ class GamePlayScreenViewComponentsManager(
     ) {
         bombView.stopFire()
         targetPhraseView.applyGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
-        applyCoinsEffect(gameModel, stage)
+        applyCoinsFlyingFromBomb(gameModel, stage)
     }
 
-    private fun applyCoinsEffect(
+    private fun applyCoinsFlyingFromBomb(
         gameModel: GameModel,
         stage: GameStage
     ) {
@@ -171,39 +202,64 @@ class GamePlayScreenViewComponentsManager(
         startPosition.y = stage.height - startPosition.y
         val targetPosition = topBarView.coinsIcon.localToScreenCoordinates(Vector2())
         targetPosition.y = stage.height - targetPosition.y
-        for (i in 0 until gameModel.selectedDifficulty.winWorth) {
-            val coin = Image(coinTexture)
-            stage.addActor(coin)
-            coin.setPosition(startPosition.x, startPosition.y)
+        applyFlyingCoinsAnimation(
+            stage,
+            coinTexture,
+            startPosition,
+            gameModel.selectedDifficulty.winWorth,
+            targetPosition
+        )
+    }
 
-            coin.addAction(
-                Actions.sequence(
-                    Actions.delay(i.toFloat() * 0.25F),
-                    Actions.alpha(0F),
-                    Actions.sizeTo(0F, 0F),
-                    Actions.parallel(
-                        Actions.alpha(1F, 0.5F),
-                        Actions.sequence(
-                            Actions.sizeTo(
-                                coinTexture.width.toFloat(),
-                                coinTexture.height.toFloat(),
-                                0.25F
-                            ),
-                            Actions.delay(0.25F),
-                            Actions.alpha(0F, 1F),
-                        ),
-                        Actions.moveTo(
-                            targetPosition.x,
-                            targetPosition.y,
-                            1F,
-                            Interpolation.smooth2
-                        )
-                    ),
-                    Actions.removeActor()
-                )
-            )
-
+    private fun applyFlyingCoinsAnimation(
+        stage: GameStage,
+        coinTexture: Texture,
+        startPosition: Vector2,
+        numberOfCoins: Int,
+        targetPosition: Vector2
+    ) {
+        for (i in 0 until numberOfCoins) {
+            addFlyingCoin(coinTexture, stage, startPosition, i, targetPosition)
         }
+    }
+
+    private fun addFlyingCoin(
+        coinTexture: Texture,
+        stage: GameStage,
+        startPosition: Vector2,
+        i: Int,
+        targetPosition: Vector2
+    ) {
+        val coin = Image(coinTexture)
+        stage.addActor(coin)
+        coin.setPosition(startPosition.x, startPosition.y)
+
+        coin.addAction(
+            Actions.sequence(
+                Actions.delay(i.toFloat() * 0.25F),
+                Actions.alpha(0F),
+                Actions.sizeTo(0F, 0F),
+                Actions.parallel(
+                    Actions.alpha(1F, 0.5F),
+                    Actions.sequence(
+                        Actions.sizeTo(
+                            coinTexture.width.toFloat(),
+                            coinTexture.height.toFloat(),
+                            0.25F
+                        ),
+                        Actions.delay(0.25F),
+                        Actions.alpha(0F, 1F),
+                    ),
+                    Actions.moveTo(
+                        targetPosition.x,
+                        targetPosition.y,
+                        1F,
+                        Interpolation.smooth2
+                    )
+                ),
+                Actions.removeActor()
+            )
+        )
     }
 
     /**
@@ -219,9 +275,18 @@ class GamePlayScreenViewComponentsManager(
     /**
      * Plays the animation for the incorrect guess event.
      */
-    fun applyIncorrectGuessAnimations() {
+    fun onIncorrectGuess() {
         bombView.onIncorrectGuess()
         optionsView.onIncorrectGuess()
+        if (!revealLetterButton.isVisible) {
+            revealLetterButton.addAction(
+                Actions.sequence(
+                    Actions.visible(true),
+                    Actions.fadeOut(0F),
+                    Actions.fadeIn(1F)
+                )
+            )
+        }
     }
 
     /**
@@ -237,11 +302,13 @@ class GamePlayScreenViewComponentsManager(
     }
 
     /**
-     * Removes the UI of the top-bar and the bomb.
+     * Removes all views.
      */
-    fun clearTopBarAndBomb() {
+    fun clear() {
         topBarView.clear()
         bombView.clear()
+        optionsView.clear()
+        revealLetterButton.remove()
     }
 
     /**

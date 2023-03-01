@@ -93,7 +93,7 @@ class GamePlayScreenView(
 
     fun clear() {
         uiTable.remove()
-        gamePlayScreenViewComponentsManager.clearTopBarAndBomb()
+        gamePlayScreenViewComponentsManager.clear()
     }
 
     fun displayCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
@@ -195,7 +195,7 @@ class GamePlayScreenView(
         if (gameOver) {
             animateGameOver()
         } else if (gamePlayScreenViewComponentsManager.optionsView.selectedBrick != null) {
-            gamePlayScreenViewComponentsManager.applyIncorrectGuessAnimations()
+            gamePlayScreenViewComponentsManager.onIncorrectGuess()
         }
     }
 

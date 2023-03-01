@@ -193,6 +193,10 @@ class OptionsView(
         )
     }
 
+    fun clear() {
+        lettersOptionsTable.remove()
+    }
+
     companion object {
         private val BRICK_MARK_COLOR_INCORRECT = Color.valueOf("#7D0000")
         private val BRICK_MARK_COLOR_CORRECT = Color.valueOf("#007D00")
