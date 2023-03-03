@@ -11,8 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
-import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
@@ -35,10 +35,7 @@ class OptionsView(
      */
     var selectedBrick: Brick? = null
 
-    /**
-     * The table that holds all the bricks.
-     */
-    lateinit var lettersOptionsTable: Table
+    private lateinit var lettersOptionsTable: Table
 
     /**
      * Creates the table that holds the bricks and adds to the given table.
@@ -195,6 +192,19 @@ class OptionsView(
 
     fun clear() {
         lettersOptionsTable.remove()
+    }
+
+    fun onLetterRevealed(letter: Char) {
+        val filter = lettersOptionsTable.cells.filter { (it.actor as Brick).letter[0] == letter }
+        if (filter.isNotEmpty()) {
+            val down = InputEvent()
+            down.type = InputEvent.Type.touchDown
+            (filter.first().actor as Brick).fire(down)
+
+            val up = InputEvent()
+            up.type = InputEvent.Type.touchUp
+            (filter.first().actor as Brick).fire(up)
+        }
     }
 
     companion object {

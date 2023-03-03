@@ -50,9 +50,9 @@ class TargetPhraseView(
         texture: Texture,
         wordTable: Table,
     ) {
-        val isLetter = i >= 0 && i < gameModel.currentTarget.length
+        val isLetter = i >= 0 && i < gameModel.currentPhrase.length
         val brick = Brick(
-            if (isLetter) gameModel.currentTarget[i].toString() else " ",
+            if (isLetter) gameModel.currentPhrase[i].toString() else " ",
             texture,
             letterSize,
             font80
@@ -96,7 +96,7 @@ class TargetPhraseView(
     private fun addTargetWordLines(gameModel: GameModel, assetsManager: GameAssetManager) {
         val cellTexture = assetsManager.getTexture(TexturesDefinitions.CELL)
         val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-        val words = gameModel.currentTarget.split(' ')
+        val words = gameModel.currentPhrase.split(' ')
         var letterIndexInCurrentLine = 0
         var globalIndex = 0
         addLineToTargetTable()

@@ -96,14 +96,12 @@ class GamePlayScreenView(
         gamePlayScreenViewComponentsManager.clear()
     }
 
-    fun displayCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
+    fun displayCorrectGuess(index: Int, gameWin: Boolean, coinsAmount: Int) {
         gamePlayScreenViewComponentsManager.applyCorrectGuessAnimation(coinsAmount)
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.CORRECT))
         if (gamePlayScreenViewComponentsManager.optionsView.selectedBrick != null) {
             val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-            indices.forEach {
-                animateBrickSuccess(it, gameWin, brickTexture)
-            }
+            animateBrickSuccess(index, gameWin, brickTexture)
             gamePlayScreenViewComponentsManager.optionsView.clearSelectedBrick()
         }
     }
@@ -113,7 +111,7 @@ class GamePlayScreenView(
         var wordCount = 0
         var letterIndexInWord = 0
         for (i in 0 until index) {
-            if (gameModel.currentTarget[i] == ' ') {
+            if (gameModel.currentPhrase[i] == ' ') {
                 wordCount++
                 letterIndexInWord = 0
             } else {
@@ -127,7 +125,7 @@ class GamePlayScreenView(
                 auxVector.setZero()
             )
         val brick =
-            Brick(gameModel.currentTarget[index].toString(), brickTexture, letterSize, font80)
+            Brick(gameModel.currentPhrase[index].toString(), brickTexture, letterSize, font80)
         brick.setPosition(
             selectedBrickScreenCoords.x,
             selectedBrickScreenCoords.y,
@@ -221,6 +219,10 @@ class GamePlayScreenView(
         val dialogView = Table()
         dialogView.add(ViewUtils.createDialogLabel(message, assetsManager))
         stage.addDialog(dialogView, "purchase_failed_dialog", assetsManager)
+    }
+
+    fun onLetterRevealed(letter: Char) {
+        gamePlayScreenViewComponentsManager.onLetterRevealed(letter)
     }
 
     companion object {

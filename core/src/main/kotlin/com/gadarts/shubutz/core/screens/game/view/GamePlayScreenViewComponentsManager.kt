@@ -29,7 +29,7 @@ import ktx.actors.alpha
 class GamePlayScreenViewComponentsManager(
     private val assetsManager: GameAssetManager,
     private val soundPlayer: SoundPlayer,
-    gamePlayScreen: GamePlayScreen
+    private val gamePlayScreen: GamePlayScreen
 ) : Disposable {
 
     private lateinit var revealLetterButton: ImageTextButton
@@ -86,9 +86,11 @@ class GamePlayScreenViewComponentsManager(
         stage.addActor(revealLetterButton)
         revealLetterButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                super.clicked(event, x, y)
+                if (revealLetterButton.isDisabled) return
+
                 soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.HELP))
                 revealLetterButton.isDisabled = true
+                gamePlayScreen.onRevealLetterButtonClicked()
 
                 revealLetterButton.addAction(
                     Actions.parallel(
@@ -316,6 +318,10 @@ class GamePlayScreenViewComponentsManager(
      */
     fun applyCorrectGuessAnimation(coinsAmount: Int) {
         topBarView.applyWinCoinEffect(coinsAmount, assetsManager)
+    }
+
+    fun onLetterRevealed(letter: Char) {
+        optionsView.onLetterRevealed(letter)
     }
 
     companion object {

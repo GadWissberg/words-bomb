@@ -2,10 +2,10 @@ package com.gadarts.shubutz.core.business
 
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings.TEST_PHRASE
-import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
 import com.gadarts.shubutz.core.model.Phrase
+import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 
 /**
  * Responsible to take care of the actual game's rules.
@@ -13,11 +13,10 @@ import com.gadarts.shubutz.core.model.Phrase
 class GameLogicHandler(
     private val phrases: HashMap<String, ArrayList<Phrase>>,
     private val androidInterface: AndroidInterface,
-) :
-    Notifier<GameLogicHandlerEventsSubscriber> {
+    private val gamePlayScreen: GamePlayScreen,
+) {
 
     private var unusedPhrases: HashMap<String, ArrayList<Phrase>> = HashMap(phrases)
-    override val subscribers = HashSet<GameLogicHandlerEventsSubscriber>()
 
     /**
      * Initializes the bomb's counter, decide the letter to be hidden and initialize the options
@@ -53,24 +52,29 @@ class GameLogicHandler(
      */
     fun onBrickClicked(selectedLetter: Char, gameModel: GameModel) {
         val indices = gameModel.hiddenLettersIndices.filter {
-            val currentLetter = gameModel.currentTarget[it]
+            val currentLetter = gameModel.currentPhrase[it]
             currentLetter == selectedLetter || suffixLetters[selectedLetter] == currentLetter
         }
         if (indices.isNotEmpty()) {
-            gameModel.hiddenLettersIndices.removeAll(indices.toSet())
-            val gameWin = gameModel.hiddenLettersIndices.isEmpty()
-            var coinsAmount = 0
-            if (gameWin) {
-                coinsAmount = gameModel.selectedDifficulty.winWorth
-                addCoinsValueAndSave(gameModel, coinsAmount)
-            }
-            subscribers.forEach {
-                it.onCorrectGuess(indices, gameWin, coinsAmount)
-            }
+            correctGuess(gameModel, indices.first())
         } else {
             gameModel.triesLeft--
-            subscribers.forEach { it.onIncorrectGuess(gameModel.triesLeft <= 0) }
+            gamePlayScreen.onIncorrectGuess(gameModel.triesLeft <= 0)
         }
+    }
+
+    private fun correctGuess(
+        gameModel: GameModel,
+        index: Int
+    ) {
+        gameModel.hiddenLettersIndices.removeAll(setOf(index))
+        val gameWin = gameModel.hiddenLettersIndices.isEmpty()
+        var coinsAmount = 0
+        if (gameWin) {
+            coinsAmount = gameModel.selectedDifficulty.winWorth
+            addCoinsValueAndSave(gameModel, coinsAmount)
+        }
+        gamePlayScreen.onCorrectGuess(index, gameWin, coinsAmount)
     }
 
     private fun addCoinsValueAndSave(
@@ -88,7 +92,7 @@ class GameLogicHandler(
         val categoryName = unusedPhrases.keys.random()
         val category = unusedPhrases[categoryName]
         val selected = if (TEST_PHRASE.value.isNotEmpty()) TEST_PHRASE else category!!.random()
-        gameModel.currentTarget = selected.value.reversed()
+        gameModel.currentPhrase = selected.value.reversed()
         gameModel.currentCategory = categoryName
         category!!.remove(selected)
         if (category.isEmpty()) {
@@ -98,9 +102,9 @@ class GameLogicHandler(
 
     private fun decideHiddenLetters(model: GameModel) {
         val indices = mutableListOf<Int>()
-        val phraseLength = model.currentTarget.length
+        val phraseLength = model.currentPhrase.length
         for (i in 0 until phraseLength) {
-            if (model.currentTarget[i] != ' ') {
+            if (model.currentPhrase[i] != ' ') {
                 indices.add(i)
             }
         }
@@ -114,6 +118,10 @@ class GameLogicHandler(
 
     fun onPurchasedCoins(gameModel: GameModel, amount: Int) {
         addCoinsValueAndSave(gameModel, amount)
+    }
+
+    fun onRevealLetterButtonClicked(gameModel: GameModel) {
+        gamePlayScreen.onLetterRevealed(gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()])
     }
 
     companion object {

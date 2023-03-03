@@ -48,9 +48,8 @@ class GamePlayScreenImpl(
     }
 
     override fun show() {
-        gameLogicHandler = GameLogicHandler(assetsManager.phrases, android)
+        gameLogicHandler = GameLogicHandler(assetsManager.phrases, android, this)
         gameLogicHandler.beginGame(gameModel)
-        gameLogicHandler.subscribeForEvents(this)
         gamePlayScreenView = createGamePlayScreenView()
         gamePlayScreenView.onShow()
     }
@@ -113,12 +112,20 @@ class GamePlayScreenImpl(
         android.launchBillingFlow(selectedProduct)
     }
 
+    override fun onRevealLetterButtonClicked() {
+        gameLogicHandler.onRevealLetterButtonClicked(gameModel)
+    }
+
+    override fun onLetterRevealed(letter: Char) {
+        gamePlayScreenView.onLetterRevealed(letter)
+    }
+
     override fun onClickedBackButton() {
         lifeCycleManager.goToMenu()
     }
 
-    override fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
-        gamePlayScreenView.displayCorrectGuess(indices, gameWin, coinsAmount)
+    override fun onCorrectGuess(index: Int, gameWin: Boolean, coinsAmount: Int) {
+        gamePlayScreenView.displayCorrectGuess(index, gameWin, coinsAmount)
     }
 
     override fun onIncorrectGuess(gameOver: Boolean) {
