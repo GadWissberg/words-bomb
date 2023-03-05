@@ -193,7 +193,7 @@ class GamePlayScreenView(
         if (gameOver) {
             animateGameOver()
         } else if (gamePlayScreenViewComponentsManager.optionsView.selectedBrick != null) {
-            gamePlayScreenViewComponentsManager.onIncorrectGuess()
+            gamePlayScreenViewComponentsManager.onIncorrectGuess(gameModel)
         }
     }
 

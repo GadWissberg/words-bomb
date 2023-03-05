@@ -371,36 +371,41 @@ class TopBarView(
     /**
      * Creates a label flying off the coins label to show the player won coins.
      */
-    fun applyWinCoinEffect(coinsAmount: Int, assetsManager: GameAssetManager) {
+    fun applyWinCoinEffect(coinsAmount: Int) {
         if (coinsAmount > 0) {
-            val winCoinLabel = addWinCoinLabel(coinsAmount, assetsManager)
-            winCoinLabel.addAction(
-                Actions.sequence(
-                    Actions.moveBy(
-                        0F,
-                        -100F,
-                        WIN_COIN_LABEL_ANIMATION_DURATION,
-                        Interpolation.smooth2
-                    ),
-                    Actions.removeActor()
-                )
-            )
-
+            addCoinValueChangedLabel(coinsAmount)
         }
     }
 
-    private fun addWinCoinLabel(
+    private fun addCoinValueChangedLabel(
         coinsAmount: Int,
-        assetsManager: GameAssetManager
-    ): Label {
+    ) {
         val winCoinLabel = Label(
-            "+$coinsAmount",
-            LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.GOLD)
+            "${if (coinsAmount > 0) "+" else ""}$coinsAmount",
+            LabelStyle(
+                assetsManager.getFont(FontsDefinitions.VARELA_80),
+                if (coinsAmount > 0) Color.GOLD else Color.RED
+            )
         )
         topPartTable.stage.addActor(winCoinLabel)
         val coinsLabelPos = coinsLabel.localToScreenCoordinates(auxVector.setZero())
         winCoinLabel.setPosition(coinsLabelPos.x, topPartTable.stage.height - coinsLabelPos.y)
-        return winCoinLabel
+
+        winCoinLabel.addAction(
+            Actions.sequence(
+                Actions.moveBy(
+                    0F,
+                    -100F,
+                    WIN_COIN_LABEL_ANIMATION_DURATION,
+                    Interpolation.smooth2
+                ),
+                Actions.removeActor()
+            )
+        )
+    }
+
+    fun onRevealLetterButtonClicked() {
+        addCoinValueChangedLabel(-8)
     }
 
     companion object {

@@ -70,13 +70,12 @@ class GamePlayScreenViewComponentsManager(
         targetPhraseView = TargetPhraseView(letterSize, font80, soundPlayer, assetsManager)
         targetPhraseView.calculateMaxBricksPerLine(assetsManager)
         optionsView = OptionsView(stage, soundPlayer, assetsManager, gameModel)
-        addRevealLetterButton(assetsManager, stage, gameModel)
+        addRevealLetterButton(assetsManager, stage)
     }
 
     private fun addRevealLetterButton(
         assetsManager: GameAssetManager,
         stage: GameStage,
-        gameModel: GameModel
     ) {
         val font = assetsManager.getFont(FontsDefinitions.VARELA_40)
         val up = assetsManager.getTexture(BUTTON_CIRCLE_UP)
@@ -91,29 +90,8 @@ class GamePlayScreenViewComponentsManager(
                 soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.HELP))
                 revealLetterButton.isDisabled = true
                 gamePlayScreen.onRevealLetterButtonClicked()
-
-                revealLetterButton.addAction(
-                    Actions.parallel(
-                        Actions.fadeOut(1F),
-                        Actions.sequence(Actions.run {
-                            val coinTexture = assetsManager.getTexture(COIN)
-                            val startPosition =
-                                topBarView.coinsIcon.localToScreenCoordinates(Vector2())
-                            startPosition.x += topBarView.coinsIcon.width / 2F - coinTexture.width / 2F
-                            startPosition.y = stage.height - startPosition.y
-                            applyFlyingCoinsAnimation(
-                                stage,
-                                coinTexture,
-                                startPosition,
-                                8,
-                                revealLetterButton.localToScreenCoordinates(Vector2()).add(
-                                    revealLetterButton.width / 2F,
-                                    revealLetterButton.height / 2F
-                                )
-                            )
-                        })
-                    )
-                )
+                topBarView.onRevealLetterButtonClicked()
+                revealLetterButton.addAction(Actions.parallel(Actions.fadeOut(1F)))
             }
         })
     }
@@ -277,10 +255,10 @@ class GamePlayScreenViewComponentsManager(
     /**
      * Plays the animation for the incorrect guess event.
      */
-    fun onIncorrectGuess() {
+    fun onIncorrectGuess(gameModel: GameModel) {
         bombView.onIncorrectGuess()
         optionsView.onIncorrectGuess()
-        if (!revealLetterButton.isVisible) {
+        if (gameModel.selectedDifficulty.tries - gameModel.triesLeft > 1 && !revealLetterButton.isVisible) {
             revealLetterButton.addAction(
                 Actions.sequence(
                     Actions.visible(true),
@@ -317,7 +295,7 @@ class GamePlayScreenViewComponentsManager(
      * Plays the animation for the correct guess event.
      */
     fun applyCorrectGuessAnimation(coinsAmount: Int) {
-        topBarView.applyWinCoinEffect(coinsAmount, assetsManager)
+        topBarView.applyWinCoinEffect(coinsAmount)
     }
 
     fun onLetterRevealed(letter: Char) {
