@@ -70,12 +70,13 @@ class GamePlayScreenViewComponentsManager(
         targetPhraseView = TargetPhraseView(letterSize, font80, soundPlayer, assetsManager)
         targetPhraseView.calculateMaxBricksPerLine(assetsManager)
         optionsView = OptionsView(stage, soundPlayer, assetsManager, gameModel)
-        addRevealLetterButton(assetsManager, stage)
+        addRevealLetterButton(assetsManager, stage, gameModel)
     }
 
     private fun addRevealLetterButton(
         assetsManager: GameAssetManager,
         stage: GameStage,
+        gameModel: GameModel,
     ) {
         val font = assetsManager.getFont(FontsDefinitions.VARELA_40)
         val up = assetsManager.getTexture(BUTTON_CIRCLE_UP)
@@ -85,13 +86,9 @@ class GamePlayScreenViewComponentsManager(
         stage.addActor(revealLetterButton)
         revealLetterButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                if (revealLetterButton.isDisabled) return
-
                 soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.HELP))
-                revealLetterButton.isDisabled = true
                 gamePlayScreen.onRevealLetterButtonClicked()
-                topBarView.onRevealLetterButtonClicked()
-                revealLetterButton.addAction(Actions.parallel(Actions.fadeOut(1F)))
+                topBarView.onRevealLetterButtonClicked(gameModel)
             }
         })
     }
@@ -156,6 +153,9 @@ class GamePlayScreenViewComponentsManager(
             gamePlayScreen,
         )
         topBarView.setCategoryLabelText(gameModel.currentCategory)
+        if (revealLetterButton.isVisible) {
+            revealLetterButton.addAction(Actions.parallel(Actions.fadeOut(1F)))
+        }
     }
 
     /**

@@ -122,10 +122,12 @@ class GameLogicHandler(
 
     fun onRevealLetterButtonClicked(gameModel: GameModel) {
         gamePlayScreen.onLetterRevealed(gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()])
+        gameModel.coins -= REVEAL_LETTER_COST
     }
 
     companion object {
         const val SHARED_PREFERENCES_DATA_KEY_COINS = "coins"
+        const val REVEAL_LETTER_COST = 8
 
         private val suffixLetters = mapOf(
             'פ' to 'ף',

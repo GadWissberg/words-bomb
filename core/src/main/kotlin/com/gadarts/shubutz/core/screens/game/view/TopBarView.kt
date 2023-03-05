@@ -404,8 +404,9 @@ class TopBarView(
         )
     }
 
-    fun onRevealLetterButtonClicked() {
+    fun onRevealLetterButtonClicked(gameModel: GameModel) {
         addCoinValueChangedLabel(-8)
+        coinsLabel.setText(gameModel.coins)
     }
 
     companion object {
