@@ -3,10 +3,10 @@ package com.gadarts.shubutz.core.screens.game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.gadarts.shubutz.core.AndroidInterface
+import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.business.GameLogicHandler
-import com.gadarts.shubutz.core.business.GameLogicHandlerEventsSubscriber
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.InAppProducts
@@ -23,14 +23,15 @@ class GamePlayScreenImpl(
     private val stage: GameStage,
     private val soundPlayer: SoundPlayer,
     selectedDifficulty: Difficulties,
-) : GameScreen(), GameLogicHandlerEventsSubscriber, GamePlayScreen {
+) : GameScreen(), GamePlayScreen {
 
 
-    private val gameModel =
-        GameModel(
-            android.getSharedPreferencesValue(GameLogicHandler.SHARED_PREFERENCES_DATA_KEY_COINS),
-            selectedDifficulty
-        )
+    private val gameModel = GameModel(
+        if (DebugSettings.FORCE_NUMBER_OF_COINS >= 0) DebugSettings.FORCE_NUMBER_OF_COINS else android.getSharedPreferencesValue(
+            GameLogicHandler.SHARED_PREFERENCES_DATA_KEY_COINS
+        ),
+        selectedDifficulty
+    )
     private lateinit var gameLogicHandler: GameLogicHandler
     private lateinit var gamePlayScreenView: GamePlayScreenView
     override fun onSuccessfulPurchase(products: MutableList<String>) {
@@ -116,16 +117,20 @@ class GamePlayScreenImpl(
         gameLogicHandler.onRevealLetterButtonClicked(gameModel)
     }
 
-    override fun onLetterRevealed(letter: Char) {
-        gamePlayScreenView.onLetterRevealed(letter)
+    override fun onLetterRevealed(letter: Char, cost: Int) {
+        gamePlayScreenView.onLetterRevealed(letter, cost)
     }
 
     override fun onClickedBackButton() {
         lifeCycleManager.goToMenu()
     }
 
-    override fun onCorrectGuess(index: Int, gameWin: Boolean, coinsAmount: Int) {
-        gamePlayScreenView.displayCorrectGuess(index, gameWin, coinsAmount)
+    override fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
+        gamePlayScreenView.displayCorrectGuess(indices, gameWin, coinsAmount)
+    }
+
+    override fun onLetterRevealFailed() {
+        gamePlayScreenView.onLetterRevealFailed()
     }
 
     override fun onIncorrectGuess(gameOver: Boolean) {

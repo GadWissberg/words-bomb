@@ -56,7 +56,7 @@ class GameLogicHandler(
             currentLetter == selectedLetter || suffixLetters[selectedLetter] == currentLetter
         }
         if (indices.isNotEmpty()) {
-            correctGuess(gameModel, indices.first())
+            correctGuess(gameModel, indices)
         } else {
             gameModel.triesLeft--
             gamePlayScreen.onIncorrectGuess(gameModel.triesLeft <= 0)
@@ -65,16 +65,16 @@ class GameLogicHandler(
 
     private fun correctGuess(
         gameModel: GameModel,
-        index: Int
+        indices: List<Int>
     ) {
-        gameModel.hiddenLettersIndices.removeAll(setOf(index))
+        gameModel.hiddenLettersIndices.removeAll(indices)
         val gameWin = gameModel.hiddenLettersIndices.isEmpty()
         var coinsAmount = 0
         if (gameWin) {
             coinsAmount = gameModel.selectedDifficulty.winWorth
             addCoinsValueAndSave(gameModel, coinsAmount)
         }
-        gamePlayScreen.onCorrectGuess(index, gameWin, coinsAmount)
+        gamePlayScreen.onCorrectGuess(indices, gameWin, coinsAmount)
     }
 
     private fun addCoinsValueAndSave(
@@ -121,8 +121,15 @@ class GameLogicHandler(
     }
 
     fun onRevealLetterButtonClicked(gameModel: GameModel) {
-        gamePlayScreen.onLetterRevealed(gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()])
-        gameModel.coins -= REVEAL_LETTER_COST
+        if (gameModel.coins - REVEAL_LETTER_COST >= 0) {
+            gamePlayScreen.onLetterRevealed(
+                gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()],
+                REVEAL_LETTER_COST
+            )
+            gameModel.coins -= REVEAL_LETTER_COST
+        } else {
+            gamePlayScreen.onLetterRevealFailed()
+        }
     }
 
     companion object {

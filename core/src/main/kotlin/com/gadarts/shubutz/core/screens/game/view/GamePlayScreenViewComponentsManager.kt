@@ -29,10 +29,12 @@ import ktx.actors.alpha
 class GamePlayScreenViewComponentsManager(
     private val assetsManager: GameAssetManager,
     private val soundPlayer: SoundPlayer,
-    private val gamePlayScreen: GamePlayScreen
+    private val gamePlayScreen: GamePlayScreen,
+    private val stage: GameStage
 ) : Disposable {
 
     private lateinit var revealLetterButton: ImageTextButton
+    private var dialogsManager = DialogsManager(soundPlayer)
 
     /**
      * The view of the phrase the player needs to discover.
@@ -65,18 +67,17 @@ class GamePlayScreenViewComponentsManager(
         gameModel: GameModel,
         gamePlayScreen: GamePlayScreen,
     ) {
-        topBarView.addTopBar(assetsManager, gameModel, gamePlayScreen, stage)
+        topBarView.addTopBar(assetsManager, gameModel, gamePlayScreen, stage, dialogsManager)
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
         targetPhraseView = TargetPhraseView(letterSize, font80, soundPlayer, assetsManager)
         targetPhraseView.calculateMaxBricksPerLine(assetsManager)
         optionsView = OptionsView(stage, soundPlayer, assetsManager, gameModel)
-        addRevealLetterButton(assetsManager, stage, gameModel)
+        addRevealLetterButton(assetsManager, stage)
     }
 
     private fun addRevealLetterButton(
         assetsManager: GameAssetManager,
         stage: GameStage,
-        gameModel: GameModel,
     ) {
         val font = assetsManager.getFont(FontsDefinitions.VARELA_40)
         val up = assetsManager.getTexture(BUTTON_CIRCLE_UP)
@@ -88,7 +89,6 @@ class GamePlayScreenViewComponentsManager(
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.HELP))
                 gamePlayScreen.onRevealLetterButtonClicked()
-                topBarView.onRevealLetterButtonClicked(gameModel)
             }
         })
     }
@@ -154,7 +154,12 @@ class GamePlayScreenViewComponentsManager(
         )
         topBarView.setCategoryLabelText(gameModel.currentCategory)
         if (revealLetterButton.isVisible) {
-            revealLetterButton.addAction(Actions.parallel(Actions.fadeOut(1F)))
+            revealLetterButton.addAction(
+                Actions.sequence(
+                    Actions.fadeOut(1F),
+                    Actions.visible(false)
+                )
+            )
         }
     }
 
@@ -298,8 +303,13 @@ class GamePlayScreenViewComponentsManager(
         topBarView.applyWinCoinEffect(coinsAmount)
     }
 
-    fun onLetterRevealed(letter: Char) {
+    fun onLetterRevealed(letter: Char, gameModel: GameModel, cost: Int) {
         optionsView.onLetterRevealed(letter)
+        topBarView.onLetterRevealed(gameModel, cost)
+    }
+
+    fun onLetterRevealFailed() {
+        dialogsManager.openBuyCoinsDialog(stage, assetsManager, gamePlayScreen)
     }
 
     companion object {

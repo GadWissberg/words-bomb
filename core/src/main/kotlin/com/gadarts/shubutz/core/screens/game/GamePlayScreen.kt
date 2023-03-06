@@ -14,8 +14,9 @@ interface GamePlayScreen {
 
     fun onPackPurchaseButtonClicked(selectedProduct: Product)
     fun onRevealLetterButtonClicked()
-    fun onLetterRevealed(letter: Char)
+    fun onLetterRevealed(letter: Char, cost: Int)
     fun onIncorrectGuess(gameOver: Boolean)
-    fun onCorrectGuess(index: Int, gameWin: Boolean, coinsAmount: Int)
+    fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int)
+    fun onLetterRevealFailed()
 
 }

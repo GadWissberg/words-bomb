@@ -27,5 +27,10 @@ object DebugSettings {
      */
     const val ENABLE_SOUNDS = true
 
+    /**
+     * Whether to set the coins number at the start.
+     */
+    const val FORCE_NUMBER_OF_COINS = -1
+
 }
 

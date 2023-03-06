@@ -34,7 +34,7 @@ class GamePlayScreenView(
     Disposable {
 
     private val gamePlayScreenViewComponentsManager =
-        GamePlayScreenViewComponentsManager(assetsManager, soundPlayer, gamePlayScreen)
+        GamePlayScreenViewComponentsManager(assetsManager, soundPlayer, gamePlayScreen, stage)
     private lateinit var uiTable: Table
     private var font80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
     private lateinit var letterSize: Vector2
@@ -96,12 +96,14 @@ class GamePlayScreenView(
         gamePlayScreenViewComponentsManager.clear()
     }
 
-    fun displayCorrectGuess(index: Int, gameWin: Boolean, coinsAmount: Int) {
+    fun displayCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
         gamePlayScreenViewComponentsManager.applyCorrectGuessAnimation(coinsAmount)
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.CORRECT))
         if (gamePlayScreenViewComponentsManager.optionsView.selectedBrick != null) {
             val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-            animateBrickSuccess(index, gameWin, brickTexture)
+            indices.forEach {
+                animateBrickSuccess(it, gameWin, brickTexture)
+            }
             gamePlayScreenViewComponentsManager.optionsView.clearSelectedBrick()
         }
     }
@@ -221,8 +223,12 @@ class GamePlayScreenView(
         stage.addDialog(dialogView, "purchase_failed_dialog", assetsManager)
     }
 
-    fun onLetterRevealed(letter: Char) {
-        gamePlayScreenViewComponentsManager.onLetterRevealed(letter)
+    fun onLetterRevealed(letter: Char, cost: Int) {
+        gamePlayScreenViewComponentsManager.onLetterRevealed(letter, gameModel, cost)
+    }
+
+    fun onLetterRevealFailed() {
+        gamePlayScreenViewComponentsManager.onLetterRevealFailed()
     }
 
     companion object {

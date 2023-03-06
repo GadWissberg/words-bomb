@@ -5,32 +5,25 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
-import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.Scaling
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
-import com.gadarts.shubutz.core.model.InAppProducts
-import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.model.assets.definitions.AtlasesDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
-import java.util.*
 
 /**
  * Handle the in-game UI top-bar's view.
@@ -59,11 +52,12 @@ class TopBarView(
         assetsManager: GameAssetManager,
         gameModel: GameModel,
         gamePlayScreen: GamePlayScreen,
-        stage: GameStage
+        stage: GameStage,
+        dialogsManager: DialogsManager
     ) {
         table = Table()
         stage.addActor(table)
-        addTopPart(stage, assetsManager, gamePlayScreen, gameModel)
+        addTopPart(stage, assetsManager, gamePlayScreen, gameModel, dialogsManager)
         addCategoryLabel(gameModel, assetsManager)
         table.setPosition(stage.width / 2F, stage.height - table.prefHeight / 2F)
         table.setDebug(DebugSettings.SHOW_UI_BORDERS, true)
@@ -85,14 +79,15 @@ class TopBarView(
         stage: GameStage,
         assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
-        gameModel: GameModel
+        gameModel: GameModel,
+        dialogsManager: DialogsManager
     ) {
         createTopPartTexture(stage)
         topPartTable = Table()
         topPartTable.background = TextureRegionDrawable(topPartTexture)
         topPartTable.debug = DebugSettings.SHOW_UI_BORDERS
         topPartTable.setSize(ShubutzGame.RESOLUTION_WIDTH.toFloat(), TOP_PART_HEIGHT.toFloat())
-        addTopPartComponents(topPartTable, assetsManager, gamePlayScreen, gameModel)
+        addTopPartComponents(topPartTable, assetsManager, gamePlayScreen, gameModel, dialogsManager)
         table.add(topPartTable).row()
     }
 
@@ -126,12 +121,13 @@ class TopBarView(
         table: Table,
         assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
-        gameModel: GameModel
+        gameModel: GameModel,
+        dialogsManager: DialogsManager
     ) {
         val leftSideTable = Table()
         leftSideTable.debug = DebugSettings.SHOW_UI_BORDERS
         addBackButton(leftSideTable, assetsManager, gamePlayScreen)
-        addBuyCoinsButton(leftSideTable, assetsManager)
+        addBuyCoinsButton(leftSideTable, assetsManager, dialogsManager)
         table.add(leftSideTable).expandX().left()
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
         addCoinsLabel(gameModel, font80, table, assetsManager)
@@ -140,8 +136,9 @@ class TopBarView(
     private fun addBuyCoinsButton(
         table: Table,
         assetsManager: GameAssetManager,
+        dialogsManager: DialogsManager,
     ) {
-        val coinsButton = createBuyCoinsButton(assetsManager, table)
+        val coinsButton = createBuyCoinsButton(assetsManager, table, dialogsManager)
         table.add(coinsButton).pad(
             COINS_BUTTON_PAD_TOP,
             COINS_BUTTON_PAD_LEFT,
@@ -153,6 +150,7 @@ class TopBarView(
     private fun createBuyCoinsButton(
         assetsManager: GameAssetManager,
         table: Table,
+        dialogsManager: DialogsManager,
     ): ImageButton {
         val coinsButton = ImageButton(
             TextureRegionDrawable(assetsManager.getTexture(COINS_BUTTON_UP)),
@@ -161,168 +159,15 @@ class TopBarView(
         addClickListenerToButton(
             coinsButton,
             {
-                val gameStage = table.stage as GameStage
-                gameStage.addDialog(
-                    addCoinsDialog(assetsManager),
-                    COINS_DIALOG_NAME,
-                    assetsManager
+                dialogsManager.openBuyCoinsDialog(
+                    table.stage as GameStage,
+                    assetsManager,
+                    gamePlayScreen
                 )
             },
             assetsManager
         )
         return coinsButton
-    }
-
-    private fun addCoinsDialog(
-        assets: GameAssetManager,
-    ): Table {
-        val dialogLayout = Table()
-        val keyFrames = assets.getAtlas(AtlasesDefinitions.LOADING).regions
-        val loadingAnimation = LoadingAnimation(keyFrames)
-        dialogLayout.add(loadingAnimation).row()
-        gamePlayScreen.onOpenProductsMenu({
-            loadingAnimation.remove()
-            dialogLayout.pack()
-            if (it.isNotEmpty()) {
-                addCoinsDialogComponents(assets, dialogLayout, it)
-            }
-        }, {
-            loadingAnimation.remove()
-            dialogLayout.add(ViewUtils.createDialogLabel(it, assetsManager))
-            dialogLayout.pack()
-        })
-        return dialogLayout
-    }
-
-    private fun addCoinsDialogComponents(
-        assets: GameAssetManager,
-        layout: Table,
-        products: Map<String, Product>,
-    ) {
-        addHeaderToCoinsWindow(assets, layout)
-        addCoinsDialogDescription(assets, layout)
-        InAppProducts.values().forEach {
-            val id = it.name.lowercase(Locale.ROOT)
-            if (products.containsKey(id)) {
-                addPackButton(
-                    layout,
-                    products[id],
-                    stage = table.stage as GameStage,
-                    definition = it
-                )
-            }
-        }
-        layout.pack()
-        (layout.parent as Table).pack()
-        (layout.parent as Table).setPosition(
-            (layout.parent as Table).stage.width / 2F - (layout.parent as Table).prefWidth / 2F,
-            (layout.parent as Table).stage.height / 2F - (layout.parent as Table).prefHeight / 2F
-        )
-    }
-
-    private fun addCoinsDialogDescription(assetsManager: GameAssetManager, dialog: Table) {
-        val style = LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
-        val text = Label(fixHebrewDescription(COINS_DIALOG_DESCRIPTION), style)
-        text.setAlignment(Align.right)
-        dialog.add(text).pad(0F, 0F, COINS_DIALOG_DESCRIPTION_PADDING_BOTTOM, 0F).row()
-    }
-
-    private fun fixHebrewDescription(text: String): CharSequence {
-        val reversed = text.reversed()
-        val result = java.lang.StringBuilder()
-        reversed.split("\n").forEach { result.insert(0, "\n").insert(0, it) }
-        return result.toString()
-    }
-
-    private fun addPackButton(
-        popup: Table,
-        product: Product?,
-        stage: GameStage,
-        definition: InAppProducts,
-    ) {
-        val button = createPackButton(definition, product, stage)
-        val stack = Stack()
-        button.add(stack)
-        addFlashEffect(definition, stack)
-        val image = addPurchaseIcon(definition, stack)
-        popup.add(button).pad(COINS_POPUP_BUTTON_PADDING).row()
-
-        if (definition.applyAnimation) {
-            image.addAction(
-                Actions.forever(
-                    Actions.sequence(
-                        Actions.delay(MathUtils.random(3F, 5F)),
-                        Actions.sizeBy(
-                            20F,
-                            20F,
-                            1F,
-                            Interpolation.swingIn
-                        ),
-                        Actions.sizeBy(
-                            -20F,
-                            -20F,
-                            1F,
-                            Interpolation.swingIn
-                        ),
-                        Actions.delay(2F)
-                    ),
-                )
-            )
-        }
-    }
-
-    private fun addPurchaseIcon(
-        definition: InAppProducts,
-        stack: Stack
-    ): Image {
-        val image = Image(assetsManager.getTexture(definition.icon))
-        image.setScaling(Scaling.none)
-        stack.add(image)
-        return image
-    }
-
-    private fun addFlashEffect(
-        definition: InAppProducts,
-        stack: Stack
-    ) {
-        if (definition.flashEffect) {
-            val texture = assetsManager.getTexture(FLASH)
-            val flash = FlashEffect(texture)
-            stack.add(flash)
-            flash.setOrigin(texture.width / 2F, texture.height / 2F)
-            flash.addAction(Actions.forever(Actions.rotateBy(360F, FLASH_EFFECT_DURATION)))
-        }
-    }
-
-    private fun createPackButton(
-        definition: InAppProducts,
-        product: Product?,
-        stage: GameStage
-    ): ImageTextButton {
-        val button = ImageTextButton(
-            definition.label.format(
-                definition.amount.toString().reversed(),
-                product?.formattedPrice?.reversed() ?: "(?)"
-            ).reversed(), stage.createNinePatchButtonStyle(assetsManager)
-        )
-        addClickListenerToButton(button, {
-            if (product != null) {
-                gamePlayScreen.onPackPurchaseButtonClicked(product)
-            }
-        }, assetsManager)
-        return button
-    }
-
-
-    private fun addHeaderToCoinsWindow(
-        assetsManager: GameAssetManager,
-        popup: Table
-    ) {
-        val font = assetsManager.getFont(FontsDefinitions.VARELA_80)
-        val headerStyle = LabelStyle(font, Color.WHITE)
-        popup.add(Label(COINS_POPUP_HEADER.reversed(), headerStyle))
-            .pad(0F, 0F, COINS_POPUP_HEADER_PADDING_BOTTOM, 0F)
-            .row()
     }
 
 
@@ -404,8 +249,8 @@ class TopBarView(
         )
     }
 
-    fun onRevealLetterButtonClicked(gameModel: GameModel) {
-        addCoinValueChangedLabel(-8)
+    fun onLetterRevealed(gameModel: GameModel, cost: Int) {
+        addCoinValueChangedLabel(-cost)
         coinsLabel.setText(gameModel.coins)
     }
 
@@ -415,19 +260,12 @@ class TopBarView(
         private const val TOP_BAR_COLOR = "#85adb0"
         private const val COINS_LABEL_PADDING_RIGHT = 40F
         private const val WIN_COIN_LABEL_ANIMATION_DURATION = 4F
-        private const val COINS_POPUP_HEADER = "קבל עוד מטבעות"
-        private const val COINS_POPUP_HEADER_PADDING_BOTTOM = 64F
-        private const val COINS_POPUP_BUTTON_PADDING = 32F
-        private const val COINS_DIALOG_DESCRIPTION =
-            "לרשותך מס' אפשרויות להשיג\nעוד מטבעות.\nכל רכישה תסיר את כל הפרסומות!"
-        private const val COINS_DIALOG_DESCRIPTION_PADDING_BOTTOM = 64F
-        private const val COINS_DIALOG_NAME = "coins"
         private const val COINS_BUTTON_PAD_TOP = 60F
         private const val COINS_BUTTON_PAD_RIGHT = 20F
         private const val COINS_BUTTON_PAD_LEFT = 20F
         private const val COINS_BUTTON_PAD_BOTTOM = 20F
         private const val COINS_ICON_PAD_RIGHT = 40F
         private const val COINS_ICON_PAD = 20F
-        private const val FLASH_EFFECT_DURATION = 4F
+
     }
 }
