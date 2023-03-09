@@ -17,6 +17,6 @@ interface GamePlayScreen {
     fun onLetterRevealed(letter: Char, cost: Int)
     fun onIncorrectGuess(gameOver: Boolean)
     fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int)
-    fun onLetterRevealFailed()
+    fun onLetterRevealFailedNotEnoughCoins()
 
 }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -13,6 +14,7 @@ import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
@@ -197,14 +199,31 @@ class OptionsView(
     fun onLetterRevealed(letter: Char) {
         val filter = lettersOptionsTable.cells.filter { (it.actor as Brick).letter[0] == letter }
         if (filter.isNotEmpty()) {
-            val down = InputEvent()
-            down.type = InputEvent.Type.touchDown
-            (filter.first().actor as Brick).fire(down)
-
-            val up = InputEvent()
-            up.type = InputEvent.Type.touchUp
-            (filter.first().actor as Brick).fire(up)
+            val brick = filter.first().actor
+            addEffectForRevealedLetter(brick)
+            triggerBrick(brick)
         }
+    }
+
+    private fun triggerBrick(brick: Actor) {
+        val down = InputEvent()
+        down.type = InputEvent.Type.touchDown
+        (brick as Brick).fire(down)
+        val up = InputEvent()
+        up.type = InputEvent.Type.touchUp
+        brick.fire(up)
+    }
+
+    private fun addEffectForRevealedLetter(brick: Actor) {
+        val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.STARS)
+        val particleEffectActor = ParticleEffectActor(particleEffect)
+        stage.addActor(particleEffectActor)
+        val position = brick.localToScreenCoordinates(Vector2())
+        particleEffectActor.setPosition(
+            position.x + brick.width / 2F,
+            stage.height - position.y - brick.height / 2F
+        )
+        particleEffectActor.start()
     }
 
     companion object {

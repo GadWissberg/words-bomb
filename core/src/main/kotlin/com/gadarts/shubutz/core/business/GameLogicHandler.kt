@@ -1,6 +1,7 @@
 package com.gadarts.shubutz.core.business
 
 import com.gadarts.shubutz.core.AndroidInterface
+import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.DebugSettings.TEST_PHRASE
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
@@ -40,7 +41,8 @@ class GameLogicHandler(
         if (unusedPhrases.isEmpty()) {
             unusedPhrases = phrases
         }
-        gameModel.triesLeft = gameModel.selectedDifficulty.tries
+        gameModel.triesLeft =
+            if (DebugSettings.NUMBER_OF_TRIES > 0) DebugSettings.NUMBER_OF_TRIES else gameModel.selectedDifficulty.tries
         chooseTarget(gameModel)
         decideHiddenLetters(gameModel)
         gameModel.options = allowedLetters.toMutableList()
@@ -122,13 +124,15 @@ class GameLogicHandler(
 
     fun onRevealLetterButtonClicked(gameModel: GameModel) {
         if (gameModel.coins - REVEAL_LETTER_COST >= 0) {
-            gamePlayScreen.onLetterRevealed(
-                gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()],
-                REVEAL_LETTER_COST
-            )
-            gameModel.coins -= REVEAL_LETTER_COST
+            if (gameModel.hiddenLettersIndices.isNotEmpty()) {
+                gameModel.coins -= REVEAL_LETTER_COST
+                gamePlayScreen.onLetterRevealed(
+                    gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()],
+                    REVEAL_LETTER_COST
+                )
+            }
         } else {
-            gamePlayScreen.onLetterRevealFailed()
+            gamePlayScreen.onLetterRevealFailedNotEnoughCoins()
         }
     }
 

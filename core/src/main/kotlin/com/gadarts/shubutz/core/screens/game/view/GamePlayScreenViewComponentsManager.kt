@@ -40,26 +40,11 @@ class GamePlayScreenViewComponentsManager(
      * The view of the phrase the player needs to discover.
      */
     lateinit var targetPhraseView: TargetPhraseView
-
-    /**
-     * The view of all the alphabet letters.
-     */
     lateinit var optionsView: OptionsView
-
-    /**
-     * The view of the bomb with the counter.
-     */
     val bombView = BombView(soundPlayer, assetsManager)
-
-    /**
-     * The view of the bar on top of the screen.
-     */
     val topBarView = TopBarView(soundPlayer, assetsManager, gamePlayScreen)
 
 
-    /**
-     * Creates the views instances of the components.
-     */
     fun createViews(
         letterSize: Vector2,
         assetsManager: GameAssetManager,
@@ -87,6 +72,8 @@ class GamePlayScreenViewComponentsManager(
         stage.addActor(revealLetterButton)
         revealLetterButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                if (!revealLetterButton.isVisible || revealLetterButton.alpha < 1F) return
+
                 soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.HELP))
                 gamePlayScreen.onRevealLetterButtonClicked()
             }
@@ -153,21 +140,21 @@ class GamePlayScreenViewComponentsManager(
             gamePlayScreen,
         )
         topBarView.setCategoryLabelText(gameModel.currentCategory)
+        hideRevealLetterButton()
+    }
+
+    private fun hideRevealLetterButton() {
         if (revealLetterButton.isVisible) {
             revealLetterButton.addAction(
                 Actions.sequence(
-                    Actions.fadeOut(1F),
+                    Actions.fadeOut(0.5F),
                     Actions.visible(false)
                 )
             )
         }
     }
 
-    /**
-     * Stops the bomb's fire, plays the winning animation of the targets phrase view and plays
-     * the coins flying animation.
-     */
-    fun applyGameWinAnimation(
+    fun onRoundWin(
         stage: GameStage,
         gameModel: GameModel,
         actionOnGameWinAnimationFinish: Runnable
@@ -175,6 +162,7 @@ class GamePlayScreenViewComponentsManager(
         bombView.stopFire()
         targetPhraseView.applyGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
         applyCoinsFlyingFromBomb(gameModel, stage)
+        hideRevealLetterButton()
     }
 
     private fun applyCoinsFlyingFromBomb(
@@ -257,29 +245,24 @@ class GamePlayScreenViewComponentsManager(
         }
     }
 
-    /**
-     * Plays the animation for the incorrect guess event.
-     */
     fun onIncorrectGuess(gameModel: GameModel) {
         bombView.onIncorrectGuess()
         optionsView.onIncorrectGuess()
-        if (gameModel.selectedDifficulty.tries - gameModel.triesLeft > 1 && !revealLetterButton.isVisible) {
+        if ((gameModel.selectedDifficulty.tries - gameModel.triesLeft > 1) && !revealLetterButton.isVisible) {
             revealLetterButton.addAction(
                 Actions.sequence(
                     Actions.visible(true),
                     Actions.fadeOut(0F),
-                    Actions.fadeIn(1F)
+                    Actions.fadeIn(0.5F)
                 )
             )
         }
     }
 
-    /**
-     * Plays the animation for the game over event and clears all options.
-     */
-    fun applyGameOverAnimation(stage: GameStage) {
+    fun onGameOver(stage: GameStage) {
         bombView.onGameOverAnimation(assetsManager, stage)
         optionsView.clearAllOptions()
+        hideRevealLetterButton()
     }
 
     override fun dispose() {
@@ -308,7 +291,7 @@ class GamePlayScreenViewComponentsManager(
         topBarView.onLetterRevealed(gameModel, cost)
     }
 
-    fun onLetterRevealFailed() {
+    fun onLetterRevealFailedNotEnoughCoins() {
         dialogsManager.openBuyCoinsDialog(stage, assetsManager, gamePlayScreen)
     }
 

@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.Queue
+import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.SoundPlayer
@@ -25,29 +27,55 @@ import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
-/**
- * Handle the in-game UI top-bar's view.
- */
 class TopBarView(
     private val soundPlayer: SoundPlayer,
     private val assetsManager: GameAssetManager,
     private val gamePlayScreen: GamePlayScreen
-) : Disposable {
+) : Table(), Disposable {
 
+    private var lastCoinsValueChangeLabelDequeue: Long = 0
+    private val coinsValueChangeLabels = Queue<Int>()
     lateinit var coinsIcon: Image
-    private lateinit var table: Table
     private lateinit var categoryLabel: Label
     private lateinit var topPartTable: Table
     private lateinit var topPartTexture: Texture
-
-    /**
-     * Displays the current coins the player has.
-     */
     lateinit var coinsLabel: Label
 
-    /**
-     * Creates and adds the top bar table to the given stage.
-     */
+    override fun act(delta: Float) {
+        super.act(delta)
+        if (coinsValueChangeLabels.notEmpty()) {
+            if (TimeUtils.timeSinceMillis(lastCoinsValueChangeLabelDequeue) > COINS_VALUE_CHANGE_LABEL_INTERVAL) {
+                applyNextCoinsValueChangeLabel(coinsValueChangeLabels.removeFirst())
+                lastCoinsValueChangeLabelDequeue = TimeUtils.millis()
+            }
+        }
+    }
+
+    private fun applyNextCoinsValueChangeLabel(coinsAmount: Int) {
+        val winCoinLabel = Label(
+            "${if (coinsAmount > 0) "+" else ""}$coinsAmount",
+            LabelStyle(
+                assetsManager.getFont(FontsDefinitions.VARELA_80),
+                if (coinsAmount > 0) Color.GOLD else Color.RED
+            )
+        )
+        topPartTable.stage.addActor(winCoinLabel)
+        val coinsLabelPos = coinsLabel.localToScreenCoordinates(auxVector.setZero())
+        winCoinLabel.setPosition(coinsLabelPos.x, topPartTable.stage.height - coinsLabelPos.y)
+
+        winCoinLabel.addAction(
+            Actions.sequence(
+                Actions.moveBy(
+                    0F,
+                    -100F,
+                    WIN_COIN_LABEL_ANIMATION_DURATION,
+                    Interpolation.smooth2
+                ),
+                Actions.removeActor()
+            )
+        )
+    }
+
     fun addTopBar(
         assetsManager: GameAssetManager,
         gameModel: GameModel,
@@ -55,12 +83,11 @@ class TopBarView(
         stage: GameStage,
         dialogsManager: DialogsManager
     ) {
-        table = Table()
-        stage.addActor(table)
+        stage.addActor(this)
         addTopPart(stage, assetsManager, gamePlayScreen, gameModel, dialogsManager)
         addCategoryLabel(gameModel, assetsManager)
-        table.setPosition(stage.width / 2F, stage.height - table.prefHeight / 2F)
-        table.setDebug(DebugSettings.SHOW_UI_BORDERS, true)
+        setPosition(stage.width / 2F, stage.height - prefHeight / 2F)
+        setDebug(DebugSettings.SHOW_UI_BORDERS, true)
     }
 
     private fun addCategoryLabel(
@@ -72,7 +99,7 @@ class TopBarView(
             LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.WHITE)
         )
         categoryLabel.setAlignment(Align.center)
-        table.add(categoryLabel).size(ShubutzGame.RESOLUTION_WIDTH.toFloat(), categoryLabel.height)
+        add(categoryLabel).size(ShubutzGame.RESOLUTION_WIDTH.toFloat(), categoryLabel.height)
     }
 
     private fun addTopPart(
@@ -88,7 +115,7 @@ class TopBarView(
         topPartTable.debug = DebugSettings.SHOW_UI_BORDERS
         topPartTable.setSize(ShubutzGame.RESOLUTION_WIDTH.toFloat(), TOP_PART_HEIGHT.toFloat())
         addTopPartComponents(topPartTable, assetsManager, gamePlayScreen, gameModel, dialogsManager)
-        table.add(topPartTable).row()
+        add(topPartTable).row()
     }
 
     private fun addBackButton(
@@ -201,13 +228,6 @@ class TopBarView(
         topPartTexture.dispose()
     }
 
-    /**
-     * Removes the top-bar's table from the stage.
-     */
-    fun clear() {
-        table.remove()
-    }
-
     fun setCategoryLabelText(currentCategory: String) {
         categoryLabel.setText(currentCategory.reversed())
         categoryLabel.toFront()
@@ -225,28 +245,7 @@ class TopBarView(
     private fun addCoinValueChangedLabel(
         coinsAmount: Int,
     ) {
-        val winCoinLabel = Label(
-            "${if (coinsAmount > 0) "+" else ""}$coinsAmount",
-            LabelStyle(
-                assetsManager.getFont(FontsDefinitions.VARELA_80),
-                if (coinsAmount > 0) Color.GOLD else Color.RED
-            )
-        )
-        topPartTable.stage.addActor(winCoinLabel)
-        val coinsLabelPos = coinsLabel.localToScreenCoordinates(auxVector.setZero())
-        winCoinLabel.setPosition(coinsLabelPos.x, topPartTable.stage.height - coinsLabelPos.y)
-
-        winCoinLabel.addAction(
-            Actions.sequence(
-                Actions.moveBy(
-                    0F,
-                    -100F,
-                    WIN_COIN_LABEL_ANIMATION_DURATION,
-                    Interpolation.smooth2
-                ),
-                Actions.removeActor()
-            )
-        )
+        coinsValueChangeLabels.addFirst(coinsAmount)
     }
 
     fun onLetterRevealed(gameModel: GameModel, cost: Int) {
@@ -266,6 +265,6 @@ class TopBarView(
         private const val COINS_BUTTON_PAD_BOTTOM = 20F
         private const val COINS_ICON_PAD_RIGHT = 40F
         private const val COINS_ICON_PAD = 20F
-
+        private const val COINS_VALUE_CHANGE_LABEL_INTERVAL = 1000F
     }
 }

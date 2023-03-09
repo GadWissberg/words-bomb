@@ -129,8 +129,8 @@ class GamePlayScreenImpl(
         gamePlayScreenView.displayCorrectGuess(indices, gameWin, coinsAmount)
     }
 
-    override fun onLetterRevealFailed() {
-        gamePlayScreenView.onLetterRevealFailed()
+    override fun onLetterRevealFailedNotEnoughCoins() {
+        gamePlayScreenView.onLetterRevealFailedNotEnoughCoins()
     }
 
     override fun onIncorrectGuess(gameOver: Boolean) {

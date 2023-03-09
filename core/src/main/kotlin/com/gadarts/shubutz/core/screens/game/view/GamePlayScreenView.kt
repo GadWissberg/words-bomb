@@ -145,7 +145,7 @@ class GamePlayScreenView(
         )
         val actions = Actions.parallel(sequence, Actions.fadeOut(1F, smoother))
         if (gameWin) {
-            sequence.addAction(Actions.run { animateGameWin(stage) })
+            sequence.addAction(Actions.run { roundWin(stage) })
             gamePlayScreenViewComponentsManager.topBarView.coinsLabel.setText(gameModel.coins.toString())
             val particleEffectActor = ParticleEffectActor(
                 assetsManager.getParticleEffect(
@@ -173,8 +173,8 @@ class GamePlayScreenView(
         stage.addActor(brick)
     }
 
-    private fun animateGameWin(stage: GameStage) {
-        gamePlayScreenViewComponentsManager.applyGameWinAnimation(
+    private fun roundWin(stage: GameStage) {
+        gamePlayScreenViewComponentsManager.onRoundWin(
             stage,
             gameModel
         ) { clearScreen() }
@@ -193,14 +193,14 @@ class GamePlayScreenView(
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.INCORRECT))
         gamePlayScreenViewComponentsManager.bombView.updateLabel(gameModel)
         if (gameOver) {
-            animateGameOver()
+            gameOver()
         } else if (gamePlayScreenViewComponentsManager.optionsView.selectedBrick != null) {
             gamePlayScreenViewComponentsManager.onIncorrectGuess(gameModel)
         }
     }
 
-    private fun animateGameOver() {
-        gamePlayScreenViewComponentsManager.applyGameOverAnimation(stage)
+    private fun gameOver() {
+        gamePlayScreenViewComponentsManager.onGameOver(stage)
         stage.addAction(Actions.delay(5F, Actions.run { gamePlayScreen.onGameOverAnimationDone() }))
     }
 
@@ -227,8 +227,8 @@ class GamePlayScreenView(
         gamePlayScreenViewComponentsManager.onLetterRevealed(letter, gameModel, cost)
     }
 
-    fun onLetterRevealFailed() {
-        gamePlayScreenViewComponentsManager.onLetterRevealFailed()
+    fun onLetterRevealFailedNotEnoughCoins() {
+        gamePlayScreenViewComponentsManager.onLetterRevealFailedNotEnoughCoins()
     }
 
     companion object {
