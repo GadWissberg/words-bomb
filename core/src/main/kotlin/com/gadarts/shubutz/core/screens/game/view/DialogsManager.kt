@@ -128,8 +128,7 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
     ): ImageTextButton {
         val button = ImageTextButton(
             definition.label.format(
-                definition.amount.toString().reversed(),
-                product?.formattedPrice?.reversed() ?: "(?)"
+                definition.amount.toString().reversed()
             ).reversed(), stage.createNinePatchButtonStyle(gameAssetManager)
         )
         addClickListenerToButton(button, {

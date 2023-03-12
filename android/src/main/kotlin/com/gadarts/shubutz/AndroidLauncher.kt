@@ -119,6 +119,8 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
                 Gdx.app.log("BillingClientState", "${p0.responseCode} - ${p0.debugMessage}")
                 if (billingClient.connectionState == BillingClient.ConnectionState.CONNECTED) {
                     fetchProducts(onSuccess, onFailure)
+                } else {
+                    onFailure.invoke(FAILURE_MESSAGE_IN_APP_PURCHASE)
                 }
             }
         }
