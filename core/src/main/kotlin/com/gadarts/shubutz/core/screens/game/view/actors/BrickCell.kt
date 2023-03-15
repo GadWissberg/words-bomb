@@ -5,9 +5,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Vector2
 import ktx.actors.alpha
 
-/**
- * The stage actor that represents a missing letter.
- */
 open class BrickCell(
     texture: Texture,
     letterSize: Vector2,

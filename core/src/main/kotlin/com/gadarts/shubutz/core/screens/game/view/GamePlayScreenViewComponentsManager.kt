@@ -279,10 +279,7 @@ class GamePlayScreenViewComponentsManager(
         revealLetterButton.remove()
     }
 
-    /**
-     * Plays the animation for the correct guess event.
-     */
-    fun applyCorrectGuessAnimation(coinsAmount: Int) {
+    fun onCorrectGuess(coinsAmount: Int) {
         topBarView.applyWinCoinEffect(coinsAmount)
     }
 

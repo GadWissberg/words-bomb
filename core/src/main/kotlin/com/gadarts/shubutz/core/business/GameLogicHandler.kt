@@ -49,9 +49,6 @@ class GameLogicHandler(
         gameModel.options.reversed()
     }
 
-    /**
-     * Called when a brick is clicked.
-     */
     fun onBrickClicked(selectedLetter: Char, gameModel: GameModel) {
         val indices = gameModel.hiddenLettersIndices.filter {
             val currentLetter = gameModel.currentPhrase[it]

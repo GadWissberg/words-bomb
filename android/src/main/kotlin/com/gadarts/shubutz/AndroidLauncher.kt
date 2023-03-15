@@ -162,8 +162,8 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
                 onSuccess.invoke(productDetailsList.associate {
                     it.productId to Product(
                         it.productId,
-                        it.name,
                         it.oneTimePurchaseOfferDetails?.formattedPrice ?: "(?)",
+                        it,
                     )
                 })
             } else {

@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Interpolation.smoother
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
+import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
@@ -97,7 +98,7 @@ class GamePlayScreenView(
     }
 
     fun displayCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
-        gamePlayScreenViewComponentsManager.applyCorrectGuessAnimation(coinsAmount)
+        gamePlayScreenViewComponentsManager.onCorrectGuess(coinsAmount)
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.CORRECT))
         if (gamePlayScreenViewComponentsManager.optionsView.selectedBrick != null) {
             val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
@@ -141,7 +142,7 @@ class GamePlayScreenView(
                 BRICK_SUCCESS_ANIMATION_DURATION,
                 circle
             ),
-            Actions.run { (cell as Cell<*>).setActor(brick) }
+            Actions.run { ((cell as Cell<*>).actor as Stack).add(brick) }
         )
         val actions = Actions.parallel(sequence, Actions.fadeOut(1F, smoother))
         if (gameWin) {

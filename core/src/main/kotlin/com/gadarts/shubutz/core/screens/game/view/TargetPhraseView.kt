@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
@@ -40,7 +41,7 @@ class TargetPhraseView(
 
     private fun addBrickCell(texture: Texture, wordTable: Table) {
         val brickCell = BrickCell(texture, letterSize, font80)
-        wordTable.add(brickCell).size(letterSize.x).pad(LETTER_PADDING)
+        wordTable.add(Stack(brickCell)).size(letterSize.x).pad(LETTER_PADDING)
         brickCell.touchable = Touchable.enabled
     }
 
@@ -205,6 +206,9 @@ class TargetPhraseView(
                     val size = word.cells.size
                     for (letterIndex in 0 until size) {
                         val actor = word.cells[letterIndex].actor
+                        if (actor is Stack) {
+                            actor.removeActorAt(0, true)
+                        }
                         animateLetterForGameWin(
                             actor,
                             i,
