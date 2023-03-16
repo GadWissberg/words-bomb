@@ -22,9 +22,6 @@ import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import kotlin.math.min
 
-/**
- * Displays the alphabet letters for the player to guess.
- */
 class OptionsView(
     private val stage: GameStage,
     private val soundPlayer: SoundPlayer,
@@ -32,16 +29,9 @@ class OptionsView(
     private val gameModel: GameModel
 ) {
 
-    /**
-     * The current brick the player chose as a guess.
-     */
     var selectedBrick: Brick? = null
-
     private lateinit var lettersOptionsTable: Table
 
-    /**
-     * Creates the table that holds the bricks and adds to the given table.
-     */
     fun addLettersOptionsTable(
         uiTable: Table,
         assetsManager: GameAssetManager,

@@ -15,16 +15,10 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.gadarts.shubutz.core.model.Phrase
 import com.gadarts.shubutz.core.model.assets.definitions.*
 
-/**
- * Responsible to load the assets.
- */
 open class GameAssetManager : AssetManager() {
     lateinit var phrases: HashMap<String, ArrayList<Phrase>>
     private val phrasesLoader = PhrasesLoader()
 
-    /**
-     * Loads all assets sync.
-     */
     fun loadAssets() {
         phrases = phrasesLoader.load()
         initializeFontLoaders()
@@ -48,10 +42,6 @@ open class GameAssetManager : AssetManager() {
                 }
             }
         }
-    }
-
-    fun getShader(shader: ShaderDefinitions): String? {
-        return get(shader.getPath(), String::class.java)
     }
 
     fun getTexture(definition: TexturesDefinitions): Texture {

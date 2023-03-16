@@ -18,18 +18,17 @@ import com.badlogic.gdx.utils.Queue
 import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
-import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
+import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class TopBarView(
-    private val soundPlayer: SoundPlayer,
-    private val assetsManager: GameAssetManager,
+    private val globalHandlers: GlobalHandlers,
     private val gamePlayScreen: GamePlayScreen
 ) : Table(), Disposable {
 
@@ -55,13 +54,13 @@ class TopBarView(
         val winCoinLabel = Label(
             "${if (coinsAmount > 0) "+" else ""}$coinsAmount",
             LabelStyle(
-                assetsManager.getFont(FontsDefinitions.VARELA_80),
+                globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
                 if (coinsAmount > 0) Color.GOLD else Color.RED
             )
         )
         topPartTable.stage.addActor(winCoinLabel)
-        val coinsLabelPos = coinsLabel.localToScreenCoordinates(auxVector.setZero())
-        winCoinLabel.setPosition(coinsLabelPos.x, topPartTable.stage.height - coinsLabelPos.y)
+        val coinsLabelPos = coinsLabel.localToStageCoordinates(auxVector.setZero())
+        winCoinLabel.setPosition(coinsLabelPos.x, coinsLabelPos.y)
 
         winCoinLabel.addAction(
             Actions.sequence(
@@ -139,7 +138,7 @@ class TopBarView(
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 super.clicked(event, x, y)
                 runnable.run()
-                soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
+                globalHandlers.soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
             }
         })
     }
@@ -233,9 +232,6 @@ class TopBarView(
         categoryLabel.toFront()
     }
 
-    /**
-     * Creates a label flying off the coins label to show the player won coins.
-     */
     fun applyWinCoinEffect(coinsAmount: Int) {
         if (coinsAmount > 0) {
             addCoinValueChangedLabel(coinsAmount)

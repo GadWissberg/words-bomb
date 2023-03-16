@@ -27,9 +27,9 @@ class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManage
     SpriteBatch(),
 ) {
 
-    lateinit var dialogButtonDown: NinePatchDrawable
-    lateinit var dialogButtonUp: NinePatchDrawable
     val openDialogs = HashMap<String, Table>()
+    private lateinit var dialogButtonDown: NinePatchDrawable
+    private lateinit var dialogButtonUp: NinePatchDrawable
 
     init {
         addCloud(assetsManager, TexturesDefinitions.CLOUD_1, 0)
@@ -49,6 +49,70 @@ class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManage
             null,
             assetsManager.getFont(FontsDefinitions.VARELA_40)
         )
+
+    override fun draw() {
+        GeneralUtils.resetDisplay(BACKGROUND_COLOR)
+        super.draw()
+    }
+
+    fun addDialog(dialogView: Table, name: String, assetsManager: GameAssetManager) {
+        if (openDialogs.containsKey(name)) return
+        val dialog = Table()
+
+        dialog.addAction(
+            Actions.sequence(
+                Actions.fadeOut(0F),
+                Actions.fadeIn(1F, Interpolation.swingOut)
+            )
+        )
+
+        initDialog(assetsManager, dialog, name)
+        dialog.add(dialogView).expand()
+        dialog.pack()
+        dialog.setPosition(width / 2F - dialog.width / 2F, height / 2F - dialog.height / 2F)
+        addActor(dialog)
+    }
+
+    fun addButton(
+        uiTable: Table,
+        onClick: ClickListener,
+        text: String,
+        newLineAfter: Boolean = true,
+        span: Int = 1,
+        up: Texture,
+        down: Texture,
+        disabled: Texture? = null,
+        bitmapFont: BitmapFont,
+        topPadding: Int,
+        scale: Float = 1F
+    ): TextButton {
+        val style = createButtonStyle(up, down, bitmapFont, disabled)
+        val button = TextButton(text, style)
+        addButtonToTable(
+            button, onClick,
+            uiTable, newLineAfter,
+            span = span, topPadding = topPadding.toFloat(),
+            scale = scale
+        )
+        return button
+    }
+
+    private fun createButtonStyle(
+        up: Texture,
+        down: Texture,
+        bitmapFont: BitmapFont,
+        disabled: Texture?
+    ): TextButton.TextButtonStyle {
+        val upDrawable = TextureRegionDrawable(up)
+        val downDrawable = TextureRegionDrawable(down)
+        val style = TextButton.TextButtonStyle(upDrawable, downDrawable, null, bitmapFont)
+        style.fontColor = Color.WHITE
+        if (disabled != null) {
+            style.disabled = TextureRegionDrawable(disabled)
+            style.disabledFontColor = BUTTON_FONT_COLOR_DISABLED
+        }
+        return style
+    }
 
     private fun createDialogButtonNinePatch(
         am: GameAssetManager, texture: TexturesDefinitions
@@ -123,11 +187,6 @@ class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManage
         )
     }
 
-    override fun draw() {
-        GeneralUtils.resetDisplay(BACKGROUND_COLOR)
-        super.draw()
-    }
-
     private fun applyDialogBackground(
         popupTexture: Texture,
         popup: Table
@@ -153,24 +212,6 @@ class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManage
         val dialogTexture = assetsManager.getTexture(TexturesDefinitions.DIALOG)
         applyDialogBackground(dialogTexture, dialog)
         openDialogs[name] = dialog
-    }
-
-    fun addDialog(dialogView: Table, name: String, assetsManager: GameAssetManager) {
-        if (openDialogs.containsKey(name)) return
-        val dialog = Table()
-
-        dialog.addAction(
-            Actions.sequence(
-                Actions.fadeOut(0F),
-                Actions.fadeIn(1F, Interpolation.swingOut)
-            )
-        )
-
-        initDialog(assetsManager, dialog, name)
-        dialog.add(dialogView).expand()
-        dialog.pack()
-        dialog.setPosition(width / 2F - dialog.width / 2F, height / 2F - dialog.height / 2F)
-        addActor(dialog)
     }
 
     fun closeAllDialogs() {
@@ -204,41 +245,6 @@ class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManage
         )
     }
 
-    fun addButton(
-        uiTable: Table,
-        onClick: ClickListener,
-        text: String,
-        newLineAfter: Boolean = true,
-        span: Int = 1,
-        up: Texture,
-        down: Texture,
-        disabled: Texture? = null,
-        bitmapFont: BitmapFont,
-        topPadding: Int,
-        scale: Float = 1F
-    ): TextButton {
-        val upDrawable = TextureRegionDrawable(up)
-        val downDrawable = TextureRegionDrawable(down)
-        val style = TextButton.TextButtonStyle(upDrawable, downDrawable, null, bitmapFont)
-        style.fontColor = Color.WHITE
-        if (disabled != null) {
-            val disabledDrawable = TextureRegionDrawable(disabled)
-            style.disabled = disabledDrawable
-            style.disabledFontColor = BUTTON_FONT_COLOR_DISABLED
-        }
-        val button = TextButton(text, style)
-        addButtonToTable(
-            button,
-            onClick,
-            uiTable,
-            newLineAfter,
-            span = span,
-            topPadding = topPadding.toFloat(),
-            scale = scale
-        )
-        return button
-    }
-
     private fun addButtonToTable(
         button: Button,
         onClick: ClickListener,
@@ -268,7 +274,6 @@ class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManage
         const val NUMBER_OF_CLOUDS = 4
         private val BUTTON_FONT_COLOR_DISABLED = Color.LIGHT_GRAY
         const val BUTTON_PADDING = 20
-
         const val CLOUDS_SCALE = 0.1F
         const val CLOUDS_SCALE_DURATION_MIN = 15F
         const val CLOUDS_SCALE_DURATION_MAX = 25F

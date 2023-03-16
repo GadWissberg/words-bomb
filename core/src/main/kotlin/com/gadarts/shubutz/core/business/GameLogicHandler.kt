@@ -8,9 +8,6 @@ import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
 import com.gadarts.shubutz.core.model.Phrase
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 
-/**
- * Responsible to take care of the actual game's rules.
- */
 class GameLogicHandler(
     private val phrases: HashMap<String, ArrayList<Phrase>>,
     private val androidInterface: AndroidInterface,
@@ -19,10 +16,6 @@ class GameLogicHandler(
 
     private var unusedPhrases: HashMap<String, ArrayList<Phrase>> = HashMap(phrases)
 
-    /**
-     * Initializes the bomb's counter, decide the letter to be hidden and initialize the options
-     * letters array.
-     */
     fun beginGame(gameModel: GameModel) {
         unusedPhrases = phrases
         unusedPhrases.forEach {
@@ -66,7 +59,7 @@ class GameLogicHandler(
         gameModel: GameModel,
         indices: List<Int>
     ) {
-        gameModel.hiddenLettersIndices.removeAll(indices)
+        gameModel.hiddenLettersIndices.removeAll(indices.toSet())
         val gameWin = gameModel.hiddenLettersIndices.isEmpty()
         var coinsAmount = 0
         if (gameWin) {

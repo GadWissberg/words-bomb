@@ -176,12 +176,12 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
                 )
             }
         }
-        layout.pack()
-        (layout.parent as Table).pack()
         (layout.parent as Table).setPosition(
             (layout.parent as Table).stage.width / 2F - (layout.parent as Table).prefWidth / 2F,
             (layout.parent as Table).stage.height / 2F - (layout.parent as Table).prefHeight / 2F
         )
+        layout.pack()
+        (layout.parent as Table).pack()
     }
 
     fun openBuyCoinsDialog(
@@ -207,10 +207,10 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         dialogLayout.add(loadingAnimation).row()
         gamePlayScreen.onOpenProductsMenu({
             loadingAnimation.remove()
-            dialogLayout.pack()
             if (it.isNotEmpty()) {
                 addCoinsDialogComponents(gameAssetManager, dialogLayout, it, gamePlayScreen, stage)
             }
+            dialogLayout.pack()
         }, {
             loadingAnimation.remove()
             dialogLayout.add(ViewUtils.createDialogLabel(it, gameAssetManager))

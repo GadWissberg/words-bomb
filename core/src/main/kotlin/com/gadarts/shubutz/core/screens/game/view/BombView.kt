@@ -4,18 +4,17 @@ import com.badlogic.gdx.math.Interpolation.*
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.*
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
+import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class BombView(
-    private val soundPlayer: SoundPlayer,
-    private val assetsManager: GameAssetManager
+    private val globalHandlers: GlobalHandlers,
 ) {
     lateinit var bombComponent: BombComponent
     private lateinit var fireParticleEffectActor: ParticleEffectActor
@@ -79,7 +78,11 @@ class BombView(
 
     fun onIncorrectGuess() {
         if (!fireParticleEffectActor.started) {
-            soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.IGNITE))
+            globalHandlers.soundPlayer.playSound(
+                globalHandlers.assetsManager.getSound(
+                    SoundsDefinitions.IGNITE
+                )
+            )
             bombComponent.startFire()
         }
     }
@@ -113,7 +116,7 @@ class BombView(
         )
 
         stage.addActor(explosionParticleEffectActor)
-        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.EXPLOSION))
+        globalHandlers.soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.EXPLOSION))
         explosionParticleEffectActor.start()
         bombComponent.hideLabel()
     }

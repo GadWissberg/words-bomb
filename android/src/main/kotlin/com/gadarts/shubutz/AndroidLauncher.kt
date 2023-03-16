@@ -160,11 +160,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
                                                                             productDetailsList ->
             if (billingResult.responseCode == BillingResponseCode.OK) {
                 onSuccess.invoke(productDetailsList.associate {
-                    it.productId to Product(
-                        it.productId,
-                        it.oneTimePurchaseOfferDetails?.formattedPrice ?: "(?)",
-                        it,
-                    )
+                    it.productId to Product(it.productId, it)
                 })
             } else {
                 onFailure.invoke(FAILURE_MESSAGE_IN_APP_PURCHASE)

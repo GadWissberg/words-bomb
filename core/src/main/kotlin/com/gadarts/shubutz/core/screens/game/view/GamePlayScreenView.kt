@@ -13,31 +13,30 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
-import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
-import com.gadarts.shubutz.core.model.assets.*
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
+import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 
 class GamePlayScreenView(
-    private val assetsManager: GameAssetManager,
+    private val globalHandlers: GlobalHandlers,
     private val gameModel: GameModel,
     private val gamePlayScreen: GamePlayScreen,
     private val stage: GameStage,
-    private val soundPlayer: SoundPlayer,
 ) :
     Disposable {
 
     private val gamePlayScreenViewComponentsManager =
-        GamePlayScreenViewComponentsManager(assetsManager, soundPlayer, gamePlayScreen, stage)
+        GamePlayScreenViewComponentsManager(globalHandlers, gamePlayScreen, stage)
     private lateinit var uiTable: Table
-    private var font80: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80)
+    private var font80: BitmapFont =
+        globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80)
     private lateinit var letterSize: Vector2
 
     fun onShow() {
@@ -51,7 +50,7 @@ class GamePlayScreenView(
         addUiTable()
         gamePlayScreenViewComponentsManager.createViews(
             letterSize,
-            assetsManager,
+            globalHandlers.assetsManager,
             stage,
             gameModel,
             gamePlayScreen,
@@ -99,9 +98,9 @@ class GamePlayScreenView(
 
     fun displayCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
         gamePlayScreenViewComponentsManager.onCorrectGuess(coinsAmount)
-        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.CORRECT))
+        globalHandlers.soundPlayer.playSound(globalHandlers.assetsManager.getSound(SoundsDefinitions.CORRECT))
         if (gamePlayScreenViewComponentsManager.optionsView.selectedBrick != null) {
-            val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
+            val brickTexture = globalHandlers.assetsManager.getTexture(TexturesDefinitions.BRICK)
             indices.forEach {
                 animateBrickSuccess(it, gameWin, brickTexture)
             }
@@ -149,7 +148,7 @@ class GamePlayScreenView(
             sequence.addAction(Actions.run { roundWin(stage) })
             gamePlayScreenViewComponentsManager.topBarView.coinsLabel.setText(gameModel.coins.toString())
             val particleEffectActor = ParticleEffectActor(
-                assetsManager.getParticleEffect(
+                globalHandlers.assetsManager.getParticleEffect(
                     ParticleEffectsDefinitions.STARS
                 )
             )
@@ -191,7 +190,7 @@ class GamePlayScreenView(
 
 
     fun onIncorrectGuess(gameOver: Boolean) {
-        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.INCORRECT))
+        globalHandlers.soundPlayer.playSound(globalHandlers.assetsManager.getSound(SoundsDefinitions.INCORRECT))
         gamePlayScreenViewComponentsManager.bombView.updateLabel(gameModel)
         if (gameOver) {
             gameOver()
@@ -207,7 +206,8 @@ class GamePlayScreenView(
 
     fun onPurchasedCoins() {
         gamePlayScreenViewComponentsManager.topBarView.coinsLabel.setText(gameModel.coins)
-        val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.PARTY)
+        val particleEffect =
+            globalHandlers.assetsManager.getParticleEffect(ParticleEffectsDefinitions.PARTY)
         particleEffect.emitters.forEach {
             it.spawnWidth.highMin = ShubutzGame.RESOLUTION_WIDTH.toFloat()
         }
@@ -215,13 +215,13 @@ class GamePlayScreenView(
         party.setPosition(0F, ShubutzGame.RESOLUTION_HEIGHT.toFloat())
         stage.addActor(party)
         party.start()
-        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.PURCHASED))
+        globalHandlers.soundPlayer.playSound(globalHandlers.assetsManager.getSound(SoundsDefinitions.PURCHASED))
     }
 
     fun displayFailedPurchase(message: String) {
         val dialogView = Table()
-        dialogView.add(ViewUtils.createDialogLabel(message, assetsManager))
-        stage.addDialog(dialogView, "purchase_failed_dialog", assetsManager)
+        dialogView.add(ViewUtils.createDialogLabel(message, globalHandlers.assetsManager))
+        stage.addDialog(dialogView, "purchase_failed_dialog", globalHandlers.assetsManager)
     }
 
     fun onLetterRevealed(letter: Char, cost: Int) {

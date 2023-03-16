@@ -17,11 +17,10 @@ import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenView
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class GamePlayScreenImpl(
-    private val assetsManager: GameAssetManager,
+    private val globalHandlers: GlobalHandlers,
     private val lifeCycleManager: GameLifeCycleManager,
     private val android: AndroidInterface,
     private val stage: GameStage,
-    private val soundPlayer: SoundPlayer,
     selectedDifficulty: Difficulties,
 ) : GameScreen(), GamePlayScreen {
 
@@ -49,18 +48,17 @@ class GamePlayScreenImpl(
     }
 
     override fun show() {
-        gameLogicHandler = GameLogicHandler(assetsManager.phrases, android, this)
+        gameLogicHandler = GameLogicHandler(globalHandlers.assetsManager.phrases, android, this)
         gameLogicHandler.beginGame(gameModel)
         gamePlayScreenView = createGamePlayScreenView()
         gamePlayScreenView.onShow()
     }
 
     private fun createGamePlayScreenView() = GamePlayScreenView(
-        assetsManager,
+        globalHandlers,
         gameModel,
         this,
         stage,
-        soundPlayer
     )
 
     override fun render(delta: Float) {

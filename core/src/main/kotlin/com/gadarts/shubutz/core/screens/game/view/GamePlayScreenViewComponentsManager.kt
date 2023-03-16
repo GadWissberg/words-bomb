@@ -13,36 +13,28 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
-import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
+import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import ktx.actors.alpha
 
-/**
- * Handles display-related logic of the game-play components.
- */
 class GamePlayScreenViewComponentsManager(
-    private val assetsManager: GameAssetManager,
-    private val soundPlayer: SoundPlayer,
+    private val globalHandlers: GlobalHandlers,
     private val gamePlayScreen: GamePlayScreen,
     private val stage: GameStage
 ) : Disposable {
 
     private lateinit var revealLetterButton: ImageTextButton
-    private var dialogsManager = DialogsManager(soundPlayer)
-
-    /**
-     * The view of the phrase the player needs to discover.
-     */
+    private var dialogsManager = DialogsManager(globalHandlers.soundPlayer)
     lateinit var targetPhraseView: TargetPhraseView
     lateinit var optionsView: OptionsView
-    val bombView = BombView(soundPlayer, assetsManager)
-    val topBarView = TopBarView(soundPlayer, assetsManager, gamePlayScreen)
+    val bombView = BombView(globalHandlers)
+    val topBarView = TopBarView(globalHandlers, gamePlayScreen)
 
 
     fun createViews(
@@ -54,9 +46,10 @@ class GamePlayScreenViewComponentsManager(
     ) {
         topBarView.addTopBar(assetsManager, gameModel, gamePlayScreen, stage, dialogsManager)
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
-        targetPhraseView = TargetPhraseView(letterSize, font80, soundPlayer, assetsManager)
+        targetPhraseView =
+            TargetPhraseView(letterSize, font80, globalHandlers.soundPlayer, assetsManager)
         targetPhraseView.calculateMaxBricksPerLine(assetsManager)
-        optionsView = OptionsView(stage, soundPlayer, assetsManager, gameModel)
+        optionsView = OptionsView(stage, globalHandlers.soundPlayer, assetsManager, gameModel)
         addRevealLetterButton(assetsManager, stage)
     }
 
@@ -74,7 +67,7 @@ class GamePlayScreenViewComponentsManager(
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 if (!revealLetterButton.isVisible || revealLetterButton.alpha < 1F) return
 
-                soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.HELP))
+                globalHandlers.soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.HELP))
                 gamePlayScreen.onRevealLetterButtonClicked()
             }
         })
@@ -130,11 +123,11 @@ class GamePlayScreenViewComponentsManager(
         gamePlayScreen: GamePlayScreen,
         stage: GameStage,
     ) {
-        bombView.addBomb(assetsManager, stage, uiTable, gameModel)
-        targetPhraseView.onGameBegin(gameModel, assetsManager, uiTable)
+        bombView.addBomb(globalHandlers.assetsManager, stage, uiTable, gameModel)
+        targetPhraseView.onGameBegin(gameModel, globalHandlers.assetsManager, uiTable)
         optionsView.addLettersOptionsTable(
             uiTable,
-            assetsManager,
+            globalHandlers.assetsManager,
             targetPhraseView.maxBricksPerLine,
             letterSize,
             gamePlayScreen,
@@ -160,7 +153,11 @@ class GamePlayScreenViewComponentsManager(
         actionOnGameWinAnimationFinish: Runnable
     ) {
         bombView.stopFire()
-        targetPhraseView.applyGameWinAnimation(assetsManager, stage, actionOnGameWinAnimationFinish)
+        targetPhraseView.applyGameWinAnimation(
+            globalHandlers.assetsManager,
+            stage,
+            actionOnGameWinAnimationFinish
+        )
         applyCoinsFlyingFromBomb(gameModel, stage)
         hideRevealLetterButton()
     }
@@ -169,12 +166,11 @@ class GamePlayScreenViewComponentsManager(
         gameModel: GameModel,
         stage: GameStage
     ) {
-        val coinTexture = assetsManager.getTexture(COIN)
-        val startPosition = bombView.bombComponent.localToScreenCoordinates(Vector2())
+        val coinTexture = globalHandlers.assetsManager.getTexture(COIN)
+        val startPosition = bombView.bombComponent.localToStageCoordinates(Vector2())
         startPosition.x += bombView.bombComponent.width / 2F - coinTexture.width / 2F
-        startPosition.y = stage.height - startPosition.y
-        val targetPosition = topBarView.coinsIcon.localToScreenCoordinates(Vector2())
-        targetPosition.y = stage.height - targetPosition.y
+        startPosition.y += bombView.bombComponent.width / 2F - coinTexture.width / 2F
+        val targetPosition = topBarView.coinsIcon.localToStageCoordinates(Vector2())
         applyFlyingCoinsAnimation(
             stage,
             coinTexture,
@@ -260,7 +256,7 @@ class GamePlayScreenViewComponentsManager(
     }
 
     fun onGameOver(stage: GameStage) {
-        bombView.onGameOverAnimation(assetsManager, stage)
+        bombView.onGameOverAnimation(globalHandlers.assetsManager, stage)
         optionsView.clearAllOptions()
         hideRevealLetterButton()
     }
@@ -289,7 +285,7 @@ class GamePlayScreenViewComponentsManager(
     }
 
     fun onLetterRevealFailedNotEnoughCoins() {
-        dialogsManager.openBuyCoinsDialog(stage, assetsManager, gamePlayScreen)
+        dialogsManager.openBuyCoinsDialog(stage, globalHandlers.assetsManager, gamePlayScreen)
     }
 
     companion object {
