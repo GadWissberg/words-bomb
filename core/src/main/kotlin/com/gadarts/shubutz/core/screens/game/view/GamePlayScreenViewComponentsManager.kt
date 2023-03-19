@@ -113,9 +113,6 @@ class GamePlayScreenViewComponentsManager(
         revealLetterButton.add(stack).size(coin.width.toFloat(), coin.height.toFloat())
     }
 
-    /**
-     * Initializes the components.
-     */
     fun init(
         uiTable: Table,
         gameModel: GameModel,
@@ -242,7 +239,7 @@ class GamePlayScreenViewComponentsManager(
     }
 
     fun onIncorrectGuess(gameModel: GameModel) {
-        bombView.onIncorrectGuess()
+        bombView.onIncorrectGuess(gameModel)
         optionsView.onIncorrectGuess()
         if ((gameModel.selectedDifficulty.tries - gameModel.triesLeft > 1) && !revealLetterButton.isVisible) {
             revealLetterButton.addAction(

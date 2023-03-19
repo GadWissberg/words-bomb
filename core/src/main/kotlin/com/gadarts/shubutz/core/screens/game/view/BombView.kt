@@ -76,7 +76,7 @@ class BombView(
         bombComponent.updateLabel(gameModel.triesLeft)
     }
 
-    fun onIncorrectGuess() {
+    fun onIncorrectGuess(gameModel: GameModel) {
         if (!fireParticleEffectActor.started) {
             globalHandlers.soundPlayer.playSound(
                 globalHandlers.assetsManager.getSound(
@@ -85,6 +85,7 @@ class BombView(
             )
             bombComponent.startFire()
         }
+        bombComponent.onIncorrectGuess(gameModel)
     }
 
     fun onGameOverAnimation(

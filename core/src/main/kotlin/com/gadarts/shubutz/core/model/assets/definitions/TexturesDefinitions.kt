@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Texture
 import java.util.*
 
 enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Texture> {
-    HUD(true),
     BACK_BUTTON,
     BUTTON_UP,
     BUTTON_DOWN,
