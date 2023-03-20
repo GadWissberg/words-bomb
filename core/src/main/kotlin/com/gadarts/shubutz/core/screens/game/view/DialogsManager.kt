@@ -23,11 +23,16 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import java.util.*
 
 class DialogsManager(private val soundPlayer: SoundPlayer) {
-    private fun addCoinsDialogDescription(assetsManager: GameAssetManager, dialog: Table) {
+    private fun addDialogDescription(
+        assetsManager: GameAssetManager,
+        dialog: Table,
+        description: String,
+        colSpan: Int = 1
+    ) {
         val style = Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
-        val text = Label(fixHebrewDescription(COINS_DIALOG_DESCRIPTION), style)
+        val text = Label(fixHebrewDescription(description), style)
         text.setAlignment(Align.right)
-        dialog.add(text).pad(0F, 0F, COINS_DIALOG_DESCRIPTION_PADDING_BOTTOM, 0F).row()
+        dialog.add(text).pad(0F, 0F, DIALOG_DESCRIPTION_PADDING_BOTTOM, 0F).colspan(colSpan).row()
     }
 
     private fun fixHebrewDescription(text: String): CharSequence {
@@ -37,31 +42,37 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         return result.toString()
     }
 
-    private fun addHeaderToCoinsWindow(
+    private fun addHeaderToDialog(
         assetsManager: GameAssetManager,
-        popup: Table
+        popup: Table,
+        text: String,
+        colSpan: Int = 1
     ) {
         val font = assetsManager.getFont(FontsDefinitions.VARELA_80)
         val headerStyle = Label.LabelStyle(font, Color.WHITE)
-        popup.add(Label(COINS_POPUP_HEADER.reversed(), headerStyle))
-            .pad(0F, 0F, COINS_POPUP_HEADER_PADDING_BOTTOM, 0F)
+        popup.add(Label(text.reversed(), headerStyle))
+            .pad(0F, 0F, DIALOG_HEADER_PADDING_BOTTOM, 0F)
+            .colspan(colSpan)
             .row()
     }
 
     private fun addPackButton(
-        popup: Table,
+        dialog: Table,
         product: Product?,
         stage: GameStage,
         definition: InAppProducts,
         gameAssetManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
     ) {
-        val button = createPackButton(definition, product, stage, gameAssetManager, gamePlayScreen)
+        val button = addDialogButton(stage, gameAssetManager, dialog, {
+            if (product != null) {
+                gamePlayScreen.onPackPurchaseButtonClicked(product)
+            }
+        }, definition.label.format(definition.amount.toString().reversed()))
         val stack = Stack()
         button.add(stack)
         addFlashEffect(definition, stack, gameAssetManager)
         val image = addPurchaseIcon(definition, stack, gameAssetManager)
-        popup.add(button).pad(COINS_POPUP_BUTTON_PADDING).row()
 
         if (definition.applyAnimation) {
             image.addAction(
@@ -85,6 +96,23 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
                 )
             )
         }
+    }
+
+    private fun addDialogButton(
+        stage: GameStage,
+        gameAssetManager: GameAssetManager,
+        dialogLayout: Table,
+        onClick: (() -> Unit)? = null,
+        text: String,
+        newRowAfter: Boolean = true
+    ): ImageTextButton {
+        val clickListener = onClick ?: { stage.closeDialog(EXIT_DIALOG_NAME) }
+        val button = createDialogButton(stage, gameAssetManager, text.reversed(), clickListener)
+        val cell = dialogLayout.add(button).pad(DIALOG_BUTTON_PADDING)
+        if (newRowAfter) {
+            cell.row()
+        }
+        return button
     }
 
     private fun addPurchaseIcon(
@@ -119,23 +147,14 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         }
     }
 
-    private fun createPackButton(
-        definition: InAppProducts,
-        product: Product?,
+    private fun createDialogButton(
         stage: GameStage,
         gameAssetManager: GameAssetManager,
-        gamePlayScreen: GamePlayScreen
+        text: String,
+        onClick: (() -> Unit)
     ): ImageTextButton {
-        val button = ImageTextButton(
-            definition.label.format(
-                definition.amount.toString().reversed()
-            ).reversed(), stage.createNinePatchButtonStyle(gameAssetManager)
-        )
-        addClickListenerToButton(button, {
-            if (product != null) {
-                gamePlayScreen.onPackPurchaseButtonClicked(product)
-            }
-        }, gameAssetManager)
+        val button = ImageTextButton(text, stage.createNinePatchButtonStyle(gameAssetManager))
+        addClickListenerToButton(button, onClick, gameAssetManager)
         return button
     }
 
@@ -161,8 +180,8 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         gamePlayScreen: GamePlayScreen,
         stage: GameStage,
     ) {
-        addHeaderToCoinsWindow(gameAssetManager, layout)
-        addCoinsDialogDescription(gameAssetManager, layout)
+        addHeaderToDialog(gameAssetManager, layout, COINS_DIALOG_HEADER)
+        addDialogDescription(gameAssetManager, layout, COINS_DIALOG_DESCRIPTION)
         InAppProducts.values().forEach {
             val id = it.name.lowercase(Locale.ROOT)
             if (products.containsKey(id)) {
@@ -176,12 +195,7 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
                 )
             }
         }
-        (layout.parent as Table).setPosition(
-            (layout.parent as Table).stage.width / 2F - (layout.parent as Table).prefWidth / 2F,
-            (layout.parent as Table).stage.height / 2F - (layout.parent as Table).prefHeight / 2F
-        )
-        layout.pack()
-        (layout.parent as Table).pack()
+        placeDialogInTheMiddle(layout)
     }
 
     fun openBuyCoinsDialog(
@@ -190,13 +204,13 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         gamePlayScreen: GamePlayScreen,
     ) {
         stage.addDialog(
-            addCoinsDialog(assetsManager, gamePlayScreen, stage),
+            createCoinsDialog(assetsManager, gamePlayScreen, stage),
             COINS_DIALOG_NAME,
             assetsManager
         )
     }
 
-    private fun addCoinsDialog(
+    private fun createCoinsDialog(
         gameAssetManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
         stage: GameStage,
@@ -219,14 +233,70 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         return dialogLayout
     }
 
+    fun openExitDialog(
+        stage: GameStage,
+        assetsManager: GameAssetManager,
+        gamePlayScreen: GamePlayScreen
+    ) {
+        val dialogView = createExitDialog(assetsManager, gamePlayScreen, stage)
+        stage.addDialog(
+            dialogView,
+            EXIT_DIALOG_NAME,
+            assetsManager
+        )
+        placeDialogInTheMiddle(dialogView)
+    }
+
+    private fun createExitDialog(
+        assetsManager: GameAssetManager,
+        gamePlayScreen: GamePlayScreen,
+        stage: GameStage
+    ): Table {
+        val layout = Table()
+        addHeaderToDialog(assetsManager, layout, EXIT_DIALOG_HEADER, 2)
+        addDialogDescription(assetsManager, layout, EXIT_DIALOG_DESCRIPTION, 2)
+        addExitDialogButtons(gamePlayScreen, stage, assetsManager, layout)
+        return layout
+    }
+
+    private fun addExitDialogButtons(
+        gamePlayScreen: GamePlayScreen,
+        stage: GameStage,
+        assetsManager: GameAssetManager,
+        layout: Table
+    ) {
+        val onClick = { gamePlayScreen.onQuitSession() }
+        addDialogButton(stage, assetsManager, layout, onClick, EXIT_DIALOG_BUTTON_OK, false)
+        addDialogButton(
+            stage = stage,
+            gameAssetManager = assetsManager,
+            dialogLayout = layout,
+            text = EXIT_DIALOG_BUTTON_NO
+        )
+    }
+
+    private fun placeDialogInTheMiddle(layout: Table) {
+        (layout.parent as Table).setPosition(
+            (layout.parent as Table).stage.width / 2F - (layout.parent as Table).prefWidth / 2F,
+            (layout.parent as Table).stage.height / 2F - (layout.parent as Table).prefHeight / 2F
+        )
+        layout.pack()
+        (layout.parent as Table).pack()
+    }
+
     companion object {
+        private const val EXIT_DIALOG_NAME = "exit"
+        private const val EXIT_DIALOG_HEADER = "חכה!"
+        private const val EXIT_DIALOG_DESCRIPTION = "אתה בטוח שאתה רוצה\nלסיים את המשחק?"
+        private const val EXIT_DIALOG_BUTTON_OK = "כן"
+        private const val EXIT_DIALOG_BUTTON_NO = "לא"
+        private const val DIALOG_HEADER_PADDING_BOTTOM = 64F
         private const val COINS_DIALOG_NAME = "coins"
-        private const val COINS_POPUP_HEADER = "קבל עוד מטבעות"
-        private const val COINS_POPUP_HEADER_PADDING_BOTTOM = 64F
+        private const val COINS_DIALOG_HEADER = "קבל עוד מטבעות"
         private const val COINS_DIALOG_DESCRIPTION =
             "לרשותך מס' אפשרויות להשיג\nעוד מטבעות.\nכל רכישה תסיר את כל הפרסומות!"
-        private const val COINS_DIALOG_DESCRIPTION_PADDING_BOTTOM = 64F
-        private const val COINS_POPUP_BUTTON_PADDING = 32F
+        private const val DIALOG_DESCRIPTION_PADDING_BOTTOM = 64F
+        private const val DIALOG_BUTTON_PADDING = 32F
         private const val FLASH_EFFECT_DURATION = 4F
     }
 

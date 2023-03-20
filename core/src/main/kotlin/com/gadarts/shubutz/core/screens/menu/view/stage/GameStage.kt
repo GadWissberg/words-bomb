@@ -245,6 +245,10 @@ class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManage
         )
     }
 
+    fun closeDialog(dialogName: String) {
+        openDialogs[dialogName]?.let { closeDialog(it) }
+    }
+
     private fun addButtonToTable(
         button: Button,
         onClick: ClickListener,

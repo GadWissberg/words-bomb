@@ -134,12 +134,17 @@ class TopBarView(
     private fun addBackButton(
         table: Table,
         assetsManager: GameAssetManager,
-        gamePlayScreen: GamePlayScreen
+        gamePlayScreen: GamePlayScreen,
+        dialogsManager: DialogsManager
     ) {
         val texture = assetsManager.getTexture(BACK_BUTTON)
         val button = ImageButton(TextureRegionDrawable(texture))
         button.pad(10F, 80F, 10F, 40F)
-        addClickListenerToButton(button, { gamePlayScreen.onClickedBackButton() }, assetsManager)
+        addClickListenerToButton(
+            button,
+            { dialogsManager.openExitDialog(stage as GameStage, assetsManager, gamePlayScreen) },
+            assetsManager
+        )
         table.add(button).left()
     }
 
@@ -166,7 +171,7 @@ class TopBarView(
     ) {
         val leftSideTable = Table()
         leftSideTable.debug = DebugSettings.SHOW_UI_BORDERS
-        addBackButton(leftSideTable, assetsManager, gamePlayScreen)
+        addBackButton(leftSideTable, assetsManager, gamePlayScreen, dialogsManager)
         addBuyCoinsButton(leftSideTable, assetsManager, dialogsManager)
         table.add(leftSideTable).expandX().left()
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)

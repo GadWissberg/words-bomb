@@ -119,7 +119,7 @@ class GamePlayScreenImpl(
         gamePlayScreenView.onLetterRevealed(letter, cost)
     }
 
-    override fun onClickedBackButton() {
+    override fun onQuitSession() {
         lifeCycleManager.goToMenu()
     }
 

@@ -4,7 +4,7 @@ import com.gadarts.shubutz.core.model.Product
 
 interface GamePlayScreen {
     fun onGameOverAnimationDone()
-    fun onClickedBackButton()
+    fun onQuitSession()
     fun onBrickClicked(letter: Char)
     fun onScreenEmpty()
     fun onOpenProductsMenu(
