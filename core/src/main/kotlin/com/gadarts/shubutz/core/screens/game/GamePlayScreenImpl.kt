@@ -5,13 +5,11 @@ import com.badlogic.gdx.Input
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GameLifeCycleManager
-import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.business.GameLogicHandler
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
-import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.GameScreen
 import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenView
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
@@ -37,8 +35,9 @@ class GamePlayScreenImpl(
         products.forEach { product ->
             val filtered = InAppProducts.values().filter { it.name.lowercase() == product }
             if (filtered.isNotEmpty()) {
-                gameLogicHandler.onPurchasedCoins(gameModel, filtered.first().amount)
-                gamePlayScreenView.onPurchasedCoins()
+                val amount = filtered.first().amount
+                gameLogicHandler.onPurchasedCoins(gameModel, amount)
+                gamePlayScreenView.onPurchasedCoins(amount)
             }
         }
     }

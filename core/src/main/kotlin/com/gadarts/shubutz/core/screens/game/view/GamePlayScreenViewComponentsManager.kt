@@ -285,6 +285,15 @@ class GamePlayScreenViewComponentsManager(
         dialogsManager.openBuyCoinsDialog(stage, globalHandlers.assetsManager, gamePlayScreen)
     }
 
+    fun onPurchasedCoins(gameModel: GameModel, amount: Int) {
+        topBarView.coinsLabel.setText(gameModel.coins)
+        dialogsManager.openCoinsPurchasedSuccessfully(
+            globalHandlers.assetsManager,
+            stage,
+            amount
+        )
+    }
+
     companion object {
         const val REVEAL_BUTTON_POSITION_X = 800F
         const val REVEAL_BUTTON_POSITION_Y = 1112F

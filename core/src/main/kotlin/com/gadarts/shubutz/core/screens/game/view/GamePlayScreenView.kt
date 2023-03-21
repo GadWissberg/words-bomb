@@ -204,8 +204,8 @@ class GamePlayScreenView(
         stage.addAction(Actions.delay(5F, Actions.run { gamePlayScreen.onGameOverAnimationDone() }))
     }
 
-    fun onPurchasedCoins() {
-        gamePlayScreenViewComponentsManager.topBarView.coinsLabel.setText(gameModel.coins)
+    fun onPurchasedCoins(amount: Int) {
+        gamePlayScreenViewComponentsManager.onPurchasedCoins(gameModel, amount)
         val particleEffect =
             globalHandlers.assetsManager.getParticleEffect(ParticleEffectsDefinitions.PARTY)
         particleEffect.emitters.forEach {

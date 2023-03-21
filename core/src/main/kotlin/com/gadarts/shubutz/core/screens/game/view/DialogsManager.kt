@@ -64,11 +64,18 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         gameAssetManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
     ) {
-        val button = addDialogButton(stage, gameAssetManager, dialog, {
-            if (product != null) {
-                gamePlayScreen.onPackPurchaseButtonClicked(product)
-            }
-        }, definition.label.format(definition.amount.toString().reversed()))
+        val button = addDialogButton(
+            stage,
+            gameAssetManager,
+            dialog,
+            {
+                if (product != null) {
+                    gamePlayScreen.onPackPurchaseButtonClicked(product)
+                }
+            },
+            definition.label.format(definition.amount.toString().reversed()),
+            dialogName = COINS_DIALOG_NAME
+        )
         val stack = Stack()
         button.add(stack)
         addFlashEffect(definition, stack, gameAssetManager)
@@ -104,9 +111,10 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         dialogLayout: Table,
         onClick: (() -> Unit)? = null,
         text: String,
-        newRowAfter: Boolean = true
+        newRowAfter: Boolean = true,
+        dialogName: String
     ): ImageTextButton {
-        val clickListener = onClick ?: { stage.closeDialog(EXIT_DIALOG_NAME) }
+        val clickListener = onClick ?: { stage.closeDialog(dialogName) }
         val button = createDialogButton(stage, gameAssetManager, text.reversed(), clickListener)
         val cell = dialogLayout.add(button).pad(DIALOG_BUTTON_PADDING)
         if (newRowAfter) {
@@ -238,25 +246,34 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen
     ) {
-        val dialogView = createExitDialog(assetsManager, gamePlayScreen, stage)
-        stage.addDialog(
-            dialogView,
-            EXIT_DIALOG_NAME,
-            assetsManager
+        val dialogView = createDialogLayout(
+            assetsManager,
+            EXIT_DIALOG_HEADER,
+            EXIT_DIALOG_DESCRIPTION
         )
+        addExitDialogButtons(gamePlayScreen, stage, assetsManager, dialogView)
+        stage.addDialog(dialogView, EXIT_DIALOG_NAME, assetsManager)
         placeDialogInTheMiddle(dialogView)
     }
 
-    private fun createExitDialog(
+    private fun createDialogLayout(
         assetsManager: GameAssetManager,
-        gamePlayScreen: GamePlayScreen,
-        stage: GameStage
+        header: String,
+        description: String
     ): Table {
         val layout = Table()
-        addHeaderToDialog(assetsManager, layout, EXIT_DIALOG_HEADER, 2)
-        addDialogDescription(assetsManager, layout, EXIT_DIALOG_DESCRIPTION, 2)
-        addExitDialogButtons(gamePlayScreen, stage, assetsManager, layout)
+        addHeaderAndDescription(assetsManager, layout, header, description)
         return layout
+    }
+
+    private fun addHeaderAndDescription(
+        assetsManager: GameAssetManager,
+        layout: Table,
+        header: String,
+        description: String
+    ) {
+        addHeaderToDialog(assetsManager, layout, header, 2)
+        addDialogDescription(assetsManager, layout, description, 2)
     }
 
     private fun addExitDialogButtons(
@@ -266,16 +283,27 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         layout: Table
     ) {
         val onClick = { gamePlayScreen.onQuitSession() }
-        addDialogButton(stage, assetsManager, layout, onClick, EXIT_DIALOG_BUTTON_OK, false)
+        addDialogButton(
+            stage,
+            assetsManager,
+            layout,
+            onClick,
+            EXIT_DIALOG_BUTTON_OK,
+            false,
+            EXIT_DIALOG_NAME
+        )
         addDialogButton(
             stage = stage,
             gameAssetManager = assetsManager,
             dialogLayout = layout,
-            text = EXIT_DIALOG_BUTTON_NO
+            text = EXIT_DIALOG_BUTTON_NO,
+            dialogName = EXIT_DIALOG_NAME
         )
     }
 
     private fun placeDialogInTheMiddle(layout: Table) {
+        if (layout.parent == null) return
+
         (layout.parent as Table).setPosition(
             (layout.parent as Table).stage.width / 2F - (layout.parent as Table).prefWidth / 2F,
             (layout.parent as Table).stage.height / 2F - (layout.parent as Table).prefHeight / 2F
@@ -284,7 +312,43 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         (layout.parent as Table).pack()
     }
 
+    fun openCoinsPurchasedSuccessfully(
+        assetsManager: GameAssetManager,
+        stage: GameStage,
+        amount: Int
+    ) {
+        val dialogView =
+            createCoinsPurchasedSuccessfullyDialog(assetsManager, stage, amount)
+        stage.addDialog(dialogView, COINS_PURCHASED_DIALOG_NAME, assetsManager)
+        placeDialogInTheMiddle(dialogView)
+        stage.closeDialog(COINS_DIALOG_NAME)
+    }
+
+    private fun createCoinsPurchasedSuccessfullyDialog(
+        assetsManager: GameAssetManager,
+        stage: GameStage,
+        amount: Int
+    ): Table {
+        val dialogView = createDialogLayout(
+            assetsManager,
+            COINS_PURCHASED_DIALOG_HEADER,
+            COINS_PURCHASED_DIALOG_DESCRIPTION.format(amount.toString().reversed())
+        )
+        addDialogButton(
+            stage = stage,
+            gameAssetManager = assetsManager,
+            dialogLayout = dialogView,
+            text = COINS_PURCHASED_DIALOG_BUTTON_OK,
+            dialogName = COINS_PURCHASED_DIALOG_NAME,
+        )
+        return dialogView
+    }
+
     companion object {
+        private const val COINS_PURCHASED_DIALOG_HEADER = "נהנים!"
+        private const val COINS_PURCHASED_DIALOG_DESCRIPTION = "רכישה של %s מטבעות\nבוצעה בהצלחה!"
+        private const val COINS_PURCHASED_DIALOG_NAME = "coins_purchased"
+        private const val COINS_PURCHASED_DIALOG_BUTTON_OK = "מעולה"
         private const val EXIT_DIALOG_NAME = "exit"
         private const val EXIT_DIALOG_HEADER = "חכה!"
         private const val EXIT_DIALOG_DESCRIPTION = "אתה בטוח שאתה רוצה\nלסיים את המשחק?"
