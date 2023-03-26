@@ -115,15 +115,20 @@ class GameLogicHandler(
     fun onRevealLetterButtonClicked(gameModel: GameModel) {
         if (gameModel.coins - REVEAL_LETTER_COST >= 0) {
             if (gameModel.hiddenLettersIndices.isNotEmpty()) {
-                gameModel.coins -= REVEAL_LETTER_COST
-                gamePlayScreen.onLetterRevealed(
-                    gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()],
-                    REVEAL_LETTER_COST
-                )
+                revealLetter(gameModel)
             }
         } else {
             gamePlayScreen.onLetterRevealFailedNotEnoughCoins()
         }
+    }
+
+    private fun revealLetter(gameModel: GameModel) {
+        gameModel.coins -= REVEAL_LETTER_COST
+        val letter = gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()]
+        gamePlayScreen.onLetterRevealed(
+            suffixLettersReverse[letter] ?: letter,
+            REVEAL_LETTER_COST
+        )
     }
 
     companion object {
@@ -137,5 +142,6 @@ class GameLogicHandler(
             'צ' to 'ץ',
             'מ' to 'ם'
         )
+        private val suffixLettersReverse = suffixLetters.entries.associate { it.value to it.key }
     }
 }
