@@ -1,5 +1,6 @@
 package com.gadarts.shubutz.core.screens.menu.view.stage
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -55,14 +56,20 @@ class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManage
         super.draw()
     }
 
-    fun addDialog(dialogView: Table, name: String, assetsManager: GameAssetManager) {
+    fun addDialog(
+        dialogView: Table,
+        name: String,
+        assetsManager: GameAssetManager,
+        onDialogReady: (() -> Unit)? = null
+    ) {
         if (openDialogs.containsKey(name)) return
         val dialog = Table()
 
         dialog.addAction(
             Actions.sequence(
                 Actions.fadeOut(0F),
-                Actions.fadeIn(1F, Interpolation.swingOut)
+                Actions.fadeIn(0.5F, Interpolation.swingOut),
+                if (onDialogReady != null) Actions.run(onDialogReady) else Actions.delay(0F)
             )
         )
 

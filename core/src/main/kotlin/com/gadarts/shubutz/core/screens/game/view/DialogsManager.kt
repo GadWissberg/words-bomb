@@ -1,5 +1,6 @@
 package com.gadarts.shubutz.core.screens.game.view
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
@@ -190,14 +191,15 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
     ) {
         addHeaderToDialog(gameAssetManager, layout, COINS_DIALOG_HEADER)
         addDialogDescription(gameAssetManager, layout, COINS_DIALOG_DESCRIPTION)
-        InAppProducts.values().forEach {
-            val id = it.name.lowercase(Locale.ROOT)
+        val productsConstants = InAppProducts.values()
+        for (product in productsConstants) {
+            val id = product.name.lowercase(Locale.ROOT)
             if (products.containsKey(id)) {
                 addPackButton(
                     layout,
                     products[id],
                     stage = stage,
-                    definition = it,
+                    definition = product,
                     gameAssetManager,
                     gamePlayScreen
                 )
@@ -211,34 +213,26 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
     ) {
-        stage.addDialog(
-            createCoinsDialog(assetsManager, gamePlayScreen, stage),
-            COINS_DIALOG_NAME,
-            assetsManager
-        )
-    }
-
-    private fun createCoinsDialog(
-        gameAssetManager: GameAssetManager,
-        gamePlayScreen: GamePlayScreen,
-        stage: GameStage,
-    ): Table {
-        val dialogLayout = Table()
-        val keyFrames = gameAssetManager.getAtlas(AtlasesDefinitions.LOADING).regions
+        val keyFrames = assetsManager.getAtlas(AtlasesDefinitions.LOADING).regions
         val loadingAnimation = LoadingAnimation(keyFrames)
+        val dialogLayout = Table()
         dialogLayout.add(loadingAnimation).row()
-        gamePlayScreen.onOpenProductsMenu({
-            loadingAnimation.remove()
-            if (it.isNotEmpty()) {
-                addCoinsDialogComponents(gameAssetManager, dialogLayout, it, gamePlayScreen, stage)
-            }
-            dialogLayout.pack()
-        }, {
-            loadingAnimation.remove()
-            dialogLayout.add(ViewUtils.createDialogLabel(it, gameAssetManager))
-            dialogLayout.pack()
-        })
-        return dialogLayout
+        stage.addDialog(dialogLayout, COINS_DIALOG_LOADING_NAME, assetsManager) {
+            gamePlayScreen.onOpenProductsMenu({
+                loadingAnimation.remove()
+                dialogLayout.remove()
+                stage.addDialog(dialogLayout, COINS_DIALOG_NAME, assetsManager)
+                if (it.isNotEmpty()) {
+                    addCoinsDialogComponents(assetsManager, dialogLayout, it, gamePlayScreen, stage)
+                }
+                dialogLayout.pack()
+                stage.closeDialog(COINS_DIALOG_LOADING_NAME)
+            }, {
+                loadingAnimation.remove()
+                dialogLayout.add(ViewUtils.createDialogLabel(it, assetsManager))
+                dialogLayout.pack()
+            })
+        }
     }
 
     fun openExitDialog(
@@ -304,12 +298,12 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
     private fun placeDialogInTheMiddle(layout: Table) {
         if (layout.parent == null) return
 
+        layout.pack()
+        (layout.parent as Table).pack()
         (layout.parent as Table).setPosition(
             (layout.parent as Table).stage.width / 2F - (layout.parent as Table).prefWidth / 2F,
             (layout.parent as Table).stage.height / 2F - (layout.parent as Table).prefHeight / 2F
         )
-        layout.pack()
-        (layout.parent as Table).pack()
     }
 
     fun openCoinsPurchasedSuccessfully(
@@ -356,6 +350,7 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         private const val EXIT_DIALOG_BUTTON_NO = "לא"
         private const val DIALOG_HEADER_PADDING_BOTTOM = 64F
         private const val COINS_DIALOG_NAME = "coins"
+        private const val COINS_DIALOG_LOADING_NAME = "loading_coins"
         private const val COINS_DIALOG_HEADER = "קבל עוד מטבעות"
         private const val COINS_DIALOG_DESCRIPTION =
             "לרשותך מס' אפשרויות להשיג\nעוד מטבעות.\nכל רכישה תסיר את כל הפרסומות!"

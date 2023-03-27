@@ -7,7 +7,7 @@ import com.gadarts.shubutz.core.model.Phrase
  */
 object DebugSettings {
 
-    val TEST_PHRASE = Phrase("נסרין קדרי")
+    val TEST_PHRASE = Phrase("")
 
     const val NUMBER_OF_TRIES = 0
 
