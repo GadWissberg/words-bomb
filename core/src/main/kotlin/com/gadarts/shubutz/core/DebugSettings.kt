@@ -2,9 +2,6 @@ package com.gadarts.shubutz.core
 
 import com.gadarts.shubutz.core.model.Phrase
 
-/**
- * Default flags values.
- */
 object DebugSettings {
 
     val TEST_PHRASE = Phrase("")

@@ -1,6 +1,5 @@
 package com.gadarts.shubutz.core.screens.game.view
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
@@ -191,15 +190,14 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
     ) {
         addHeaderToDialog(gameAssetManager, layout, COINS_DIALOG_HEADER)
         addDialogDescription(gameAssetManager, layout, COINS_DIALOG_DESCRIPTION)
-        val productsConstants = InAppProducts.values()
-        for (product in productsConstants) {
-            val id = product.name.lowercase(Locale.ROOT)
+        InAppProducts.values().forEach {
+            val id = it.name.lowercase(Locale.ROOT)
             if (products.containsKey(id)) {
                 addPackButton(
                     layout,
                     products[id],
                     stage = stage,
-                    definition = product,
+                    definition = it,
                     gameAssetManager,
                     gamePlayScreen
                 )

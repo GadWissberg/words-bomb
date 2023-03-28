@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
-import com.gadarts.shubutz.core.Notifier
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
@@ -23,18 +22,17 @@ import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.BeginGameAction
 import com.gadarts.shubutz.core.screens.menu.LoadingAnimationHandler
+import com.gadarts.shubutz.core.screens.menu.MenuScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage.Companion.BUTTON_PADDING
 
-/**
- * Handles the menu's display.
- */
 class MenuScreenView(
     private val assetsManager: GameAssetManager,
     private val versionName: String,
     private val stage: GameStage,
-    private val soundPlayer: SoundPlayer
-) : Disposable, Notifier<MenuScreenViewEventsSubscriber> {
+    private val soundPlayer: SoundPlayer,
+    private val menuScreen: MenuScreen
+) : Disposable {
 
 
     private lateinit var logoTable: Table
@@ -42,11 +40,7 @@ class MenuScreenView(
     private var mainMenuTable = Table()
     private var difficultySelectionTable = Table()
     private var loadingAnimationRenderer = LoadingAnimationHandler()
-    override val subscribers = HashSet<MenuScreenViewEventsSubscriber>()
 
-    /**
-     * Adding loading animation.
-     */
     fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: BeginGameAction) {
         if (!loadingDone) {
             loadingAnimationRenderer.addLoadingAnimation(assetsManager, stage)
@@ -55,18 +49,12 @@ class MenuScreenView(
         }
     }
 
-    /**
-     * Renders the stage and the loading animation.
-     */
     fun render(delta: Float) {
         stage.act(delta)
         stage.draw()
-        loadingAnimationRenderer.render(subscribers)
+        loadingAnimationRenderer.render(menuScreen)
     }
 
-    /**
-     * Handles loading animation finish and calls to add an interface.
-     */
     fun finishLoadingAnimationAndDisplayMenu(beginGameAction: BeginGameAction) {
         loadingAnimationRenderer.flyOutBricks(
             assetsManager.getSound(SoundsDefinitions.FLYBY),
@@ -78,6 +66,20 @@ class MenuScreenView(
             difficultySelectionTable.isVisible = false
             stage.addActor(difficultySelectionTable)
         }
+    }
+
+    override fun dispose() {
+
+    }
+
+    fun clearScreen() {
+        mainMenuTable.remove()
+        difficultySelectionTable.remove()
+        versionLabel.remove()
+    }
+
+    class BrickAnimation : Table() {
+        var ready: Boolean = false
     }
 
     private fun addUserInterface(beginGameAction: BeginGameAction) {
@@ -219,23 +221,6 @@ class MenuScreenView(
             LOGO_PADDING_BOTTOM, 0F
         ).colspan(2).row()
         return logoTable
-    }
-
-    override fun dispose() {
-
-    }
-
-    fun clearScreen() {
-        mainMenuTable.remove()
-        difficultySelectionTable.remove()
-        versionLabel.remove()
-    }
-
-    /**
-     * Represents the loading animation.
-     */
-    class BrickAnimation : Table() {
-        var ready: Boolean = false
     }
 
     companion object {

@@ -23,7 +23,7 @@ android {
     }
     buildTypes {
         release {
-            isDebuggable = true
+            isDebuggable = false
         }
         debug {
             isDebuggable = true

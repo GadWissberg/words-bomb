@@ -16,7 +16,6 @@ import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
-import com.gadarts.shubutz.core.screens.menu.view.MenuScreenViewEventsSubscriber
 
 class LoadingAnimationHandler {
     private var loadingReady: Boolean = false
@@ -48,11 +47,11 @@ class LoadingAnimationHandler {
         brick4 = addLoadingBrick(stage, texture, style, "ן", -halfWidth - texture.width)
     }
 
-    fun render(subscribers: HashSet<MenuScreenViewEventsSubscriber>) {
+    fun render(menuScreen: MenuScreen) {
         if (oneOfBricksMissing()) return
         if (!loadingReady && brick1!!.ready && brick2!!.ready && brick3!!.ready && brick4!!.ready) {
             loadingReady = true
-            subscribers.forEach { it.onLoadingAnimationReady() }
+            menuScreen.onLoadingAnimationReady()
         }
     }
 

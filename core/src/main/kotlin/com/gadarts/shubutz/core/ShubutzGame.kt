@@ -6,7 +6,7 @@ import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.screens.GameScreen
 import com.gadarts.shubutz.core.screens.game.GamePlayScreenImpl
 import com.gadarts.shubutz.core.screens.game.GlobalHandlers
-import com.gadarts.shubutz.core.screens.menu.MenuScreen
+import com.gadarts.shubutz.core.screens.menu.MenuScreenImpl
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 
@@ -56,10 +56,11 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     }
 
     override fun goToMenu() {
-        if (getScreen() is MenuScreen) return
+        if (getScreen() is MenuScreenImpl) return
         screen?.dispose()
-        val menuScreen = MenuScreen(globalHandlers.assetsManager, android, this, stage, soundPlayer)
-        setScreen(menuScreen)
+        val menuScreenImpl =
+            MenuScreenImpl(globalHandlers.assetsManager, android, this, stage, soundPlayer)
+        setScreen(menuScreenImpl)
     }
 
     override fun goToPlayScreen(selectedDifficulty: Difficulties) {
