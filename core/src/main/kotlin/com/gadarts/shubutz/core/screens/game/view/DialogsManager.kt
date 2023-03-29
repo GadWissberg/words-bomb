@@ -23,16 +23,19 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import java.util.*
 
 class DialogsManager(private val soundPlayer: SoundPlayer) {
-    private fun addDialogDescription(
+    private fun addDialogText(
         assetsManager: GameAssetManager,
         dialog: Table,
         description: String,
-        colSpan: Int = 1
+        colSpan: Int = 1,
+        topPadding: Float = 0F,
+        bottomPadding: Float = DIALOG_DESCRIPTION_PADDING_BOTTOM
     ) {
         val style = Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
         val text = Label(fixHebrewDescription(description), style)
         text.setAlignment(Align.right)
-        dialog.add(text).pad(0F, 0F, DIALOG_DESCRIPTION_PADDING_BOTTOM, 0F).colspan(colSpan).row()
+        dialog.add(text).pad(topPadding, 0F, bottomPadding, 0F).colspan(colSpan)
+            .row()
     }
 
     private fun fixHebrewDescription(text: String): CharSequence {
@@ -112,11 +115,13 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         onClick: (() -> Unit)? = null,
         text: String,
         newRowAfter: Boolean = true,
-        dialogName: String
+        dialogName: String,
+        topPadding: Float = DIALOG_BUTTON_PADDING
     ): ImageTextButton {
         val clickListener = onClick ?: { stage.closeDialog(dialogName) }
         val button = createDialogButton(stage, gameAssetManager, text.reversed(), clickListener)
-        val cell = dialogLayout.add(button).pad(DIALOG_BUTTON_PADDING)
+        val cell = dialogLayout.add(button)
+            .pad(topPadding, DIALOG_BUTTON_PADDING, DIALOG_BUTTON_PADDING, DIALOG_BUTTON_PADDING)
         if (newRowAfter) {
             cell.row()
         }
@@ -189,7 +194,7 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         stage: GameStage,
     ) {
         addHeaderToDialog(gameAssetManager, layout, COINS_DIALOG_HEADER)
-        addDialogDescription(gameAssetManager, layout, COINS_DIALOG_DESCRIPTION)
+        addDialogText(gameAssetManager, layout, COINS_DIALOG_DESCRIPTION)
         InAppProducts.values().forEach {
             val id = it.name.lowercase(Locale.ROOT)
             if (products.containsKey(id)) {
@@ -203,7 +208,42 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
                 )
             }
         }
+        addVideoSection(gameAssetManager, layout, stage)
         placeDialogInTheMiddle(layout)
+    }
+
+    private fun addVideoSection(
+        gameAssetManager: GameAssetManager,
+        layout: Table,
+        stage: GameStage
+    ) {
+        addDialogText(
+            gameAssetManager,
+            layout,
+            COINS_DIALOG_DESCRIPTION_2,
+            topPadding = COINS_DIALOG_DESCRIPTION_2_TOP_PADDING,
+            bottomPadding = 0F
+        )
+        addVideoButton(stage, gameAssetManager, layout)
+    }
+
+    private fun addVideoButton(
+        stage: GameStage,
+        gameAssetManager: GameAssetManager,
+        layout: Table
+    ) {
+        val button = addDialogButton(
+            stage,
+            gameAssetManager,
+            layout,
+            text = COINS_DIALOG_BUTTON_VIDEO,
+            dialogName = COINS_DIALOG_NAME,
+            topPadding = 0F
+        )
+        val image = Image(gameAssetManager.getTexture(TexturesDefinitions.POPCORN))
+        image.setScaling(Scaling.none)
+        val cell = button.add(image).pad(COINS_DIALOG_BUTTON_VIDEO_ICON_PADDING)
+        cell.size(cell.prefWidth, COINS_DIALOG_BUTTON_VIDEO_PADDING)
     }
 
     fun openBuyCoinsDialog(
@@ -265,7 +305,7 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         description: String
     ) {
         addHeaderToDialog(assetsManager, layout, header, 2)
-        addDialogDescription(assetsManager, layout, description, 2)
+        addDialogText(assetsManager, layout, description, 2)
     }
 
     private fun addExitDialogButtons(
@@ -352,6 +392,11 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         private const val COINS_DIALOG_HEADER = "קבל עוד מטבעות"
         private const val COINS_DIALOG_DESCRIPTION =
             "לרשותך מס' אפשרויות להשיג\nעוד מטבעות.\nכל רכישה תסיר את כל הפרסומות!"
+        private const val COINS_DIALOG_DESCRIPTION_2 = "או צפייה בסרטון:"
+        private const val COINS_DIALOG_DESCRIPTION_2_TOP_PADDING = 40F
+        private const val COINS_DIALOG_BUTTON_VIDEO = "צפייה שווה 4 מטבעות"
+        private const val COINS_DIALOG_BUTTON_VIDEO_PADDING = 128F
+        private const val COINS_DIALOG_BUTTON_VIDEO_ICON_PADDING = 20F
         private const val DIALOG_DESCRIPTION_PADDING_BOTTOM = 64F
         private const val DIALOG_BUTTON_PADDING = 32F
         private const val FLASH_EFFECT_DURATION = 4F
