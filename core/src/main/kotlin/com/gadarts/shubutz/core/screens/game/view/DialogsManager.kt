@@ -1,5 +1,6 @@
 package com.gadarts.shubutz.core.screens.game.view
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
@@ -10,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Scaling
-import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -19,10 +19,11 @@ import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
+import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import java.util.*
 
-class DialogsManager(private val soundPlayer: SoundPlayer) {
+class DialogsManager(private val globalHandlers: GlobalHandlers) {
     private fun addDialogText(
         assetsManager: GameAssetManager,
         dialog: Table,
@@ -69,7 +70,6 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
     ) {
         val button = addDialogButton(
             stage,
-            gameAssetManager,
             dialog,
             {
                 if (product != null) {
@@ -110,7 +110,6 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
 
     private fun addDialogButton(
         stage: GameStage,
-        gameAssetManager: GameAssetManager,
         dialogLayout: Table,
         onClick: (() -> Unit)? = null,
         text: String,
@@ -119,7 +118,7 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         topPadding: Float = DIALOG_BUTTON_PADDING
     ): ImageTextButton {
         val clickListener = onClick ?: { stage.closeDialog(dialogName) }
-        val button = createDialogButton(stage, gameAssetManager, text.reversed(), clickListener)
+        val button = createDialogButton(stage, text.reversed(), clickListener)
         val cell = dialogLayout.add(button)
             .pad(topPadding, DIALOG_BUTTON_PADDING, DIALOG_BUTTON_PADDING, DIALOG_BUTTON_PADDING)
         if (newRowAfter) {
@@ -162,39 +161,41 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
 
     private fun createDialogButton(
         stage: GameStage,
-        gameAssetManager: GameAssetManager,
         text: String,
         onClick: (() -> Unit)
     ): ImageTextButton {
-        val button = ImageTextButton(text, stage.createNinePatchButtonStyle(gameAssetManager))
-        addClickListenerToButton(button, onClick, gameAssetManager)
+        val button =
+            ImageTextButton(text, stage.createNinePatchButtonStyle(globalHandlers.assetsManager))
+        addClickListenerToButton(button, onClick)
         return button
     }
 
     private fun addClickListenerToButton(
         button: Button,
         runnable: Runnable,
-        assetsManager: GameAssetManager
     ) {
         button.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 super.clicked(event, x, y)
                 runnable.run()
-                soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
+                globalHandlers.soundPlayer.playSound(
+                    globalHandlers.assetsManager.getSound(
+                        SoundsDefinitions.BUTTON
+                    )
+                )
             }
         })
     }
 
 
     private fun addCoinsDialogComponents(
-        gameAssetManager: GameAssetManager,
         layout: Table,
         products: Map<String, Product>,
         gamePlayScreen: GamePlayScreen,
         stage: GameStage,
     ) {
-        addHeaderToDialog(gameAssetManager, layout, COINS_DIALOG_HEADER)
-        addDialogText(gameAssetManager, layout, COINS_DIALOG_DESCRIPTION)
+        addHeaderToDialog(globalHandlers.assetsManager, layout, COINS_DIALOG_HEADER)
+        addDialogText(globalHandlers.assetsManager, layout, COINS_DIALOG_DESCRIPTION)
         InAppProducts.values().forEach {
             val id = it.name.lowercase(Locale.ROOT)
             if (products.containsKey(id)) {
@@ -203,44 +204,42 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
                     products[id],
                     stage = stage,
                     definition = it,
-                    gameAssetManager,
+                    globalHandlers.assetsManager,
                     gamePlayScreen
                 )
             }
         }
-        addVideoSection(gameAssetManager, layout, stage)
+        addVideoSection(layout, stage)
         placeDialogInTheMiddle(layout)
     }
 
     private fun addVideoSection(
-        gameAssetManager: GameAssetManager,
         layout: Table,
-        stage: GameStage
+        stage: GameStage,
     ) {
         addDialogText(
-            gameAssetManager,
+            globalHandlers.assetsManager,
             layout,
             COINS_DIALOG_DESCRIPTION_2,
             topPadding = COINS_DIALOG_DESCRIPTION_2_TOP_PADDING,
             bottomPadding = 0F
         )
-        addVideoButton(stage, gameAssetManager, layout)
+        addVideoButton(stage, layout)
     }
 
     private fun addVideoButton(
         stage: GameStage,
-        gameAssetManager: GameAssetManager,
-        layout: Table
+        layout: Table,
     ) {
         val button = addDialogButton(
-            stage,
-            gameAssetManager,
-            layout,
+            stage = stage,
+            dialogLayout = layout,
             text = COINS_DIALOG_BUTTON_VIDEO,
             dialogName = COINS_DIALOG_NAME,
-            topPadding = 0F
+            topPadding = 0F,
+            onClick = { Gdx.app.postRunnable { globalHandlers.androidInterface.loadAd() } }
         )
-        val image = Image(gameAssetManager.getTexture(TexturesDefinitions.POPCORN))
+        val image = Image(globalHandlers.assetsManager.getTexture(TexturesDefinitions.POPCORN))
         image.setScaling(Scaling.none)
         val cell = button.add(image).pad(COINS_DIALOG_BUTTON_VIDEO_ICON_PADDING)
         cell.size(cell.prefWidth, COINS_DIALOG_BUTTON_VIDEO_PADDING)
@@ -248,27 +247,26 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
 
     fun openBuyCoinsDialog(
         stage: GameStage,
-        assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
     ) {
-        val keyFrames = assetsManager.getAtlas(AtlasesDefinitions.LOADING).regions
+        val keyFrames = globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING).regions
         val loadingAnimation = LoadingAnimation(keyFrames)
-        val dialogLayout = Table()
-        dialogLayout.add(loadingAnimation).row()
-        stage.addDialog(dialogLayout, COINS_DIALOG_LOADING_NAME, assetsManager) {
+        val layout = Table()
+        layout.add(loadingAnimation).row()
+        stage.addDialog(layout, COINS_DIALOG_LOADING_NAME, globalHandlers.assetsManager) {
             gamePlayScreen.onOpenProductsMenu({
                 loadingAnimation.remove()
-                dialogLayout.remove()
-                stage.addDialog(dialogLayout, COINS_DIALOG_NAME, assetsManager)
+                layout.remove()
+                stage.addDialog(layout, COINS_DIALOG_NAME, globalHandlers.assetsManager)
                 if (it.isNotEmpty()) {
-                    addCoinsDialogComponents(assetsManager, dialogLayout, it, gamePlayScreen, stage)
+                    addCoinsDialogComponents(layout, it, gamePlayScreen, stage)
                 }
-                dialogLayout.pack()
+                layout.pack()
                 stage.closeDialog(COINS_DIALOG_LOADING_NAME)
             }, {
                 loadingAnimation.remove()
-                dialogLayout.add(ViewUtils.createDialogLabel(it, assetsManager))
-                dialogLayout.pack()
+                layout.add(ViewUtils.createDialogLabel(it, globalHandlers.assetsManager))
+                layout.pack()
             })
         }
     }
@@ -283,7 +281,7 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
             EXIT_DIALOG_HEADER,
             EXIT_DIALOG_DESCRIPTION
         )
-        addExitDialogButtons(gamePlayScreen, stage, assetsManager, dialogView)
+        addExitDialogButtons(gamePlayScreen, stage, dialogView)
         stage.addDialog(dialogView, EXIT_DIALOG_NAME, assetsManager)
         placeDialogInTheMiddle(dialogView)
     }
@@ -311,13 +309,11 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
     private fun addExitDialogButtons(
         gamePlayScreen: GamePlayScreen,
         stage: GameStage,
-        assetsManager: GameAssetManager,
         layout: Table
     ) {
         val onClick = { gamePlayScreen.onQuitSession() }
         addDialogButton(
             stage,
-            assetsManager,
             layout,
             onClick,
             EXIT_DIALOG_BUTTON_OK,
@@ -326,7 +322,6 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         )
         addDialogButton(
             stage = stage,
-            gameAssetManager = assetsManager,
             dialogLayout = layout,
             text = EXIT_DIALOG_BUTTON_NO,
             dialogName = EXIT_DIALOG_NAME
@@ -368,7 +363,6 @@ class DialogsManager(private val soundPlayer: SoundPlayer) {
         )
         addDialogButton(
             stage = stage,
-            gameAssetManager = assetsManager,
             dialogLayout = dialogView,
             text = COINS_PURCHASED_DIALOG_BUTTON_OK,
             dialogName = COINS_PURCHASED_DIALOG_NAME,

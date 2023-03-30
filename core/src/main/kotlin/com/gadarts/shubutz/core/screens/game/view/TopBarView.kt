@@ -172,7 +172,7 @@ class TopBarView(
         val leftSideTable = Table()
         leftSideTable.debug = DebugSettings.SHOW_UI_BORDERS
         addBackButton(leftSideTable, assetsManager, gamePlayScreen, dialogsManager)
-        addBuyCoinsButton(leftSideTable, assetsManager, dialogsManager)
+        addBuyCoinsButton(leftSideTable, dialogsManager)
         table.add(leftSideTable).expandX().left()
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
         addCoinsLabel(gameModel, font80, table, assetsManager)
@@ -180,10 +180,9 @@ class TopBarView(
 
     private fun addBuyCoinsButton(
         table: Table,
-        assetsManager: GameAssetManager,
         dialogsManager: DialogsManager,
     ) {
-        val coinsButton = createBuyCoinsButton(assetsManager, table, dialogsManager)
+        val coinsButton = createBuyCoinsButton(table, dialogsManager)
         table.add(coinsButton).pad(
             COINS_BUTTON_PAD_TOP,
             COINS_BUTTON_PAD_LEFT,
@@ -193,24 +192,19 @@ class TopBarView(
     }
 
     private fun createBuyCoinsButton(
-        assetsManager: GameAssetManager,
         table: Table,
         dialogsManager: DialogsManager,
     ): ImageButton {
         val coinsButton = ImageButton(
-            TextureRegionDrawable(assetsManager.getTexture(COINS_BUTTON_UP)),
-            TextureRegionDrawable(assetsManager.getTexture(COINS_BUTTON_DOWN))
+            TextureRegionDrawable(globalHandlers.assetsManager.getTexture(COINS_BUTTON_UP)),
+            TextureRegionDrawable(globalHandlers.assetsManager.getTexture(COINS_BUTTON_DOWN))
         )
         addClickListenerToButton(
             coinsButton,
             {
-                dialogsManager.openBuyCoinsDialog(
-                    table.stage as GameStage,
-                    assetsManager,
-                    gamePlayScreen
-                )
+                dialogsManager.openBuyCoinsDialog(table.stage as GameStage, gamePlayScreen)
             },
-            assetsManager
+            globalHandlers.assetsManager
         )
         return coinsButton
     }

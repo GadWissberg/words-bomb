@@ -30,7 +30,7 @@ class GamePlayScreenViewComponentsManager(
 ) : Disposable {
 
     private lateinit var revealLetterButton: ImageTextButton
-    private var dialogsManager = DialogsManager(globalHandlers.soundPlayer)
+    private var dialogsManager = DialogsManager(globalHandlers)
     lateinit var targetPhraseView: TargetPhraseView
     lateinit var optionsView: OptionsView
     val bombView = BombView(globalHandlers)
@@ -282,7 +282,7 @@ class GamePlayScreenViewComponentsManager(
     }
 
     fun onLetterRevealFailedNotEnoughCoins() {
-        dialogsManager.openBuyCoinsDialog(stage, globalHandlers.assetsManager, gamePlayScreen)
+        dialogsManager.openBuyCoinsDialog(stage, gamePlayScreen)
     }
 
     fun onPurchasedCoins(gameModel: GameModel, amount: Int) {

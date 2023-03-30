@@ -18,7 +18,7 @@ import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 
 class LoadingAnimationHandler {
-    private var loadingReady: Boolean = false
+    var loadingAnimationFinished: Boolean = false
     private var brick1: MenuScreenView.BrickAnimation? = null
     private var brick2: MenuScreenView.BrickAnimation? = null
     private var brick3: MenuScreenView.BrickAnimation? = null
@@ -49,9 +49,9 @@ class LoadingAnimationHandler {
 
     fun render(menuScreen: MenuScreen) {
         if (oneOfBricksMissing()) return
-        if (!loadingReady && brick1!!.ready && brick2!!.ready && brick3!!.ready && brick4!!.ready) {
-            loadingReady = true
-            menuScreen.onLoadingAnimationReady()
+        if (!loadingAnimationFinished && brick1!!.ready && brick2!!.ready && brick3!!.ready && brick4!!.ready) {
+            loadingAnimationFinished = true
+            menuScreen.onLoadingAnimationFinished()
         }
     }
 

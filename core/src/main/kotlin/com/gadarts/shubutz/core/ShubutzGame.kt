@@ -18,12 +18,18 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     override var loadingDone: Boolean = false
 
     override fun create() {
+        android.initializeAds { gameReady() }
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
-        globalHandlers = GlobalHandlers()
+        globalHandlers = GlobalHandlers(android)
         loadAssets()
         Gdx.input.inputProcessor = InputMultiplexer()
         createStage()
         goToMenu()
+    }
+
+    private fun gameReady() {
+        loadingDone = true
+        (screen as MenuScreenImpl).onGameReady()
     }
 
     private fun createStage() {

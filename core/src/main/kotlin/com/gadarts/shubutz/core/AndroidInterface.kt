@@ -13,4 +13,6 @@ interface AndroidInterface {
     )
 
     fun launchBillingFlow(selectedProduct: Product)
+    fun initializeAds(onFinish: () -> Unit)
+    fun loadAd()
 }

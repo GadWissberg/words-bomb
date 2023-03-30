@@ -39,8 +39,7 @@ class MenuScreenView(
     private lateinit var versionLabel: Label
     private var mainMenuTable = Table()
     private var difficultySelectionTable = Table()
-    private var loadingAnimationRenderer = LoadingAnimationHandler()
-
+    var loadingAnimationRenderer = LoadingAnimationHandler()
     fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: BeginGameAction) {
         if (!loadingDone) {
             loadingAnimationRenderer.addLoadingAnimation(assetsManager, stage)
@@ -76,10 +75,6 @@ class MenuScreenView(
         mainMenuTable.remove()
         difficultySelectionTable.remove()
         versionLabel.remove()
-    }
-
-    class BrickAnimation : Table() {
-        var ready: Boolean = false
     }
 
     private fun addUserInterface(beginGameAction: BeginGameAction) {
@@ -221,6 +216,10 @@ class MenuScreenView(
             LOGO_PADDING_BOTTOM, 0F
         ).colspan(2).row()
         return logoTable
+    }
+
+    class BrickAnimation : Table() {
+        var ready: Boolean = false
     }
 
     companion object {

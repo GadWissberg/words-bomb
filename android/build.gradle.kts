@@ -55,6 +55,7 @@ dependencies {
 
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
     implementation("com.android.billingclient:billing:5.1.0")
+    implementation("com.google.android.gms:play-services-ads:22.0.0")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a")

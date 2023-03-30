@@ -4,6 +4,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import com.android.billingclient.api.*
@@ -15,6 +16,11 @@ import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
@@ -141,6 +147,35 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         if (billingResult.responseCode != BillingResponseCode.OK) {
             toast(billingResult.debugMessage)
         }
+    }
+
+    override fun initializeAds(onFinish: () -> Unit) {
+        MobileAds.initialize(this) { onFinish.invoke() }
+    }
+
+    override fun loadAd() {
+        val adRequest = AdRequest.Builder().build()
+        val activity = this
+        RewardedAd.load(
+            this,
+            "ca-app-pub-3940256099942544/5224354917",
+            adRequest,
+            object : RewardedAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    adError.toString().let { Log.d("shit", it) }
+                }
+
+                override fun onAdLoaded(ad: RewardedAd) {
+                    Log.d("yay", "Ad was loaded.")
+                    ad.let {
+                        it.show(activity) { rewardItem ->
+                            val rewardAmount = rewardItem.amount
+                            val rewardType = rewardItem.type
+                            Log.d("gad", "User earned the reward. ${rewardAmount},$rewardType")
+                        }
+                    }
+                }
+            })
     }
 
     private fun fetchProducts(
