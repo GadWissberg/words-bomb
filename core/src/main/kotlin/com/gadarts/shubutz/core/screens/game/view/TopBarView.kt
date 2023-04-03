@@ -86,7 +86,7 @@ class TopBarView(
         gameModel: GameModel,
         gamePlayScreen: GamePlayScreen,
         stage: GameStage,
-        dialogsManager: DialogsManager
+        dialogsManager: DialogsManager,
     ) {
         stage.addActor(this)
         addTopPart(stage, assetsManager, gamePlayScreen, gameModel, dialogsManager)
@@ -116,10 +116,10 @@ class TopBarView(
 
     private fun addTopPart(
         stage: GameStage,
-        assetsManager: GameAssetManager,
+        am: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
         gameModel: GameModel,
-        dialogsManager: DialogsManager
+        dialogs: DialogsManager,
     ) {
         topPartTexture = createTopPartTexture(stage, TOP_BAR_COLOR)
         categoryBackgroundTexture = createTopPartTexture(stage, CATEGORY_BACKGROUND_COLOR)
@@ -127,7 +127,7 @@ class TopBarView(
         topPartTable.background = TextureRegionDrawable(topPartTexture)
         topPartTable.debug = DebugSettings.SHOW_UI_BORDERS
         topPartTable.setSize(ShubutzGame.RESOLUTION_WIDTH.toFloat(), TOP_PART_HEIGHT.toFloat())
-        addTopPartComponents(topPartTable, assetsManager, gamePlayScreen, gameModel, dialogsManager)
+        addTopPartComponents(topPartTable, am, gamePlayScreen, gameModel, dialogs)
         add(topPartTable).row()
     }
 
@@ -167,7 +167,7 @@ class TopBarView(
         assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
         gameModel: GameModel,
-        dialogsManager: DialogsManager
+        dialogsManager: DialogsManager,
     ) {
         val leftSideTable = Table()
         leftSideTable.debug = DebugSettings.SHOW_UI_BORDERS
@@ -247,7 +247,7 @@ class TopBarView(
         categoryLabel.toFront()
     }
 
-    fun applyWinCoinEffect(coinsAmount: Int) {
+    fun onCorrectGuess(coinsAmount: Int) {
         if (coinsAmount > 0) {
             addCoinValueChangedLabel(coinsAmount)
         }
@@ -260,8 +260,19 @@ class TopBarView(
     }
 
     fun onLetterRevealed(gameModel: GameModel, cost: Int) {
-        addCoinValueChangedLabel(-cost)
+        applyCoinsViewChangeEffect(cost, gameModel)
+    }
+
+    private fun applyCoinsViewChangeEffect(
+        delta: Int,
+        gameModel: GameModel
+    ) {
+        addCoinValueChangedLabel(delta)
         coinsLabel.setText(gameModel.coins)
+    }
+
+    fun onRewardForVideoAd(rewardAmount: Int, gameModel: GameModel) {
+        applyCoinsViewChangeEffect(rewardAmount, gameModel)
     }
 
     companion object {

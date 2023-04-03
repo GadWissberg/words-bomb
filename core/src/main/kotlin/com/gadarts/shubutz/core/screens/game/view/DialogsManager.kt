@@ -1,6 +1,5 @@
 package com.gadarts.shubutz.core.screens.game.view
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
@@ -23,7 +22,10 @@ import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import java.util.*
 
-class DialogsManager(private val globalHandlers: GlobalHandlers) {
+class DialogsManager(
+    private val globalHandlers: GlobalHandlers,
+    private val effectsHandler: EffectsHandler
+) {
     private fun addDialogText(
         assetsManager: GameAssetManager,
         dialog: Table,
@@ -193,6 +195,7 @@ class DialogsManager(private val globalHandlers: GlobalHandlers) {
         products: Map<String, Product>,
         gamePlayScreen: GamePlayScreen,
         stage: GameStage,
+        onVideoDone: () -> Unit,
     ) {
         addHeaderToDialog(globalHandlers.assetsManager, layout, COINS_DIALOG_HEADER)
         addDialogText(globalHandlers.assetsManager, layout, COINS_DIALOG_DESCRIPTION)
@@ -209,13 +212,15 @@ class DialogsManager(private val globalHandlers: GlobalHandlers) {
                 )
             }
         }
-        addVideoSection(layout, stage)
+        addVideoSection(layout, stage, onVideoDone, gamePlayScreen)
         placeDialogInTheMiddle(layout)
     }
 
     private fun addVideoSection(
         layout: Table,
         stage: GameStage,
+        onVideoDone: () -> Unit,
+        gamePlayScreen: GamePlayScreen,
     ) {
         addDialogText(
             globalHandlers.assetsManager,
@@ -224,12 +229,14 @@ class DialogsManager(private val globalHandlers: GlobalHandlers) {
             topPadding = COINS_DIALOG_DESCRIPTION_2_TOP_PADDING,
             bottomPadding = 0F
         )
-        addVideoButton(stage, layout)
+        addVideoButton(stage, layout, onVideoDone, gamePlayScreen)
     }
 
     private fun addVideoButton(
         stage: GameStage,
         layout: Table,
+        onVideoDone: () -> Unit,
+        gamePlayScreen: GamePlayScreen,
     ) {
         val button = addDialogButton(
             stage = stage,
@@ -237,7 +244,9 @@ class DialogsManager(private val globalHandlers: GlobalHandlers) {
             text = COINS_DIALOG_BUTTON_VIDEO,
             dialogName = COINS_DIALOG_NAME,
             topPadding = 0F,
-            onClick = { Gdx.app.postRunnable { globalHandlers.androidInterface.loadAd() } }
+            onClick = {
+                gamePlayScreen.onShowVideoAdClicked(onVideoDone)
+            }
         )
         val image = Image(globalHandlers.assetsManager.getTexture(TexturesDefinitions.POPCORN))
         image.setScaling(Scaling.none)
@@ -253,13 +262,19 @@ class DialogsManager(private val globalHandlers: GlobalHandlers) {
         val loadingAnimation = LoadingAnimation(keyFrames)
         val layout = Table()
         layout.add(loadingAnimation).row()
+        gamePlayScreen.onBuyCoinsDialogOpened()
         stage.addDialog(layout, COINS_DIALOG_LOADING_NAME, globalHandlers.assetsManager) {
             gamePlayScreen.onOpenProductsMenu({
                 loadingAnimation.remove()
                 layout.remove()
                 stage.addDialog(layout, COINS_DIALOG_NAME, globalHandlers.assetsManager)
                 if (it.isNotEmpty()) {
-                    addCoinsDialogComponents(layout, it, gamePlayScreen, stage)
+                    addCoinsDialogComponents(layout, it, gamePlayScreen, stage) {
+                        effectsHandler.applyPartyEffect(
+                            globalHandlers,
+                            stage
+                        )
+                    }
                 }
                 layout.pack()
                 stage.closeDialog(COINS_DIALOG_LOADING_NAME)

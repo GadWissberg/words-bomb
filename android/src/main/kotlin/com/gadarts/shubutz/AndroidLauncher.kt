@@ -25,6 +25,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
+    private lateinit var loadedAd: RewardedAd
     private lateinit var game: ShubutzGame
     private var versionName = "0.0.0"
     private val purchasesUpdatedListener =
@@ -155,27 +156,35 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
     override fun loadAd() {
         val adRequest = AdRequest.Builder().build()
-        val activity = this
-        RewardedAd.load(
-            this,
-            "ca-app-pub-3940256099942544/5224354917",
-            adRequest,
-            object : RewardedAdLoadCallback() {
-                override fun onAdFailedToLoad(adError: LoadAdError) {
-                    adError.toString().let { Log.d("shit", it) }
-                }
-
-                override fun onAdLoaded(ad: RewardedAd) {
-                    Log.d("yay", "Ad was loaded.")
-                    ad.let {
-                        it.show(activity) { rewardItem ->
-                            val rewardAmount = rewardItem.amount
-                            val rewardType = rewardItem.type
-                            Log.d("gad", "User earned the reward. ${rewardAmount},$rewardType")
-                        }
+        runOnUiThread {
+            RewardedAd.load(
+                this,
+                "ca-app-pub-3940256099942544/5224354917",
+                adRequest,
+                object : RewardedAdLoadCallback() {
+                    override fun onAdFailedToLoad(adError: LoadAdError) {
+                        adError.toString().let { Log.d("shit", it) }
                     }
+
+                    override fun onAdLoaded(ad: RewardedAd) {
+                        loadedAd = ad
+                    }
+                })
+        }
+
+    }
+
+    override fun displayRewardedAd(onVideoDone: () -> Unit) {
+        val activity = this
+        runOnUiThread {
+            loadedAd.let {
+                it.show(activity) { rewardItem ->
+                    val rewardAmount = rewardItem.amount
+                    game.onRewardForVideoAd(rewardAmount)
+                    onVideoDone.invoke()
                 }
-            })
+            }
+        }
     }
 
     private fun fetchProducts(

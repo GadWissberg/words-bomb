@@ -46,6 +46,11 @@ class GamePlayScreenImpl(
         gamePlayScreenView.displayFailedPurchase(message)
     }
 
+    override fun onRewardForVideoAd(rewardAmount: Int) {
+        gameLogicHandler.onRewardForVideoAd(rewardAmount, gameModel)
+        gamePlayScreenView.onRewardForVideoAd(rewardAmount)
+    }
+
     override fun show() {
         gameLogicHandler = GameLogicHandler(globalHandlers.assetsManager.phrases, android, this)
         gameLogicHandler.beginGame(gameModel)
@@ -128,6 +133,16 @@ class GamePlayScreenImpl(
 
     override fun onLetterRevealFailedNotEnoughCoins() {
         gamePlayScreenView.onLetterRevealFailedNotEnoughCoins()
+    }
+
+    override fun onBuyCoinsDialogOpened() {
+        gameLogicHandler.onBuyCoinsDialogOpened()
+    }
+
+    override fun onShowVideoAdClicked(onVideoDone: () -> Unit) {
+        Gdx.app.postRunnable {
+            globalHandlers.androidInterface.displayRewardedAd(onVideoDone)
+        }
     }
 
     override fun onIncorrectGuess(gameOver: Boolean) {

@@ -1,5 +1,6 @@
 package com.gadarts.shubutz.core.business
 
+import com.badlogic.gdx.Gdx
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.DebugSettings.TEST_PHRASE
@@ -129,6 +130,17 @@ class GameLogicHandler(
             suffixLettersReverse[letter] ?: letter,
             REVEAL_LETTER_COST
         )
+    }
+
+    fun onRewardForVideoAd(rewardAmount: Int, gameModel: GameModel) {
+        addCoinsValueAndSave(gameModel, rewardAmount)
+        androidInterface.loadAd()
+    }
+
+    fun onBuyCoinsDialogOpened() {
+        Gdx.app.postRunnable {
+            androidInterface.loadAd()
+        }
     }
 
     companion object {

@@ -11,9 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Disposable
-import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
-import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.ParticleEffectsDefinitions
@@ -33,13 +31,13 @@ class GamePlayScreenView(
 ) :
     Disposable {
 
+    private val effectsHandler = EffectsHandler()
     private val gamePlayScreenViewComponentsManager =
-        GamePlayScreenViewComponentsManager(globalHandlers, gamePlayScreen, stage)
+        GamePlayScreenViewComponentsManager(globalHandlers, gamePlayScreen, stage, effectsHandler)
     private lateinit var uiTable: Table
     private var font80: BitmapFont =
         globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80)
     private lateinit var letterSize: Vector2
-
     fun onShow() {
         val letterGlyphLayout = GlyphLayout(font80, "א")
         letterSize = Vector2(letterGlyphLayout.width, letterGlyphLayout.height)
@@ -207,17 +205,9 @@ class GamePlayScreenView(
 
     fun onPurchasedCoins(amount: Int) {
         gamePlayScreenViewComponentsManager.onPurchasedCoins(gameModel, amount)
-        val particleEffect =
-            globalHandlers.assetsManager.getParticleEffect(ParticleEffectsDefinitions.PARTY)
-        particleEffect.emitters.forEach {
-            it.spawnWidth.highMin = ShubutzGame.RESOLUTION_WIDTH.toFloat()
-        }
-        val party = ParticleEffectActor(particleEffect)
-        party.setPosition(0F, ShubutzGame.RESOLUTION_HEIGHT.toFloat())
-        stage.addActor(party)
-        party.start()
-        globalHandlers.soundPlayer.playSound(globalHandlers.assetsManager.getSound(SoundsDefinitions.PURCHASED))
+        effectsHandler.applyPartyEffect(globalHandlers, stage)
     }
+
 
     fun displayFailedPurchase(message: String) {
         val dialogView = Table()
@@ -231,6 +221,10 @@ class GamePlayScreenView(
 
     fun onLetterRevealFailedNotEnoughCoins() {
         gamePlayScreenViewComponentsManager.onLetterRevealFailedNotEnoughCoins()
+    }
+
+    fun onRewardForVideoAd(rewardAmount: Int) {
+        gamePlayScreenViewComponentsManager.onRewardForVideoAd(rewardAmount, gameModel)
     }
 
     companion object {

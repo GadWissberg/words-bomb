@@ -31,6 +31,9 @@ class MenuScreenImpl(
 
     }
 
+    override fun onRewardForVideoAd(rewardAmount: Int) {
+    }
+
     override fun show() {
         menuScreenView.onShow(gameLifeCycleManager.loadingDone, goToPlayScreenOnClick())
     }

@@ -26,11 +26,12 @@ import ktx.actors.alpha
 class GamePlayScreenViewComponentsManager(
     private val globalHandlers: GlobalHandlers,
     private val gamePlayScreen: GamePlayScreen,
-    private val stage: GameStage
+    private val stage: GameStage,
+    effectsHandler: EffectsHandler
 ) : Disposable {
 
     private lateinit var revealLetterButton: ImageTextButton
-    private var dialogsManager = DialogsManager(globalHandlers)
+    private var dialogsManager = DialogsManager(globalHandlers, effectsHandler)
     lateinit var targetPhraseView: TargetPhraseView
     lateinit var optionsView: OptionsView
     val bombView = BombView(globalHandlers)
@@ -39,18 +40,18 @@ class GamePlayScreenViewComponentsManager(
 
     fun createViews(
         letterSize: Vector2,
-        assetsManager: GameAssetManager,
+        am: GameAssetManager,
         stage: GameStage,
         gameModel: GameModel,
         gamePlayScreen: GamePlayScreen,
     ) {
-        topBarView.addTopBar(assetsManager, gameModel, gamePlayScreen, stage, dialogsManager)
-        val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
+        topBarView.addTopBar(am, gameModel, gamePlayScreen, stage, dialogsManager)
+        val font80 = am.getFont(FontsDefinitions.VARELA_80)
         targetPhraseView =
-            TargetPhraseView(letterSize, font80, globalHandlers.soundPlayer, assetsManager)
-        targetPhraseView.calculateMaxBricksPerLine(assetsManager)
-        optionsView = OptionsView(stage, globalHandlers.soundPlayer, assetsManager, gameModel)
-        addRevealLetterButton(assetsManager, stage)
+            TargetPhraseView(letterSize, font80, globalHandlers.soundPlayer, am)
+        targetPhraseView.calculateMaxBricksPerLine(am)
+        optionsView = OptionsView(stage, globalHandlers.soundPlayer, am, gameModel)
+        addRevealLetterButton(am, stage)
     }
 
     private fun addRevealLetterButton(
@@ -262,9 +263,6 @@ class GamePlayScreenViewComponentsManager(
         topBarView.dispose()
     }
 
-    /**
-     * Removes all views.
-     */
     fun clear() {
         topBarView.clear()
         bombView.clear()
@@ -273,7 +271,7 @@ class GamePlayScreenViewComponentsManager(
     }
 
     fun onCorrectGuess(coinsAmount: Int) {
-        topBarView.applyWinCoinEffect(coinsAmount)
+        topBarView.onCorrectGuess(coinsAmount)
     }
 
     fun onLetterRevealed(letter: Char, gameModel: GameModel, cost: Int) {
@@ -292,6 +290,10 @@ class GamePlayScreenViewComponentsManager(
             stage,
             amount
         )
+    }
+
+    fun onRewardForVideoAd(rewardAmount: Int, gameModel: GameModel) {
+        topBarView.onRewardForVideoAd(rewardAmount, gameModel)
     }
 
     companion object {

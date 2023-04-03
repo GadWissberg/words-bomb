@@ -18,13 +18,13 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     override var loadingDone: Boolean = false
 
     override fun create() {
-        android.initializeAds { gameReady() }
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
         globalHandlers = GlobalHandlers(android)
         loadAssets()
         Gdx.input.inputProcessor = InputMultiplexer()
         createStage()
         goToMenu()
+        android.initializeAds { gameReady() }
     }
 
     private fun gameReady() {
@@ -79,6 +79,10 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
 
     override fun onFailedPurchase(message: String) {
         (screen as GameScreen).onFailedPurchase(message)
+    }
+
+    fun onRewardForVideoAd(rewardAmount: Int) {
+        (screen as GameScreen).onRewardForVideoAd(rewardAmount)
     }
 
     private fun createGamePlayScreen(selectedDifficulty: Difficulties) =
