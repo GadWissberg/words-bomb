@@ -13,6 +13,7 @@ object DebugSettings {
     const val ENABLE_SOUNDS = true
 
     const val FORCE_NUMBER_OF_COINS = -1
+    const val TEST_REWARDED_AD = false
 
 }
 

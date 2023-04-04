@@ -212,7 +212,10 @@ class DialogsManager(
                 )
             }
         }
-        addVideoSection(layout, stage, onVideoDone, gamePlayScreen)
+        val videoSection = addVideoSection(layout, stage, onVideoDone, gamePlayScreen)
+        gamePlayScreen.onBuyCoinsDialogOpened {
+            videoSection.isVisible = true
+        }
         placeDialogInTheMiddle(layout)
     }
 
@@ -221,21 +224,25 @@ class DialogsManager(
         stage: GameStage,
         onVideoDone: () -> Unit,
         gamePlayScreen: GamePlayScreen,
-    ) {
+    ): Table {
+        val table = Table()
         addDialogText(
-            globalHandlers.assetsManager,
-            layout,
-            COINS_DIALOG_DESCRIPTION_2,
+            assetsManager = globalHandlers.assetsManager,
+            dialog = table,
+            description = COINS_DIALOG_DESCRIPTION_2,
             topPadding = COINS_DIALOG_DESCRIPTION_2_TOP_PADDING,
             bottomPadding = 0F
         )
-        addVideoButton(stage, layout, onVideoDone, gamePlayScreen)
+        addVideoButton(stage, table, onVideoDone, gamePlayScreen)
+        table.isVisible = false
+        layout.add(table)
+        return table
     }
 
     private fun addVideoButton(
         stage: GameStage,
         layout: Table,
-        onVideoDone: () -> Unit,
+        onAdCompleted: () -> Unit,
         gamePlayScreen: GamePlayScreen,
     ) {
         val button = addDialogButton(
@@ -245,7 +252,12 @@ class DialogsManager(
             dialogName = COINS_DIALOG_NAME,
             topPadding = 0F,
             onClick = {
-                gamePlayScreen.onShowVideoAdClicked(onVideoDone)
+                gamePlayScreen.onShowVideoAdClicked({
+                    onAdCompleted.invoke()
+                    layout.isVisible = false
+                }, {
+                    layout.isVisible = false
+                })
             }
         )
         val image = Image(globalHandlers.assetsManager.getTexture(TexturesDefinitions.POPCORN))
@@ -262,7 +274,6 @@ class DialogsManager(
         val loadingAnimation = LoadingAnimation(keyFrames)
         val layout = Table()
         layout.add(loadingAnimation).row()
-        gamePlayScreen.onBuyCoinsDialogOpened()
         stage.addDialog(layout, COINS_DIALOG_LOADING_NAME, globalHandlers.assetsManager) {
             gamePlayScreen.onOpenProductsMenu({
                 loadingAnimation.remove()

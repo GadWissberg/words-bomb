@@ -13,10 +13,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.gadarts.shubutz.core.AndroidInterface
+import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.rewarded.RewardedAd
@@ -154,34 +156,40 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         MobileAds.initialize(this) { onFinish.invoke() }
     }
 
-    override fun loadAd() {
+    override fun loadAd(onLoaded: () -> Unit) {
         val adRequest = AdRequest.Builder().build()
         runOnUiThread {
             RewardedAd.load(
                 this,
-                "ca-app-pub-3940256099942544/5224354917",
+                if (DebugSettings.TEST_REWARDED_AD) REWARDED_AD_UNIT_TEST else REWARDED_AD_UNIT_PROD,
                 adRequest,
                 object : RewardedAdLoadCallback() {
                     override fun onAdFailedToLoad(adError: LoadAdError) {
-                        adError.toString().let { Log.d("shit", it) }
+                        adError.toString().let { Log.d("Rewarded Ad", it) }
                     }
 
                     override fun onAdLoaded(ad: RewardedAd) {
                         loadedAd = ad
+                        onLoaded.invoke()
                     }
                 })
         }
 
     }
 
-    override fun displayRewardedAd(onVideoDone: () -> Unit) {
+    override fun displayRewardedAd(onAdCompleted: () -> Unit, onAdDismissed: () -> Unit) {
         val activity = this
         runOnUiThread {
+            loadedAd.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdDismissedFullScreenContent() {
+                    onAdDismissed.invoke()
+                }
+            }
             loadedAd.let {
                 it.show(activity) { rewardItem ->
                     val rewardAmount = rewardItem.amount
                     game.onRewardForVideoAd(rewardAmount)
-                    onVideoDone.invoke()
+                    onAdCompleted.invoke()
                 }
             }
         }
@@ -215,5 +223,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     companion object {
         private const val SHARED_PREFERENCES_DATA_NAME = "data"
         private const val FAILURE_MESSAGE_IN_APP_PURCHASE = "אופס! קרתה תקלה..."
+        private const val REWARDED_AD_UNIT_TEST = "ca-app-pub-3940256099942544/5224354917"
+        private const val REWARDED_AD_UNIT_PROD = "ca-app-pub-2312113291496409/2061684764"
     }
 }

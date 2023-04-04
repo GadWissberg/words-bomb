@@ -134,12 +134,11 @@ class GameLogicHandler(
 
     fun onRewardForVideoAd(rewardAmount: Int, gameModel: GameModel) {
         addCoinsValueAndSave(gameModel, rewardAmount)
-        androidInterface.loadAd()
     }
 
-    fun onBuyCoinsDialogOpened() {
+    fun onBuyCoinsDialogOpened(onLoaded: () -> Unit) {
         Gdx.app.postRunnable {
-            androidInterface.loadAd()
+            androidInterface.loadAd(onLoaded)
         }
     }
 

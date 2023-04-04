@@ -14,6 +14,6 @@ interface AndroidInterface {
 
     fun launchBillingFlow(selectedProduct: Product)
     fun initializeAds(onFinish: () -> Unit)
-    fun loadAd()
-    fun displayRewardedAd(onVideoDone: () -> Unit)
+    fun loadAd(onLoaded: () -> Unit)
+    fun displayRewardedAd(onAdCompleted: () -> Unit, onAdDismissed: () -> Unit)
 }

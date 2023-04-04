@@ -135,13 +135,13 @@ class GamePlayScreenImpl(
         gamePlayScreenView.onLetterRevealFailedNotEnoughCoins()
     }
 
-    override fun onBuyCoinsDialogOpened() {
-        gameLogicHandler.onBuyCoinsDialogOpened()
+    override fun onBuyCoinsDialogOpened(onLoaded: () -> Unit) {
+        gameLogicHandler.onBuyCoinsDialogOpened(onLoaded)
     }
 
-    override fun onShowVideoAdClicked(onVideoDone: () -> Unit) {
+    override fun onShowVideoAdClicked(onAdCompleted: () -> Unit, onAdDismissed: () -> Unit) {
         Gdx.app.postRunnable {
-            globalHandlers.androidInterface.displayRewardedAd(onVideoDone)
+            globalHandlers.androidInterface.displayRewardedAd(onAdCompleted, onAdDismissed)
         }
     }
 

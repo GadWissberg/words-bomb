@@ -18,7 +18,7 @@ interface GamePlayScreen {
     fun onIncorrectGuess(gameOver: Boolean)
     fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int)
     fun onLetterRevealFailedNotEnoughCoins()
-    fun onBuyCoinsDialogOpened()
-    fun onShowVideoAdClicked(onVideoDone: () -> Unit)
+    fun onBuyCoinsDialogOpened(onLoaded: () -> Unit)
+    fun onShowVideoAdClicked(onAdCompleted: () -> Unit, onAdDismissed: () -> Unit)
 
 }
