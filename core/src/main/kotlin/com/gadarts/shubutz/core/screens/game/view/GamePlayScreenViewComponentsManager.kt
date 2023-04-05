@@ -31,7 +31,7 @@ class GamePlayScreenViewComponentsManager(
 ) : Disposable {
 
     private lateinit var revealLetterButton: ImageTextButton
-    private var dialogsManager = DialogsManager(globalHandlers, effectsHandler)
+    private var dialogsManager = DialogsManager(globalHandlers, effectsHandler, stage)
     lateinit var targetPhraseView: TargetPhraseView
     lateinit var optionsView: OptionsView
     val bombView = BombView(globalHandlers)

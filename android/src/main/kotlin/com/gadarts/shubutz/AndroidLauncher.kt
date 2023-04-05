@@ -39,7 +39,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
                     }
                 }
             } else if (billingResult.responseCode != BillingResponseCode.USER_CANCELED) {
-                toast(billingResult.debugMessage)
+                Gdx.app.log("Shubutz", "Purchase failed: ${billingResult.debugMessage}")
             }
         }
     private lateinit var billingClient: BillingClient
@@ -148,7 +148,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
             .build()
         val billingResult = billingClient.launchBillingFlow(this, billingFlowParams)
         if (billingResult.responseCode != BillingResponseCode.OK) {
-            toast(billingResult.debugMessage)
+            Gdx.app.log("Shubutz", "Failed to launch billing flow: ${billingResult.debugMessage}")
         }
     }
 

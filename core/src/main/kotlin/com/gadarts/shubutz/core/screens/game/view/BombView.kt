@@ -94,7 +94,7 @@ class BombView(
     ) {
         fireParticleEffectActor.stop()
         val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.EXP)
-        val bombPosition = bombComponent.localToScreenCoordinates(auxVector.setZero())
+        val bombPosition = bombComponent.localToStageCoordinates(auxVector.setZero())
         explosionParticleEffectActor = ParticleEffectActor(particleEffect)
         explosionParticleEffectActor.setPosition(
             bombPosition.x + bombComponent.width / 2F,

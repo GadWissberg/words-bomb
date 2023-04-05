@@ -24,7 +24,8 @@ import java.util.*
 
 class DialogsManager(
     private val globalHandlers: GlobalHandlers,
-    private val effectsHandler: EffectsHandler
+    private val effectsHandler: EffectsHandler,
+    private val stage: GameStage
 ) {
     private fun addDialogText(
         assetsManager: GameAssetManager,
@@ -65,13 +66,11 @@ class DialogsManager(
     private fun addPackButton(
         dialog: Table,
         product: Product?,
-        stage: GameStage,
         definition: InAppProducts,
         gameAssetManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
     ) {
         val button = addDialogButton(
-            stage,
             dialog,
             {
                 if (product != null) {
@@ -111,18 +110,19 @@ class DialogsManager(
     }
 
     private fun addDialogButton(
-        stage: GameStage,
         dialogLayout: Table,
         onClick: (() -> Unit)? = null,
         text: String,
         newRowAfter: Boolean = true,
         dialogName: String,
-        topPadding: Float = DIALOG_BUTTON_PADDING
+        topPadding: Float = DIALOG_BUTTON_PADDING,
+        width: Float? = null
     ): ImageTextButton {
         val clickListener = onClick ?: { stage.closeDialog(dialogName) }
         val button = createDialogButton(stage, text.reversed(), clickListener)
         val cell = dialogLayout.add(button)
             .pad(topPadding, DIALOG_BUTTON_PADDING, DIALOG_BUTTON_PADDING, DIALOG_BUTTON_PADDING)
+        width?.let { cell.width(it) }
         if (newRowAfter) {
             cell.row()
         }
@@ -194,7 +194,6 @@ class DialogsManager(
         layout: Table,
         products: Map<String, Product>,
         gamePlayScreen: GamePlayScreen,
-        stage: GameStage,
         onVideoDone: () -> Unit,
     ) {
         addHeaderToDialog(globalHandlers.assetsManager, layout, COINS_DIALOG_HEADER)
@@ -205,14 +204,13 @@ class DialogsManager(
                 addPackButton(
                     layout,
                     products[id],
-                    stage = stage,
                     definition = it,
                     globalHandlers.assetsManager,
                     gamePlayScreen
                 )
             }
         }
-        val videoSection = addVideoSection(layout, stage, onVideoDone, gamePlayScreen)
+        val videoSection = addVideoSection(layout, onVideoDone, gamePlayScreen)
         gamePlayScreen.onBuyCoinsDialogOpened {
             videoSection.isVisible = true
         }
@@ -221,7 +219,6 @@ class DialogsManager(
 
     private fun addVideoSection(
         layout: Table,
-        stage: GameStage,
         onVideoDone: () -> Unit,
         gamePlayScreen: GamePlayScreen,
     ): Table {
@@ -233,20 +230,18 @@ class DialogsManager(
             topPadding = COINS_DIALOG_DESCRIPTION_2_TOP_PADDING,
             bottomPadding = 0F
         )
-        addVideoButton(stage, table, onVideoDone, gamePlayScreen)
+        addVideoButton(table, onVideoDone, gamePlayScreen)
         table.isVisible = false
         layout.add(table)
         return table
     }
 
     private fun addVideoButton(
-        stage: GameStage,
         layout: Table,
         onAdCompleted: () -> Unit,
         gamePlayScreen: GamePlayScreen,
     ) {
         val button = addDialogButton(
-            stage = stage,
             dialogLayout = layout,
             text = COINS_DIALOG_BUTTON_VIDEO,
             dialogName = COINS_DIALOG_NAME,
@@ -280,7 +275,7 @@ class DialogsManager(
                 layout.remove()
                 stage.addDialog(layout, COINS_DIALOG_NAME, globalHandlers.assetsManager)
                 if (it.isNotEmpty()) {
-                    addCoinsDialogComponents(layout, it, gamePlayScreen, stage) {
+                    addCoinsDialogComponents(layout, it, gamePlayScreen) {
                         effectsHandler.applyPartyEffect(
                             globalHandlers,
                             stage
@@ -307,7 +302,7 @@ class DialogsManager(
             EXIT_DIALOG_HEADER,
             EXIT_DIALOG_DESCRIPTION
         )
-        addExitDialogButtons(gamePlayScreen, stage, dialogView)
+        addExitDialogButtons(gamePlayScreen, dialogView)
         stage.addDialog(dialogView, EXIT_DIALOG_NAME, assetsManager)
         placeDialogInTheMiddle(dialogView)
     }
@@ -334,23 +329,22 @@ class DialogsManager(
 
     private fun addExitDialogButtons(
         gamePlayScreen: GamePlayScreen,
-        stage: GameStage,
         layout: Table
     ) {
         val onClick = { gamePlayScreen.onQuitSession() }
         addDialogButton(
-            stage,
-            layout,
-            onClick,
-            EXIT_DIALOG_BUTTON_OK,
-            false,
-            EXIT_DIALOG_NAME
+            dialogLayout = layout,
+            onClick = onClick,
+            text = EXIT_DIALOG_BUTTON_OK,
+            newRowAfter = false,
+            dialogName = EXIT_DIALOG_NAME,
+            width = EXIT_DIALOG_BUTTON_WIDTH
         )
         addDialogButton(
-            stage = stage,
             dialogLayout = layout,
             text = EXIT_DIALOG_BUTTON_NO,
-            dialogName = EXIT_DIALOG_NAME
+            dialogName = EXIT_DIALOG_NAME,
+            width = EXIT_DIALOG_BUTTON_WIDTH
         )
     }
 
@@ -371,7 +365,7 @@ class DialogsManager(
         amount: Int
     ) {
         val dialogView =
-            createCoinsPurchasedSuccessfullyDialog(assetsManager, stage, amount)
+            createCoinsPurchasedSuccessfullyDialog(assetsManager, amount)
         stage.addDialog(dialogView, COINS_PURCHASED_DIALOG_NAME, assetsManager)
         placeDialogInTheMiddle(dialogView)
         stage.closeDialog(COINS_DIALOG_NAME)
@@ -379,7 +373,6 @@ class DialogsManager(
 
     private fun createCoinsPurchasedSuccessfullyDialog(
         assetsManager: GameAssetManager,
-        stage: GameStage,
         amount: Int
     ): Table {
         val dialogView = createDialogLayout(
@@ -388,7 +381,6 @@ class DialogsManager(
             COINS_PURCHASED_DIALOG_DESCRIPTION.format(amount.toString().reversed())
         )
         addDialogButton(
-            stage = stage,
             dialogLayout = dialogView,
             text = COINS_PURCHASED_DIALOG_BUTTON_OK,
             dialogName = COINS_PURCHASED_DIALOG_NAME,
@@ -406,6 +398,7 @@ class DialogsManager(
         private const val EXIT_DIALOG_DESCRIPTION = "אתה בטוח שאתה רוצה\nלסיים את המשחק?"
         private const val EXIT_DIALOG_BUTTON_OK = "כן"
         private const val EXIT_DIALOG_BUTTON_NO = "לא"
+        private const val EXIT_DIALOG_BUTTON_WIDTH = 200F
         private const val DIALOG_HEADER_PADDING_BOTTOM = 64F
         private const val COINS_DIALOG_NAME = "coins"
         private const val COINS_DIALOG_LOADING_NAME = "loading_coins"
