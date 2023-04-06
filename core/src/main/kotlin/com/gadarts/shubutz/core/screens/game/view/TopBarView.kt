@@ -24,6 +24,7 @@ import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
@@ -32,9 +33,12 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class TopBarView(
     private val globalHandlers: GlobalHandlers,
-    private val gamePlayScreen: GamePlayScreen
+    private val gamePlayScreen: GamePlayScreen,
+    private val gameModel: GameModel
 ) : Table(), Disposable {
 
+    private var applyCoinsChangeAnimation = false
+    private var lastCoinsLabelChange = 0L
     private var letterGlyphLayout: GlyphLayout =
         GlyphLayout(globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80), "א")
     private var lastCoinsValueChangeLabelDequeue: Long = 0
@@ -44,7 +48,7 @@ class TopBarView(
     private lateinit var topPartTable: Table
     private lateinit var topPartTexture: Texture
     private lateinit var categoryBackgroundTexture: Texture
-    lateinit var coinsLabel: Label
+    private lateinit var coinsLabel: Label
 
     override fun act(delta: Float) {
         super.act(delta)
@@ -52,6 +56,19 @@ class TopBarView(
             if (TimeUtils.timeSinceMillis(lastCoinsValueChangeLabelDequeue) > COINS_VALUE_CHANGE_LABEL_INTERVAL) {
                 applyNextCoinsValueChangeLabel(coinsValueChangeLabels.removeFirst())
                 lastCoinsValueChangeLabelDequeue = TimeUtils.millis()
+            }
+        }
+        handleCoinsLabelChangeAnimation()
+    }
+
+    private fun handleCoinsLabelChangeAnimation() {
+        if (applyCoinsChangeAnimation && TimeUtils.timeSinceMillis(lastCoinsLabelChange) >= COINS_LABEL_CHANGE_INCREMENT_INTERVAL) {
+            val displayedValue = Integer.parseInt(coinsLabel.text.toString())
+            if (displayedValue != gameModel.coins) {
+                coinsLabel.setText(displayedValue + (if (displayedValue > gameModel.coins) -1 else 1))
+                lastCoinsLabelChange = TimeUtils.millis()
+            } else {
+                applyCoinsChangeAnimation = false
             }
         }
     }
@@ -66,7 +83,10 @@ class TopBarView(
         )
         topPartTable.stage.addActor(winCoinLabel)
         val coinsLabelPos = coinsLabel.localToStageCoordinates(auxVector.setZero())
-        winCoinLabel.setPosition(coinsLabelPos.x, coinsLabelPos.y)
+        winCoinLabel.setPosition(
+            coinsLabelPos.x,
+            coinsLabelPos.y - COINS_VALUE_CHANGE_LABEL_Y_OFFSET
+        )
 
         winCoinLabel.addAction(
             Actions.sequence(
@@ -249,7 +269,7 @@ class TopBarView(
 
     fun onCorrectGuess(coinsAmount: Int) {
         if (coinsAmount > 0) {
-            addCoinValueChangedLabel(coinsAmount)
+            applyCoinsChange(coinsAmount)
         }
     }
 
@@ -259,20 +279,39 @@ class TopBarView(
         coinsValueChangeLabels.addFirst(coinsAmount)
     }
 
-    fun onLetterRevealed(gameModel: GameModel, cost: Int) {
-        applyCoinsViewChangeEffect(cost, gameModel)
+    fun onLetterRevealed(cost: Int) {
+        applyCoinsChange(-cost)
     }
 
-    private fun applyCoinsViewChangeEffect(
-        delta: Int,
-        gameModel: GameModel
-    ) {
-        addCoinValueChangedLabel(delta)
-        coinsLabel.setText(gameModel.coins)
+    private fun applyCoinsChange(cost: Int) {
+        addCoinValueChangedLabel(cost)
+        applyCoinsChangeAnimation = true
     }
 
-    fun onRewardForVideoAd(rewardAmount: Int, gameModel: GameModel) {
-        applyCoinsViewChangeEffect(rewardAmount, gameModel)
+
+    fun onRewardForVideoAd(rewardAmount: Int) {
+        applyCoinsChange(rewardAmount)
+    }
+
+    fun onPurchasedCoins(amount: Int) {
+        applyCoinsChange(amount)
+    }
+
+    fun onGameWin() {
+        addStarsEffectToCoinsLabel()
+    }
+
+    private fun addStarsEffectToCoinsLabel() {
+        val particleEffect =
+            globalHandlers.assetsManager.getParticleEffect(ParticleEffectsDefinitions.STARS)
+        val particleEffectActor = ParticleEffectActor(particleEffect)
+        stage.addActor(particleEffectActor)
+        particleEffectActor.start()
+        val coords = coinsLabel.localToStageCoordinates(auxVector.setZero())
+        particleEffectActor.setPosition(
+            coords.x + coinsLabel.width / 2F,
+            coords.y + coinsLabel.height / 2F
+        )
     }
 
     companion object {
@@ -289,5 +328,7 @@ class TopBarView(
         private const val COINS_ICON_PAD_RIGHT = 40F
         private const val COINS_ICON_PAD = 20F
         private const val COINS_VALUE_CHANGE_LABEL_INTERVAL = 1000F
+        private const val COINS_LABEL_CHANGE_INCREMENT_INTERVAL = 128F
+        private const val COINS_VALUE_CHANGE_LABEL_Y_OFFSET = 50F
     }
 }

@@ -14,7 +14,6 @@ import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
-import com.gadarts.shubutz.core.model.assets.definitions.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
@@ -33,7 +32,13 @@ class GamePlayScreenView(
 
     private val effectsHandler = EffectsHandler()
     private val gamePlayScreenViewComponentsManager =
-        GamePlayScreenViewComponentsManager(globalHandlers, gamePlayScreen, stage, effectsHandler)
+        GamePlayScreenViewComponentsManager(
+            globalHandlers,
+            gamePlayScreen,
+            stage,
+            effectsHandler,
+            gameModel
+        )
     private lateinit var uiTable: Table
     private var font80: BitmapFont =
         globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80)
@@ -145,24 +150,7 @@ class GamePlayScreenView(
         val actions = Actions.parallel(sequence, Actions.fadeOut(1F, smoother))
         if (gameWin) {
             sequence.addAction(Actions.run { roundWin(stage) })
-            gamePlayScreenViewComponentsManager.topBarView.coinsLabel.setText(gameModel.coins.toString())
-            val particleEffectActor = ParticleEffectActor(
-                globalHandlers.assetsManager.getParticleEffect(
-                    ParticleEffectsDefinitions.STARS
-                )
-            )
-            stage.addActor(
-                particleEffectActor
-            )
-            particleEffectActor.start()
-            val localToScreenCoordinates =
-                gamePlayScreenViewComponentsManager.topBarView.coinsLabel.localToStageCoordinates(
-                    auxVector.setZero()
-                )
-            particleEffectActor.setPosition(
-                localToScreenCoordinates.x + gamePlayScreenViewComponentsManager.topBarView.coinsLabel.width / 2F,
-                localToScreenCoordinates.y + gamePlayScreenViewComponentsManager.topBarView.coinsLabel.height / 2F
-            )
+            gamePlayScreenViewComponentsManager.onGameWin()
         }
         brick.addAction(actions)
     }
@@ -204,7 +192,7 @@ class GamePlayScreenView(
     }
 
     fun onPurchasedCoins(amount: Int) {
-        gamePlayScreenViewComponentsManager.onPurchasedCoins(gameModel, amount)
+        gamePlayScreenViewComponentsManager.onPurchasedCoins(amount)
         effectsHandler.applyPartyEffect(globalHandlers, stage)
     }
 
@@ -216,7 +204,7 @@ class GamePlayScreenView(
     }
 
     fun onLetterRevealed(letter: Char, cost: Int) {
-        gamePlayScreenViewComponentsManager.onLetterRevealed(letter, gameModel, cost)
+        gamePlayScreenViewComponentsManager.onLetterRevealed(letter, cost)
     }
 
     fun onLetterRevealFailedNotEnoughCoins() {
@@ -224,7 +212,11 @@ class GamePlayScreenView(
     }
 
     fun onRewardForVideoAd(rewardAmount: Int) {
-        gamePlayScreenViewComponentsManager.onRewardForVideoAd(rewardAmount, gameModel)
+        gamePlayScreenViewComponentsManager.onRewardForVideoAd(rewardAmount)
+    }
+
+    fun onPhysicalBackClicked() {
+        gamePlayScreenViewComponentsManager.onPhysicalBackClicked()
     }
 
     companion object {

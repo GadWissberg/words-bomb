@@ -27,7 +27,8 @@ class GamePlayScreenViewComponentsManager(
     private val globalHandlers: GlobalHandlers,
     private val gamePlayScreen: GamePlayScreen,
     private val stage: GameStage,
-    effectsHandler: EffectsHandler
+    effectsHandler: EffectsHandler,
+    gameModel: GameModel
 ) : Disposable {
 
     private lateinit var revealLetterButton: ImageTextButton
@@ -35,7 +36,7 @@ class GamePlayScreenViewComponentsManager(
     lateinit var targetPhraseView: TargetPhraseView
     lateinit var optionsView: OptionsView
     val bombView = BombView(globalHandlers)
-    val topBarView = TopBarView(globalHandlers, gamePlayScreen)
+    val topBarView = TopBarView(globalHandlers, gamePlayScreen, gameModel)
 
 
     fun createViews(
@@ -274,17 +275,17 @@ class GamePlayScreenViewComponentsManager(
         topBarView.onCorrectGuess(coinsAmount)
     }
 
-    fun onLetterRevealed(letter: Char, gameModel: GameModel, cost: Int) {
+    fun onLetterRevealed(letter: Char, cost: Int) {
         optionsView.onLetterRevealed(letter)
-        topBarView.onLetterRevealed(gameModel, cost)
+        topBarView.onLetterRevealed(cost)
     }
 
     fun onLetterRevealFailedNotEnoughCoins() {
         dialogsManager.openBuyCoinsDialog(stage, gamePlayScreen)
     }
 
-    fun onPurchasedCoins(gameModel: GameModel, amount: Int) {
-        topBarView.coinsLabel.setText(gameModel.coins)
+    fun onPurchasedCoins(amount: Int) {
+        topBarView.onPurchasedCoins(amount)
         dialogsManager.openCoinsPurchasedSuccessfully(
             globalHandlers.assetsManager,
             stage,
@@ -292,8 +293,20 @@ class GamePlayScreenViewComponentsManager(
         )
     }
 
-    fun onRewardForVideoAd(rewardAmount: Int, gameModel: GameModel) {
-        topBarView.onRewardForVideoAd(rewardAmount, gameModel)
+    fun onRewardForVideoAd(rewardAmount: Int) {
+        topBarView.onRewardForVideoAd(rewardAmount)
+    }
+
+    fun onGameWin() {
+        topBarView.onGameWin()
+    }
+
+    fun onPhysicalBackClicked() {
+        if (stage.openDialogs.isEmpty()) {
+            dialogsManager.openExitDialog(stage, globalHandlers.assetsManager, gamePlayScreen)
+        } else {
+            stage.closeAllDialogs()
+        }
     }
 
     companion object {
