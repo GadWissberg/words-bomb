@@ -36,6 +36,7 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     ICON_EYE,
     BUTTON_CIRCLE_UP,
     BUTTON_CIRCLE_DOWN,
+    KIDS,
     POPCORN;
 
     private var path: String =

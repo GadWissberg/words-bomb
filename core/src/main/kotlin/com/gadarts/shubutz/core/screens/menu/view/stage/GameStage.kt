@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GeneralUtils
@@ -82,7 +83,7 @@ class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManage
     fun addButton(
         uiTable: Table,
         onClick: ClickListener,
-        text: String,
+        text: String?,
         newLineAfter: Boolean = true,
         span: Int = 1,
         up: Texture,
@@ -90,10 +91,16 @@ class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManage
         disabled: Texture? = null,
         bitmapFont: BitmapFont,
         topPadding: Int,
-        scale: Float = 1F
+        scale: Float = 1F,
+        image: Texture? = null
     ): TextButton {
         val style = createButtonStyle(up, down, bitmapFont, disabled)
         val button = TextButton(text, style)
+        if (image != null) {
+            val imageComponent = Image(image)
+            imageComponent.setScaling(Scaling.none)
+            button.add(imageComponent)
+        }
         addButtonToTable(
             button, onClick,
             uiTable, newLineAfter,

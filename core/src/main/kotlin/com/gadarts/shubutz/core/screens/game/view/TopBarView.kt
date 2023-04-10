@@ -3,13 +3,9 @@ package com.gadarts.shubutz.core.screens.game.view
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.NinePatch
-import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -17,14 +13,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.Queue
-import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
-import com.gadarts.shubutz.core.model.assets.definitions.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions.*
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
@@ -36,69 +29,26 @@ class TopBarView(
     private val gamePlayScreen: GamePlayScreen,
     private val gameModel: GameModel
 ) : Table(), Disposable {
-
-    private var applyCoinsChangeAnimation = false
-    private var lastCoinsLabelChange = 0L
     private var letterGlyphLayout: GlyphLayout =
         GlyphLayout(globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80), "א")
-    private var lastCoinsValueChangeLabelDequeue: Long = 0
-    private val coinsValueChangeLabels = Queue<Int>()
-    lateinit var coinsIcon: Image
     private lateinit var categoryLabel: Label
     private lateinit var topPartTable: Table
     private lateinit var topPartTexture: Texture
     private lateinit var categoryBackgroundTexture: Texture
-    private lateinit var coinsLabel: Label
+    private var coinsLabelHandler = CoinsLabelHandler()
 
-    override fun act(delta: Float) {
-        super.act(delta)
-        if (coinsValueChangeLabels.notEmpty()) {
-            if (TimeUtils.timeSinceMillis(lastCoinsValueChangeLabelDequeue) > COINS_VALUE_CHANGE_LABEL_INTERVAL) {
-                applyNextCoinsValueChangeLabel(coinsValueChangeLabels.removeFirst())
-                lastCoinsValueChangeLabelDequeue = TimeUtils.millis()
-            }
-        }
-        handleCoinsLabelChangeAnimation()
+    override fun dispose() {
+        topPartTexture.dispose()
+        categoryBackgroundTexture.dispose()
     }
 
-    private fun handleCoinsLabelChangeAnimation() {
-        if (applyCoinsChangeAnimation && TimeUtils.timeSinceMillis(lastCoinsLabelChange) >= COINS_LABEL_CHANGE_INCREMENT_INTERVAL) {
-            val displayedValue = Integer.parseInt(coinsLabel.text.toString())
-            if (displayedValue != gameModel.coins) {
-                coinsLabel.setText(displayedValue + (if (displayedValue > gameModel.coins) -1 else 1))
-                lastCoinsLabelChange = TimeUtils.millis()
-            } else {
-                applyCoinsChangeAnimation = false
-            }
-        }
+    fun setCategoryLabelText(currentCategory: String) {
+        categoryLabel.setText(currentCategory.reversed())
+        categoryLabel.toFront()
     }
 
-    private fun applyNextCoinsValueChangeLabel(coinsAmount: Int) {
-        val winCoinLabel = Label(
-            "${if (coinsAmount > 0) "+" else ""}$coinsAmount",
-            LabelStyle(
-                globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
-                if (coinsAmount > 0) Color.GOLD else Color.RED
-            )
-        )
-        topPartTable.stage.addActor(winCoinLabel)
-        val coinsLabelPos = coinsLabel.localToStageCoordinates(auxVector.setZero())
-        winCoinLabel.setPosition(
-            coinsLabelPos.x,
-            coinsLabelPos.y - COINS_VALUE_CHANGE_LABEL_Y_OFFSET
-        )
-
-        winCoinLabel.addAction(
-            Actions.sequence(
-                Actions.moveBy(
-                    0F,
-                    -100F,
-                    WIN_COIN_LABEL_ANIMATION_DURATION,
-                    Interpolation.smooth2
-                ),
-                Actions.removeActor()
-            )
-        )
+    fun onCorrectGuess(coinsAmount: Int) {
+        coinsLabelHandler.onCorrectGuess(coinsAmount)
     }
 
     fun addTopBar(
@@ -114,6 +64,29 @@ class TopBarView(
         setPosition(stage.width / 2F, stage.height - prefHeight / 2F)
         setDebug(DebugSettings.SHOW_UI_BORDERS, true)
     }
+
+    override fun act(delta: Float) {
+        super.act(delta)
+        coinsLabelHandler.act(topPartTable, gameModel, globalHandlers)
+    }
+
+    fun onLetterRevealed(cost: Int) {
+        coinsLabelHandler.onLetterRevealed(cost)
+    }
+
+
+    fun onRewardForVideoAd(rewardAmount: Int) {
+        coinsLabelHandler.onRewardForVideoAd(rewardAmount)
+    }
+
+    fun onPurchasedCoins(amount: Int) {
+        coinsLabelHandler.onPurchasedCoins(amount)
+    }
+
+    fun onGameWin() {
+        coinsLabelHandler.onGameWin(globalHandlers, stage)
+    }
+
 
     private fun addCategoryLabel(
         gameModel: GameModel,
@@ -195,8 +168,9 @@ class TopBarView(
         addBuyCoinsButton(leftSideTable, dialogsManager)
         table.add(leftSideTable).expandX().left()
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
-        addCoinsLabel(gameModel, font80, table, assetsManager)
+        coinsLabelHandler.addCoinsLabel(gameModel, font80, table, assetsManager, topPartTexture)
     }
+
 
     private fun addBuyCoinsButton(
         table: Table,
@@ -230,22 +204,6 @@ class TopBarView(
     }
 
 
-    private fun addCoinsLabel(
-        gameModel: GameModel,
-        font80: BitmapFont,
-        table: Table,
-        assetsManager: GameAssetManager
-    ) {
-        coinsLabel = Label(gameModel.coins.toString(), LabelStyle(font80, Color.WHITE))
-        table.add(coinsLabel).pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
-        coinsIcon = Image(assetsManager.getTexture(COINS_ICON))
-        table.add(coinsIcon)
-            .size(
-                topPartTexture.height.toFloat(),
-                topPartTexture.height.toFloat()
-            ).pad(COINS_ICON_PAD, COINS_ICON_PAD, COINS_ICON_PAD, COINS_ICON_PAD_RIGHT).row()
-    }
-
     private fun createTopPartTexture(stage: GameStage, backgroundColor: String): Texture {
         val pixmap = Pixmap(stage.width.toInt(), TOP_PART_HEIGHT, Pixmap.Format.RGBA8888)
         val color = Color.valueOf(backgroundColor)
@@ -257,78 +215,18 @@ class TopBarView(
         return topPartTexture
     }
 
-    override fun dispose() {
-        topPartTexture.dispose()
-        categoryBackgroundTexture.dispose()
+    fun getCoinsIcon(): Image {
+        return coinsLabelHandler.coinsIcon
     }
 
-    fun setCategoryLabelText(currentCategory: String) {
-        categoryLabel.setText(currentCategory.reversed())
-        categoryLabel.toFront()
-    }
-
-    fun onCorrectGuess(coinsAmount: Int) {
-        if (coinsAmount > 0) {
-            applyCoinsChange(coinsAmount)
-        }
-    }
-
-    private fun addCoinValueChangedLabel(
-        coinsAmount: Int,
-    ) {
-        coinsValueChangeLabels.addFirst(coinsAmount)
-    }
-
-    fun onLetterRevealed(cost: Int) {
-        applyCoinsChange(-cost)
-    }
-
-    private fun applyCoinsChange(cost: Int) {
-        addCoinValueChangedLabel(cost)
-        applyCoinsChangeAnimation = true
-    }
-
-
-    fun onRewardForVideoAd(rewardAmount: Int) {
-        applyCoinsChange(rewardAmount)
-    }
-
-    fun onPurchasedCoins(amount: Int) {
-        applyCoinsChange(amount)
-    }
-
-    fun onGameWin() {
-        addStarsEffectToCoinsLabel()
-    }
-
-    private fun addStarsEffectToCoinsLabel() {
-        val particleEffect =
-            globalHandlers.assetsManager.getParticleEffect(ParticleEffectsDefinitions.STARS)
-        val particleEffectActor = ParticleEffectActor(particleEffect)
-        stage.addActor(particleEffectActor)
-        particleEffectActor.start()
-        val coords = coinsLabel.localToStageCoordinates(auxVector.setZero())
-        particleEffectActor.setPosition(
-            coords.x + coinsLabel.width / 2F,
-            coords.y + coinsLabel.height / 2F
-        )
-    }
 
     companion object {
         private const val TOP_PART_HEIGHT = 150
-        private val auxVector = Vector2()
         private const val TOP_BAR_COLOR = "#85adb0"
         private const val CATEGORY_BACKGROUND_COLOR = "#557d80"
-        private const val COINS_LABEL_PADDING_RIGHT = 40F
-        private const val WIN_COIN_LABEL_ANIMATION_DURATION = 4F
         private const val COINS_BUTTON_PAD_TOP = 60F
         private const val COINS_BUTTON_PAD_RIGHT = 20F
         private const val COINS_BUTTON_PAD_LEFT = 20F
         private const val COINS_BUTTON_PAD_BOTTOM = 20F
-        private const val COINS_ICON_PAD_RIGHT = 40F
-        private const val COINS_ICON_PAD = 20F
-        private const val COINS_VALUE_CHANGE_LABEL_INTERVAL = 1000F
-        private const val COINS_LABEL_CHANGE_INCREMENT_INTERVAL = 128F
-        private const val COINS_VALUE_CHANGE_LABEL_Y_OFFSET = 50F
     }
 }

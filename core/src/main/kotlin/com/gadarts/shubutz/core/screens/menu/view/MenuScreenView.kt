@@ -2,6 +2,7 @@ package com.gadarts.shubutz.core.screens.menu.view
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
@@ -93,9 +94,8 @@ class MenuScreenView(
         Difficulties.values().forEach {
             addButton(
                 difficultySelectionTable,
-                { beginGameAction.begin(it) },
                 it.displayName,
-            )
+            ) { beginGameAction.begin(it) }
         }
         addBackButton()
     }
@@ -103,15 +103,14 @@ class MenuScreenView(
     private fun addBackButton() {
         addButton(
             difficultySelectionTable,
-            {
-                difficultySelectionTable.isVisible = false
-                mainMenuTable.isVisible = true
-            },
             LABEL_BACK,
             160,
             assetsManager.getFont(FontsDefinitions.VARELA_40),
             scale = 0.5F
-        )
+        ) {
+            difficultySelectionTable.isVisible = false
+            mainMenuTable.isVisible = true
+        }
     }
 
     private fun addDifficultySelectionLabel() {
@@ -126,10 +125,23 @@ class MenuScreenView(
     private fun addMainMenuTable() {
         initMenuTable(mainMenuTable)
         addLogo()
-        addButton(mainMenuTable, {
+        addButton(
+            mainMenuTable,
+            LABEL_BEGIN_GAME,
+            font = assetsManager.getFont(FontsDefinitions.VARELA_80)
+        ) {
             mainMenuTable.isVisible = false
             difficultySelectionTable.isVisible = true
-        }, LABEL_BEGIN_GAME, font = assetsManager.getFont(FontsDefinitions.VARELA_80))
+        }
+        addButton(
+            mainMenuTable,
+            null,
+            font = assetsManager.getFont(FontsDefinitions.VARELA_80),
+            image = assetsManager.getTexture(TexturesDefinitions.KIDS)
+        ) {
+            mainMenuTable.isVisible = false
+            difficultySelectionTable.isVisible = true
+        }
     }
 
     private fun initMenuTable(table: Table) {
@@ -140,11 +152,12 @@ class MenuScreenView(
 
     private fun addButton(
         table: Table,
-        onClick: Runnable,
-        label: String,
+        label: String?,
         topPadding: Int = BUTTON_PADDING,
         font: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80),
-        scale: Float = 1F
+        scale: Float = 1F,
+        image: Texture? = null,
+        onClick: Runnable
     ) {
         stage.addButton(
             table,
@@ -155,13 +168,14 @@ class MenuScreenView(
                     soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
                 }
             },
-            label.reversed(),
+            label?.reversed(),
             span = 2,
             up = assetsManager.getTexture(TexturesDefinitions.BUTTON_UP),
             down = assetsManager.getTexture(TexturesDefinitions.BUTTON_DOWN),
             bitmapFont = font,
             topPadding = topPadding,
-            scale = scale
+            scale = scale,
+            image = image
         )
     }
 

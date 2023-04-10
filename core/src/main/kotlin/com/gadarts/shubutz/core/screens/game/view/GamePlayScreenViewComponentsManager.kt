@@ -36,7 +36,7 @@ class GamePlayScreenViewComponentsManager(
     lateinit var targetPhraseView: TargetPhraseView
     lateinit var optionsView: OptionsView
     val bombView = BombView(globalHandlers)
-    val topBarView = TopBarView(globalHandlers, gamePlayScreen, gameModel)
+    private val topBarView = TopBarView(globalHandlers, gamePlayScreen, gameModel)
 
 
     fun createViews(
@@ -169,7 +169,7 @@ class GamePlayScreenViewComponentsManager(
         val startPosition = bombView.bombComponent.localToStageCoordinates(Vector2())
         startPosition.x += bombView.bombComponent.width / 2F - coinTexture.width / 2F
         startPosition.y += bombView.bombComponent.width / 2F - coinTexture.width / 2F
-        val targetPosition = topBarView.coinsIcon.localToStageCoordinates(Vector2())
+        val targetPosition = topBarView.getCoinsIcon().localToStageCoordinates(Vector2())
         applyFlyingCoinsAnimation(
             stage,
             coinTexture,
