@@ -19,7 +19,7 @@ class GamePlayScreenImpl(
     private val lifeCycleManager: GameLifeCycleManager,
     private val android: AndroidInterface,
     private val stage: GameStage,
-    selectedDifficulty: Difficulties,
+    private val selectedDifficulty: Difficulties,
 ) : GameScreen(), GamePlayScreen {
 
 
@@ -52,7 +52,11 @@ class GamePlayScreenImpl(
     }
 
     override fun show() {
-        gameLogicHandler = GameLogicHandler(globalHandlers.assetsManager.phrases, android, this)
+        gameLogicHandler = GameLogicHandler(
+            globalHandlers.assetsManager.phrases[selectedDifficulty.phrasesFileName]!!,
+            android,
+            this
+        )
         gameLogicHandler.beginGame(gameModel)
         gamePlayScreenView = createGamePlayScreenView()
         gamePlayScreenView.onShow()

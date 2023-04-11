@@ -79,7 +79,7 @@ class MenuScreenView(
     }
 
     private fun addUserInterface(beginGameAction: BeginGameAction) {
-        addMainMenuTable()
+        addMainMenuTable(beginGameAction)
         addDifficultySelectionTable(beginGameAction)
         versionLabel = Label(
             "v$versionName",
@@ -91,7 +91,7 @@ class MenuScreenView(
     private fun addDifficultySelectionTable(beginGameAction: BeginGameAction) {
         initMenuTable(difficultySelectionTable)
         addDifficultySelectionLabel()
-        Difficulties.values().forEach {
+        Difficulties.values().filter { it.displayName != null }.forEach {
             addButton(
                 difficultySelectionTable,
                 it.displayName,
@@ -122,25 +122,24 @@ class MenuScreenView(
         ).pad(20F).row()
     }
 
-    private fun addMainMenuTable() {
+    private fun addMainMenuTable(beginGameAction: BeginGameAction) {
         initMenuTable(mainMenuTable)
         addLogo()
         addButton(
-            mainMenuTable,
-            LABEL_BEGIN_GAME,
+            table = mainMenuTable,
+            label = LABEL_BEGIN_GAME,
             font = assetsManager.getFont(FontsDefinitions.VARELA_80)
         ) {
             mainMenuTable.isVisible = false
             difficultySelectionTable.isVisible = true
         }
         addButton(
-            mainMenuTable,
-            null,
+            table = mainMenuTable,
+            label = null,
             font = assetsManager.getFont(FontsDefinitions.VARELA_80),
             image = assetsManager.getTexture(TexturesDefinitions.KIDS)
         ) {
-            mainMenuTable.isVisible = false
-            difficultySelectionTable.isVisible = true
+            beginGameAction.begin(Difficulties.KIDS)
         }
     }
 

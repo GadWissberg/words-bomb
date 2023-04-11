@@ -21,7 +21,7 @@ class GameLogicHandler(
         unusedPhrases = phrases
         unusedPhrases.forEach {
             unusedPhrases[it.key] = ArrayList(it.value.filter { p ->
-                p.value.length >= gameModel.selectedDifficulty.regularPhrasesMinimumLength
+                p.value.length >= gameModel.selectedDifficulty.minimumLength
             })
         }
         beginRound(gameModel)

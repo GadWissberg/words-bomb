@@ -16,7 +16,7 @@ import com.gadarts.shubutz.core.model.Phrase
 import com.gadarts.shubutz.core.model.assets.definitions.*
 
 open class GameAssetManager : AssetManager() {
-    lateinit var phrases: HashMap<String, ArrayList<Phrase>>
+    lateinit var phrases: HashMap<String, HashMap<String, ArrayList<Phrase>>>
     private val phrasesLoader = PhrasesLoader()
 
     fun loadAssets() {

@@ -4,15 +4,28 @@ import com.badlogic.gdx.Gdx
 import com.gadarts.shubutz.core.model.Phrase
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import java.io.Reader
 
 class PhrasesLoader {
     private val gson = Gson()
 
-    fun load(): HashMap<String, ArrayList<Phrase>> {
-        val result = HashMap<String, ArrayList<Phrase>>()
-        val reader = Gdx.files.local(PHRASES_JSON_FILE_PATH).reader()
+    fun load(): HashMap<String, HashMap<String, ArrayList<Phrase>>> {
+        val result = HashMap<String, HashMap<String, ArrayList<Phrase>>>()
+        val dirHandle = Gdx.files.internal(PHRASES_JSON_FILES_FOLDER_PATH)
+        dirHandle.list().forEach {
+            loadPhrasesFile(it.file().nameWithoutExtension, it.reader(), result)
+        }
+        return result
+    }
+
+    private fun loadPhrasesFile(
+        name: String,
+        reader: Reader?,
+        result: HashMap<String, HashMap<String, ArrayList<Phrase>>>
+    ) {
         val jsonObject = gson.fromJson(reader, JsonObject::class.java)
         val wordsByCategoryJsonArray = jsonObject.get(JSON_KEY_PHRASES_BY_CATEGORY).asJsonArray
+        val currentMap = HashMap<String, ArrayList<Phrase>>()
         wordsByCategoryJsonArray.forEach {
             val asJsonObject = it.asJsonObject
             val category = asJsonObject.get(JSON_KEY_CATEGORY).asString
@@ -26,9 +39,9 @@ class PhrasesLoader {
                         list.add(Phrase(phraseJsonObject.get(JSON_KEY_PHRASE).asString))
                     }
                 }
-            result[category] = list
+            currentMap[category] = list
         }
-        return result
+        result[name] = currentMap
     }
 
     companion object {
@@ -36,6 +49,6 @@ class PhrasesLoader {
         const val JSON_KEY_CATEGORY = "category"
         const val JSON_KEY_PHRASES = "phrases"
         const val JSON_KEY_PHRASE = "phrase"
-        const val PHRASES_JSON_FILE_PATH = "assets/phrases.json"
+        private const val PHRASES_JSON_FILES_FOLDER_PATH = "phrases/"
     }
 }
