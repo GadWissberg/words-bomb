@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
@@ -135,16 +136,15 @@ class TopBarView(
         button.pad(10F, 80F, 10F, 40F)
         addClickListenerToButton(
             button,
-            { dialogsManager.openExitDialog(stage as GameStage, assetsManager, gamePlayScreen) },
             assetsManager
-        )
+        ) { dialogsManager.openExitDialog(stage as GameStage, assetsManager, gamePlayScreen) }
         table.add(button).left()
     }
 
     private fun addClickListenerToButton(
         button: Button,
+        assetsManager: GameAssetManager,
         runnable: Runnable,
-        assetsManager: GameAssetManager
     ) {
         button.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
@@ -189,17 +189,20 @@ class TopBarView(
         table: Table,
         dialogsManager: DialogsManager,
     ): ImageButton {
+        val up =
+            if (gameModel.selectedDifficulty != Difficulties.KIDS) COINS_BUTTON_UP else CANDY_BUTTON_UP
+        val down =
+            if (gameModel.selectedDifficulty != Difficulties.KIDS) COINS_BUTTON_DOWN else CANDY_BUTTON_DOWN
         val coinsButton = ImageButton(
-            TextureRegionDrawable(globalHandlers.assetsManager.getTexture(COINS_BUTTON_UP)),
-            TextureRegionDrawable(globalHandlers.assetsManager.getTexture(COINS_BUTTON_DOWN))
+            TextureRegionDrawable(globalHandlers.assetsManager.getTexture(up)),
+            TextureRegionDrawable(globalHandlers.assetsManager.getTexture(down))
         )
         addClickListenerToButton(
             coinsButton,
-            {
-                dialogsManager.openBuyCoinsDialog(table.stage as GameStage, gamePlayScreen)
-            },
             globalHandlers.assetsManager
-        )
+        ) {
+            dialogsManager.openBuyCoinsDialog(table.stage as GameStage, gamePlayScreen)
+        }
         return coinsButton
     }
 

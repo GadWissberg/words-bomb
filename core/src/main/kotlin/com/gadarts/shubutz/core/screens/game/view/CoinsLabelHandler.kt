@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Queue
 import com.badlogic.gdx.utils.TimeUtils
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
@@ -60,7 +61,9 @@ class CoinsLabelHandler {
     ) {
         coinsLabel = Label(gameModel.coins.toString(), Label.LabelStyle(font80, Color.WHITE))
         table.add(coinsLabel).pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
-        coinsIcon = Image(assetsManager.getTexture(TexturesDefinitions.COINS_ICON))
+        val icon =
+            if (gameModel.selectedDifficulty != Difficulties.KIDS) TexturesDefinitions.COINS_ICON else TexturesDefinitions.CANDY
+        coinsIcon = Image(assetsManager.getTexture(icon))
         table.add(coinsIcon)
             .size(
                 topPartTexture.height.toFloat(),
