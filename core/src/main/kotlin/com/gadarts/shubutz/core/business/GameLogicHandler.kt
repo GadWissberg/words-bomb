@@ -76,7 +76,7 @@ class GameLogicHandler(
     ) {
         gameModel.coins += coinsAmount
         androidInterface.saveSharedPreferencesValue(
-            SHARED_PREFERENCES_DATA_KEY_COINS,
+            gameModel.selectedDifficulty.sharedPreferencesCoinsKey,
             gameModel.coins
         )
     }
@@ -114,7 +114,7 @@ class GameLogicHandler(
     }
 
     fun onRevealLetterButtonClicked(gameModel: GameModel) {
-        if (gameModel.coins - REVEAL_LETTER_COST >= 0) {
+        if (gameModel.coins - gameModel.selectedDifficulty.revealLetterCost >= 0) {
             if (gameModel.hiddenLettersIndices.isNotEmpty()) {
                 revealLetter(gameModel)
             }
@@ -124,11 +124,11 @@ class GameLogicHandler(
     }
 
     private fun revealLetter(gameModel: GameModel) {
-        gameModel.coins -= REVEAL_LETTER_COST
+        gameModel.coins -= gameModel.selectedDifficulty.revealLetterCost
         val letter = gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()]
         gamePlayScreen.onLetterRevealed(
             suffixLettersReverse[letter] ?: letter,
-            REVEAL_LETTER_COST
+            gameModel.selectedDifficulty.revealLetterCost
         )
     }
 
@@ -143,8 +143,6 @@ class GameLogicHandler(
     }
 
     companion object {
-        const val SHARED_PREFERENCES_DATA_KEY_COINS = "coins"
-        const val REVEAL_LETTER_COST = 8
 
         private val suffixLetters = mapOf(
             'פ' to 'ף',

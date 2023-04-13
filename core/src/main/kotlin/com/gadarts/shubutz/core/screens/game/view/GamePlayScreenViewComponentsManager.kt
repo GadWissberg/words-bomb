@@ -113,7 +113,7 @@ class GamePlayScreenViewComponentsManager(
             assetsManager.getTexture(if (selectedDifficulty != Difficulties.KIDS) COIN else CANDY)
         val labelStyle = LabelStyle(font, Color.WHITE)
         stack.add(Image(coin))
-        val cost = Label("8", labelStyle)
+        val cost = Label(selectedDifficulty.revealLetterCost.toString(), labelStyle)
         cost.setAlignment(Align.center)
         stack.add(cost)
         revealLetterButton.add(stack).size(coin.width.toFloat(), coin.height.toFloat())

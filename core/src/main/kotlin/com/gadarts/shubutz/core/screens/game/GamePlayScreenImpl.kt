@@ -23,14 +23,21 @@ class GamePlayScreenImpl(
 ) : GameScreen(), GamePlayScreen {
 
 
-    private val gameModel = GameModel(
-        if (DebugSettings.FORCE_NUMBER_OF_COINS >= 0) DebugSettings.FORCE_NUMBER_OF_COINS else android.getSharedPreferencesValue(
-            GameLogicHandler.SHARED_PREFERENCES_DATA_KEY_COINS
-        ),
-        selectedDifficulty
-    )
+    private val gameModel = createGameModel()
+
     private lateinit var gameLogicHandler: GameLogicHandler
+
     private lateinit var gamePlayScreenView: GamePlayScreenView
+
+    private fun createGameModel(): GameModel {
+        val coins: Int = if (DebugSettings.FORCE_NUMBER_OF_COINS >= 0) {
+            DebugSettings.FORCE_NUMBER_OF_COINS
+        } else {
+            android.getSharedPreferencesValue(selectedDifficulty.sharedPreferencesCoinsKey)
+        }
+        return GameModel(coins, selectedDifficulty)
+    }
+
     override fun onSuccessfulPurchase(products: MutableList<String>) {
         products.forEach { product ->
             val filtered = InAppProducts.values().filter { it.name.lowercase() == product }
