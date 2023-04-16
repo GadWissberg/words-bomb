@@ -210,10 +210,7 @@ class DialogsManager(
                 )
             }
         }
-        val videoSection = addVideoSection(layout, onVideoDone, gamePlayScreen)
-        gamePlayScreen.onBuyCoinsDialogOpened {
-            videoSection.isVisible = true
-        }
+        addVideoSection(layout, onVideoDone, gamePlayScreen)
         placeDialogInTheMiddle(layout)
     }
 
@@ -221,7 +218,8 @@ class DialogsManager(
         layout: Table,
         onVideoDone: () -> Unit,
         gamePlayScreen: GamePlayScreen,
-    ): Table {
+    ) {
+        val stack = Stack()
         val table = Table()
         addDialogText(
             assetsManager = globalHandlers.assetsManager,
@@ -232,8 +230,14 @@ class DialogsManager(
         )
         addVideoButton(table, onVideoDone, gamePlayScreen)
         table.isVisible = false
-        layout.add(table)
-        return table
+        stack.add(table)
+        val loadingAnimation = createLoadingAnimation()
+        stack.add(loadingAnimation)
+        layout.add(stack)
+        gamePlayScreen.onBuyCoinsDialogOpened {
+            table.isVisible = true
+            loadingAnimation.isVisible = false
+        }
     }
 
     private fun addVideoButton(
@@ -265,8 +269,7 @@ class DialogsManager(
         stage: GameStage,
         gamePlayScreen: GamePlayScreen,
     ) {
-        val keyFrames = globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING).regions
-        val loadingAnimation = LoadingAnimation(keyFrames)
+        val loadingAnimation = createLoadingAnimation()
         val layout = Table()
         layout.add(loadingAnimation).row()
         stage.addDialog(layout, COINS_DIALOG_LOADING_NAME, globalHandlers.assetsManager) {
@@ -290,6 +293,11 @@ class DialogsManager(
                 layout.pack()
             })
         }
+    }
+
+    private fun createLoadingAnimation(): LoadingAnimation {
+        val keyFrames = globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING).regions
+        return LoadingAnimation(keyFrames)
     }
 
     fun openExitDialog(

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.Scaling
 
 class LoadingAnimation(keyFrames: Array<TextureAtlas.AtlasRegion>) : Image() {
     private val drawables: List<TextureRegionDrawable>
@@ -15,6 +16,7 @@ class LoadingAnimation(keyFrames: Array<TextureAtlas.AtlasRegion>) : Image() {
     init {
         animation = Animation(FRAME_DURATION, keyFrames, Animation.PlayMode.LOOP)
         drawables = keyFrames.map { TextureRegionDrawable(TextureRegion(it)) }
+        setScaling(Scaling.none)
     }
 
     override fun act(delta: Float) {
