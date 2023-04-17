@@ -27,10 +27,6 @@ class GameLogicHandler(
         beginRound(gameModel)
     }
 
-    /**
-     * Initializes the bomb's counter, decide the letter to be hidden and initialize the options
-     * letters array.
-     */
     fun beginRound(gameModel: GameModel) {
         if (unusedPhrases.isEmpty()) {
             unusedPhrases = phrases
@@ -66,8 +62,13 @@ class GameLogicHandler(
         if (gameWin) {
             coinsAmount = gameModel.selectedDifficulty.winWorth
             addCoinsValueAndSave(gameModel, coinsAmount)
+            coinsAmount += if (isPerfectBonus(gameModel)) gameModel.coins / 2 else 0
         }
-        gamePlayScreen.onCorrectGuess(indices, gameWin, coinsAmount)
+        gamePlayScreen.onCorrectGuess(indices, gameWin, coinsAmount, isPerfectBonus(gameModel))
+    }
+
+    private fun isPerfectBonus(gameModel: GameModel): Boolean {
+        return gameModel.selectedDifficulty.perfectBonusEnabled && gameModel.selectedDifficulty.tries == gameModel.triesLeft
     }
 
     private fun addCoinsValueAndSave(
@@ -95,17 +96,14 @@ class GameLogicHandler(
 
     private fun decideHiddenLetters(model: GameModel) {
         val indices = mutableListOf<Int>()
-        val phraseLength = model.currentPhrase.length
-        for (i in 0 until phraseLength) {
+        for (i in 0 until model.currentPhrase.length) {
             if (model.currentPhrase[i] != ' ') {
                 indices.add(i)
             }
         }
-        val toDropFromHiddenIndices =
-            (phraseLength - phraseLength * model.selectedDifficulty.lettersToHideFactor).toInt()
         model.hiddenLettersIndices = indices.shuffled()
             .toMutableList()
-            .drop(toDropFromHiddenIndices)
+            .drop((model.currentPhrase.length - model.currentPhrase.length * model.selectedDifficulty.lettersToHideFactor).toInt())
             .toMutableList()
     }
 

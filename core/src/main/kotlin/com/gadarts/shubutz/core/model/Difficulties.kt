@@ -9,10 +9,17 @@ enum class Difficulties(
     val phrasesFileName: String = "phrases",
     val sharedPreferencesCoinsKey: String = "regular_coins",
     val revealLetterCost: Int = 8,
+    val perfectBonusEnabled: Boolean = true
 ) {
 
 
-    BEGINNER("מתחיל", 0.5F, 6, 1),
+    BEGINNER(
+        displayName = "מתחיל",
+        lettersToHideFactor = 0.5F,
+        tries = 6,
+        winWorth = 1,
+        perfectBonusEnabled = false
+    ),
     INTERMEDIATE("בינוני", 0.8F, 5, 2, 4),
     ADVANCED("מתקדם", 0.9F, 4, 3, 5),
     EXPERT("מומחה", 1F, 3, 4, 6),

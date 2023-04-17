@@ -16,7 +16,13 @@ interface GamePlayScreen {
     fun onRevealLetterButtonClicked()
     fun onLetterRevealed(letter: Char, cost: Int)
     fun onIncorrectGuess(gameOver: Boolean)
-    fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int)
+    fun onCorrectGuess(
+        indices: List<Int>,
+        gameWin: Boolean,
+        coinsAmount: Int,
+        perfectBonusAchieved: Boolean
+    )
+
     fun onLetterRevealFailedNotEnoughCoins()
     fun onBuyCoinsDialogOpened(onLoaded: () -> Unit)
     fun onShowVideoAdClicked(onAdCompleted: () -> Unit, onAdDismissed: () -> Unit)

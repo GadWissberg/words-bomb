@@ -134,7 +134,12 @@ class GamePlayScreenImpl(
         lifeCycleManager.goToMenu()
     }
 
-    override fun onCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
+    override fun onCorrectGuess(
+        indices: List<Int>,
+        gameWin: Boolean,
+        coinsAmount: Int,
+        perfectBonusAchieved: Boolean
+    ) {
         gamePlayScreenView.displayCorrectGuess(indices, gameWin, coinsAmount)
     }
 

@@ -27,6 +27,63 @@ class DialogsManager(
     private val effectsHandler: EffectsHandler,
     private val stage: GameStage
 ) {
+    fun openBuyCoinsDialog(
+        stage: GameStage,
+        gamePlayScreen: GamePlayScreen,
+    ) {
+        val loadingAnimation = createLoadingAnimation()
+        val layout = Table()
+        layout.add(loadingAnimation).row()
+        stage.addDialog(layout, COINS_DIALOG_LOADING_NAME, globalHandlers.assetsManager) {
+            gamePlayScreen.onOpenProductsMenu({
+                loadingAnimation.remove()
+                layout.remove()
+                stage.addDialog(layout, COINS_DIALOG_NAME, globalHandlers.assetsManager)
+                if (it.isNotEmpty()) {
+                    addCoinsDialogComponents(layout, it, gamePlayScreen) {
+                        effectsHandler.applyPartyEffect(
+                            globalHandlers,
+                            stage
+                        )
+                    }
+                }
+                layout.pack()
+                stage.closeDialog(COINS_DIALOG_LOADING_NAME)
+            }, {
+                loadingAnimation.remove()
+                layout.add(ViewUtils.createDialogLabel(it, globalHandlers.assetsManager))
+                layout.pack()
+            })
+        }
+    }
+
+    fun openCoinsPurchasedSuccessfully(
+        assetsManager: GameAssetManager,
+        stage: GameStage,
+        amount: Int
+    ) {
+        val dialogView =
+            createCoinsPurchasedSuccessfullyDialog(assetsManager, amount)
+        stage.addDialog(dialogView, COINS_PURCHASED_DIALOG_NAME, assetsManager)
+        placeDialogInTheMiddle(dialogView)
+        stage.closeDialog(COINS_DIALOG_NAME)
+    }
+
+    fun openExitDialog(
+        stage: GameStage,
+        assetsManager: GameAssetManager,
+        gamePlayScreen: GamePlayScreen
+    ) {
+        val dialogView = createDialogLayout(
+            assetsManager,
+            EXIT_DIALOG_HEADER,
+            EXIT_DIALOG_DESCRIPTION
+        )
+        addExitDialogButtons(gamePlayScreen, dialogView)
+        stage.addDialog(dialogView, EXIT_DIALOG_NAME, assetsManager)
+        placeDialogInTheMiddle(dialogView)
+    }
+
     private fun addDialogText(
         assetsManager: GameAssetManager,
         dialog: Table,
@@ -71,13 +128,13 @@ class DialogsManager(
         gamePlayScreen: GamePlayScreen,
     ) {
         val button = addDialogButton(
-            dialog,
-            {
+            dialogLayout = dialog,
+            onClick = {
                 if (product != null) {
                     gamePlayScreen.onPackPurchaseButtonClicked(product)
                 }
             },
-            definition.label.format(definition.amount.toString().reversed()),
+            text = definition.label.format(definition.amount.toString().reversed()),
             dialogName = COINS_DIALOG_NAME
         )
         val stack = Stack()
@@ -161,6 +218,7 @@ class DialogsManager(
         }
     }
 
+
     private fun createDialogButton(
         stage: GameStage,
         text: String,
@@ -189,7 +247,6 @@ class DialogsManager(
         })
     }
 
-
     private fun addCoinsDialogComponents(
         layout: Table,
         products: Map<String, Product>,
@@ -202,11 +259,11 @@ class DialogsManager(
             val id = it.name.lowercase(Locale.ROOT)
             if (products.containsKey(id)) {
                 addPackButton(
-                    layout,
-                    products[id],
+                    dialog = layout,
+                    product = products[id],
                     definition = it,
-                    globalHandlers.assetsManager,
-                    gamePlayScreen
+                    gameAssetManager = globalHandlers.assetsManager,
+                    gamePlayScreen = gamePlayScreen
                 )
             }
         }
@@ -265,54 +322,9 @@ class DialogsManager(
         cell.size(cell.prefWidth, COINS_DIALOG_BUTTON_VIDEO_PADDING)
     }
 
-    fun openBuyCoinsDialog(
-        stage: GameStage,
-        gamePlayScreen: GamePlayScreen,
-    ) {
-        val loadingAnimation = createLoadingAnimation()
-        val layout = Table()
-        layout.add(loadingAnimation).row()
-        stage.addDialog(layout, COINS_DIALOG_LOADING_NAME, globalHandlers.assetsManager) {
-            gamePlayScreen.onOpenProductsMenu({
-                loadingAnimation.remove()
-                layout.remove()
-                stage.addDialog(layout, COINS_DIALOG_NAME, globalHandlers.assetsManager)
-                if (it.isNotEmpty()) {
-                    addCoinsDialogComponents(layout, it, gamePlayScreen) {
-                        effectsHandler.applyPartyEffect(
-                            globalHandlers,
-                            stage
-                        )
-                    }
-                }
-                layout.pack()
-                stage.closeDialog(COINS_DIALOG_LOADING_NAME)
-            }, {
-                loadingAnimation.remove()
-                layout.add(ViewUtils.createDialogLabel(it, globalHandlers.assetsManager))
-                layout.pack()
-            })
-        }
-    }
-
     private fun createLoadingAnimation(): LoadingAnimation {
         val keyFrames = globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING).regions
         return LoadingAnimation(keyFrames)
-    }
-
-    fun openExitDialog(
-        stage: GameStage,
-        assetsManager: GameAssetManager,
-        gamePlayScreen: GamePlayScreen
-    ) {
-        val dialogView = createDialogLayout(
-            assetsManager,
-            EXIT_DIALOG_HEADER,
-            EXIT_DIALOG_DESCRIPTION
-        )
-        addExitDialogButtons(gamePlayScreen, dialogView)
-        stage.addDialog(dialogView, EXIT_DIALOG_NAME, assetsManager)
-        placeDialogInTheMiddle(dialogView)
     }
 
     private fun createDialogLayout(
@@ -365,18 +377,6 @@ class DialogsManager(
             (layout.parent as Table).stage.width / 2F - (layout.parent as Table).prefWidth / 2F,
             (layout.parent as Table).stage.height / 2F - (layout.parent as Table).prefHeight / 2F
         )
-    }
-
-    fun openCoinsPurchasedSuccessfully(
-        assetsManager: GameAssetManager,
-        stage: GameStage,
-        amount: Int
-    ) {
-        val dialogView =
-            createCoinsPurchasedSuccessfullyDialog(assetsManager, amount)
-        stage.addDialog(dialogView, COINS_PURCHASED_DIALOG_NAME, assetsManager)
-        placeDialogInTheMiddle(dialogView)
-        stage.closeDialog(COINS_DIALOG_NAME)
     }
 
     private fun createCoinsPurchasedSuccessfullyDialog(
