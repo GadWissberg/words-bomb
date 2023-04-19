@@ -14,6 +14,7 @@ enum class SoundsDefinitions : AssetDefinition<Sound> {
     BUBBLE,
     CORRECT,
     PURCHASED,
+    PERFECT,
     HELP;
 
     private var path: String =

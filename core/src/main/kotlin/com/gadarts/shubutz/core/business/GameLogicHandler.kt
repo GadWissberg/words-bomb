@@ -8,6 +8,7 @@ import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
 import com.gadarts.shubutz.core.model.Phrase
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
+import kotlin.math.max
 
 class GameLogicHandler(
     private val phrases: HashMap<String, ArrayList<Phrase>>,
@@ -59,12 +60,14 @@ class GameLogicHandler(
         gameModel.hiddenLettersIndices.removeAll(indices.toSet())
         val gameWin = gameModel.hiddenLettersIndices.isEmpty()
         var coinsAmount = 0
+        var perfectBonus = false
         if (gameWin) {
             coinsAmount = gameModel.selectedDifficulty.winWorth
+            perfectBonus = isPerfectBonus(gameModel)
+            coinsAmount += if (perfectBonus) max(coinsAmount / 2, 1) else 0
             addCoinsValueAndSave(gameModel, coinsAmount)
-            coinsAmount += if (isPerfectBonus(gameModel)) gameModel.coins / 2 else 0
         }
-        gamePlayScreen.onCorrectGuess(indices, gameWin, coinsAmount, isPerfectBonus(gameModel))
+        gamePlayScreen.onCorrectGuess(indices, gameWin, coinsAmount, perfectBonus)
     }
 
     private fun isPerfectBonus(gameModel: GameModel): Boolean {

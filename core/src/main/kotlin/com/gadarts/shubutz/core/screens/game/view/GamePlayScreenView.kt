@@ -100,8 +100,13 @@ class GamePlayScreenView(
         gamePlayScreenViewComponentsManager.clear()
     }
 
-    fun displayCorrectGuess(indices: List<Int>, gameWin: Boolean, coinsAmount: Int) {
-        gamePlayScreenViewComponentsManager.onCorrectGuess(coinsAmount)
+    fun displayCorrectGuess(
+        indices: List<Int>,
+        gameWin: Boolean,
+        coinsAmount: Int,
+        perfectBonusAchieved: Boolean
+    ) {
+        gamePlayScreenViewComponentsManager.onCorrectGuess(coinsAmount, perfectBonusAchieved)
         globalHandlers.soundPlayer.playSound(globalHandlers.assetsManager.getSound(SoundsDefinitions.CORRECT))
         if (gamePlayScreenViewComponentsManager.optionsView.selectedBrick != null) {
             val brickTexture = globalHandlers.assetsManager.getTexture(TexturesDefinitions.BRICK)

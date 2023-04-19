@@ -276,8 +276,48 @@ class GamePlayScreenViewComponentsManager(
         revealLetterButton.remove()
     }
 
-    fun onCorrectGuess(coinsAmount: Int) {
+    fun onCorrectGuess(coinsAmount: Int, perfectBonusAchieved: Boolean) {
         topBarView.onCorrectGuess(coinsAmount)
+        if (perfectBonusAchieved) {
+            displayPerfect()
+        }
+    }
+
+    private fun displayPerfect() {
+        val texture = globalHandlers.assetsManager.getTexture(PERFECT)
+        val perfectImage = Image(texture)
+        perfectImage.setPosition(stage.width / 2F - texture.width / 2F, stage.height)
+        perfectImage.setOrigin(Align.center)
+        val sound = globalHandlers.assetsManager.getSound(SoundsDefinitions.PERFECT)
+        globalHandlers.soundPlayer.playSound(sound)
+
+        perfectImage.addAction(
+            Actions.sequence(
+                Actions.moveTo(
+                    stage.width / 2F - texture.width / 2F,
+                    stage.height / 2F,
+                    1F,
+                    Interpolation.bounce
+                ),
+                Actions.delay(1F),
+                Actions.rotateBy(35F, 0.2F, Interpolation.swingIn),
+                Actions.rotateBy(-70F, 0.2F, Interpolation.swingIn),
+                Actions.rotateBy(35F, 0.2F, Interpolation.swingIn),
+                Actions.delay(0.5F),
+                Actions.parallel(
+                    Actions.sizeTo(0F, 0F, 0.5F, Interpolation.swingOut),
+                    Actions.moveBy(
+                        texture.width / 2F,
+                        texture.height / 2F,
+                        0.5F,
+                        Interpolation.swingOut
+                    )
+                ),
+                Actions.removeActor()
+            )
+        )
+
+        stage.addActor(perfectImage)
     }
 
     fun onLetterRevealed(letter: Char, cost: Int) {
