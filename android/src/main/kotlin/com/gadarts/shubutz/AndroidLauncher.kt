@@ -103,15 +103,27 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         return versionName
     }
 
-    override fun getSharedPreferencesValue(key: String): Int {
+    override fun getSharedPreferencesIntValue(key: String): Int {
         val sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_DATA_NAME, MODE_PRIVATE)
         return sharedPreferences.getInt(key, 0)
     }
 
-    override fun saveSharedPreferencesValue(key: String, value: Int) {
+    override fun getSharedPreferencesBooleanValue(key: String, default: Boolean): Boolean {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_DATA_NAME, MODE_PRIVATE)
+        return sharedPreferences.getBoolean(key, default)
+    }
+
+    override fun saveSharedPreferencesIntValue(key: String, value: Int) {
         val sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_DATA_NAME, MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putInt(key, value)
+        editor.apply()
+    }
+
+    override fun saveSharedPreferencesBooleanValue(key: String, value: Boolean) {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_DATA_NAME, MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putBoolean(key, value)
         editor.apply()
     }
 

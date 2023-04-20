@@ -5,8 +5,10 @@ import com.gadarts.shubutz.core.model.Product
 interface AndroidInterface {
     fun toast(msg: String)
     fun versionName(): String
-    fun getSharedPreferencesValue(key: String): Int
-    fun saveSharedPreferencesValue(key: String, value: Int)
+    fun getSharedPreferencesIntValue(key: String): Int
+    fun getSharedPreferencesBooleanValue(key: String, default: Boolean): Boolean
+    fun saveSharedPreferencesIntValue(key: String, value: Int)
+    fun saveSharedPreferencesBooleanValue(key: String, value: Boolean)
     fun initializeInAppPurchases(
         onSuccess: (products: Map<String, Product>) -> Unit,
         onFailure: (message: String) -> Unit

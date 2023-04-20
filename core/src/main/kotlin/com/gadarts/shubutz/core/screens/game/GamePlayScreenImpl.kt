@@ -33,7 +33,7 @@ class GamePlayScreenImpl(
         val coins: Int = if (DebugSettings.FORCE_NUMBER_OF_COINS >= 0) {
             DebugSettings.FORCE_NUMBER_OF_COINS
         } else {
-            android.getSharedPreferencesValue(selectedDifficulty.sharedPreferencesCoinsKey)
+            android.getSharedPreferencesIntValue(selectedDifficulty.sharedPreferencesCoinsKey)
         }
         return GameModel(coins, selectedDifficulty)
     }

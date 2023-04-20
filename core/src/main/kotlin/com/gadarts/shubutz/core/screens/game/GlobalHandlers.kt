@@ -7,7 +7,7 @@ import com.gadarts.shubutz.core.model.assets.GameAssetManager
 
 class GlobalHandlers(val androidInterface: AndroidInterface) : Disposable {
     val assetsManager: GameAssetManager = GameAssetManager()
-    val soundPlayer: SoundPlayer = SoundPlayer()
+    val soundPlayer: SoundPlayer = SoundPlayer(androidInterface)
     override fun dispose() {
         assetsManager.dispose()
     }

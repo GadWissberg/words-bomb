@@ -10,10 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Disposable
+import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.Difficulties
@@ -32,15 +35,54 @@ class MenuScreenView(
     private val versionName: String,
     private val stage: GameStage,
     private val soundPlayer: SoundPlayer,
-    private val menuScreen: MenuScreen
+    private val menuScreen: MenuScreen,
+    private val androidInterface: AndroidInterface
 ) : Disposable {
 
 
+    private lateinit var soundButton: ImageButton
     private lateinit var logoTable: Table
     private lateinit var versionLabel: Label
     private var mainMenuTable = Table()
     private var difficultySelectionTable = Table()
     var loadingAnimationRenderer = LoadingAnimationHandler()
+
+    private fun addSoundButton() {
+        val imageButton = createSoundButton()
+        imageButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                super.clicked(event, x, y)
+                soundPlayer.enabled = !soundPlayer.enabled
+                soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
+                androidInterface.saveSharedPreferencesBooleanValue(
+                    SoundPlayer.SHARED_PREF_KEY_SOUND_ENABLED,
+                    soundPlayer.enabled
+                )
+            }
+        })
+        stage.addActor(imageButton)
+        soundButton = imageButton
+    }
+
+    private fun createSoundButton(): ImageButton {
+        val texture = assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_UP)
+        val style = ImageButton.ImageButtonStyle(
+            TextureRegionDrawable(texture),
+            TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_DOWN)),
+            null,
+            TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.ICON_SOUND_OFF)),
+            null,
+            TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.ICON_SOUND_ON)),
+        )
+        val imageButton = ImageButton(style)
+        imageButton.isChecked = soundPlayer.enabled
+        imageButton.setPosition(
+            stage.width - texture.width - SOUND_BUTTON_PADDING,
+            SOUND_BUTTON_PADDING
+        )
+        return imageButton
+    }
+
     fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: BeginGameAction) {
         if (!loadingDone) {
             loadingAnimationRenderer.addLoadingAnimation(assetsManager, stage)
@@ -56,6 +98,7 @@ class MenuScreenView(
     }
 
     fun finishLoadingAnimationAndDisplayMenu(beginGameAction: BeginGameAction) {
+        addSoundButton()
         loadingAnimationRenderer.flyOutBricks(
             assetsManager.getSound(SoundsDefinitions.FLYBY),
             soundPlayer
@@ -76,6 +119,7 @@ class MenuScreenView(
         mainMenuTable.remove()
         difficultySelectionTable.remove()
         versionLabel.remove()
+        soundButton.remove()
     }
 
     private fun addUserInterface(beginGameAction: BeginGameAction) {
@@ -241,6 +285,7 @@ class MenuScreenView(
         private const val LABEL_BACK = "חזרה"
         private const val LOGO_PADDING_TOP = 300F
         private const val LOGO_PADDING_BOTTOM = 75F
+        private const val SOUND_BUTTON_PADDING = 20F
     }
 
 }

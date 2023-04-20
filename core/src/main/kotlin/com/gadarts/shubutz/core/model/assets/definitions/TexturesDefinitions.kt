@@ -33,6 +33,8 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     ICON_PACK_1,
     ICON_PACK_2,
     ICON_PACK_3,
+    ICON_SOUND_ON,
+    ICON_SOUND_OFF,
     DIALOG_CLOSE_BUTTON,
     COIN,
     FLASH,

@@ -14,7 +14,7 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
 
     private lateinit var globalHandlers: GlobalHandlers
     private lateinit var stage: GameStage
-    private val soundPlayer = SoundPlayer()
+    private val soundPlayer = SoundPlayer(android)
     override var loadingDone: Boolean = false
 
     override fun create() {

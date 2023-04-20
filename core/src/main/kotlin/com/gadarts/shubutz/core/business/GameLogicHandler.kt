@@ -79,7 +79,7 @@ class GameLogicHandler(
         coinsAmount: Int
     ) {
         gameModel.coins += coinsAmount
-        androidInterface.saveSharedPreferencesValue(
+        androidInterface.saveSharedPreferencesIntValue(
             gameModel.selectedDifficulty.sharedPreferencesCoinsKey,
             gameModel.coins
         )
