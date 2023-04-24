@@ -67,6 +67,7 @@ class GamePlayScreenImpl(
         gameLogicHandler.beginGame(gameModel)
         gamePlayScreenView = createGamePlayScreenView()
         gamePlayScreenView.onShow()
+        android.loadBannerAd()
     }
 
     private fun createGamePlayScreenView() = GamePlayScreenView(

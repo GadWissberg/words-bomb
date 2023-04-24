@@ -139,7 +139,7 @@ class GameLogicHandler(
 
     fun onBuyCoinsDialogOpened(onLoaded: () -> Unit) {
         Gdx.app.postRunnable {
-            androidInterface.loadAd(onLoaded)
+            androidInterface.loadVideoAd(onLoaded)
         }
     }
 
