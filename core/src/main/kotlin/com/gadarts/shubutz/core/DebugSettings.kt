@@ -14,6 +14,7 @@ object DebugSettings {
 
     const val FORCE_NUMBER_OF_COINS = -1
     const val TEST_ADS = true
+    const val ALWAYS_DISPLAY_BANNER_ADS = false
 
 }
 

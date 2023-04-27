@@ -19,4 +19,5 @@ interface AndroidInterface {
     fun loadVideoAd(onLoaded: () -> Unit)
     fun displayRewardedAd(onAdCompleted: () -> Unit, onAdDismissed: () -> Unit)
     fun loadBannerAd()
+    fun hideBannerAd()
 }

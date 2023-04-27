@@ -4,27 +4,25 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.GameLifeCycleManager
-import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.Difficulties
-import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.GameScreen
+import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class MenuScreenImpl(
-    assetsManager: GameAssetManager,
-    androidInterface: AndroidInterface,
+    globalHandlers: GlobalHandlers,
+    private val androidInterface: AndroidInterface,
     private val gameLifeCycleManager: GameLifeCycleManager,
     stage: GameStage,
-    soundPlayer: SoundPlayer,
 ) :
     GameScreen(), MenuScreen {
 
     private val menuScreenView = MenuScreenView(
-        assetsManager,
+        globalHandlers.assetsManager,
         androidInterface.versionName(),
         stage,
-        soundPlayer,
+        globalHandlers.soundPlayer,
         this,
         androidInterface
     )
@@ -42,6 +40,7 @@ class MenuScreenImpl(
 
     override fun show() {
         menuScreenView.onShow(gameLifeCycleManager.loadingDone, goToPlayScreenOnClick())
+        androidInterface.hideBannerAd()
     }
 
     override fun render(delta: Float) {

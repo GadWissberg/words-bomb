@@ -14,7 +14,6 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
 
     private lateinit var globalHandlers: GlobalHandlers
     private lateinit var stage: GameStage
-    private val soundPlayer = SoundPlayer(android)
     override var loadingDone: Boolean = false
 
     override fun create() {
@@ -64,8 +63,7 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     override fun goToMenu() {
         if (getScreen() is MenuScreenImpl) return
         screen?.dispose()
-        val menuScreenImpl =
-            MenuScreenImpl(globalHandlers.assetsManager, android, this, stage, soundPlayer)
+        val menuScreenImpl = MenuScreenImpl(globalHandlers, android, this, stage)
         setScreen(menuScreenImpl)
     }
 

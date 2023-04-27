@@ -10,6 +10,7 @@ import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
+import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.DISABLE_ADS
 import com.gadarts.shubutz.core.screens.GameScreen
 import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenView
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
@@ -45,6 +46,7 @@ class GamePlayScreenImpl(
                 val amount = filtered.first().amount
                 gameLogicHandler.onPurchasedCoins(gameModel, amount)
                 gamePlayScreenView.onPurchasedCoins(amount)
+                android.saveSharedPreferencesBooleanValue(DISABLE_ADS, true)
             }
         }
     }

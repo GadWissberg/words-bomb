@@ -5,7 +5,10 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.Window
+import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.Toast
@@ -19,6 +22,8 @@ import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
+import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
+import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SHARED_PREFERENCES_DATA_NAME
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -32,6 +37,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
+    private lateinit var adView: AdView
     private lateinit var layout: RelativeLayout
     private lateinit var loadedAd: RewardedAd
     private lateinit var game: ShubutzGame
@@ -65,7 +71,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        layout = RelativeLayout(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         try {
             val pInfo = context.packageManager.getPackageInfoCompat(context.packageName, 0)
@@ -74,16 +79,42 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
             e.printStackTrace()
         }
         game = ShubutzGame(this)
+        createLayout()
+        createBillingClient()
+    }
+
+    private fun createLayout() {
+        layout = RelativeLayout(this)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
-        window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
         val view = initializeForView(game, createAndroidApplicationConfig())
         layout.addView(view)
-        createBillingClient()
         setContentView(layout)
+        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.hide(WindowInsets.Type.statusBars())
+        } else {
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
+        }
+        addBannerAdLayout()
+    }
+
+    private fun addBannerAdLayout() {
+        adView = AdView(this)
+        val adParams = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.WRAP_CONTENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        )
+        adView.setAdSize(AdSize.BANNER)
+        adView.adUnitId =
+            if (DebugSettings.TEST_ADS) BANNER_AD_UNIT_TEST else BANNER_AD_UNIT_PROD
+        adParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        adParams.addRule(RelativeLayout.CENTER_HORIZONTAL)
+        layout.addView(adView, adParams)
+        defineBannerAdListener(adView)
     }
 
     private fun createAndroidApplicationConfig(): AndroidApplicationConfiguration {
@@ -224,21 +255,30 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     }
 
     override fun loadBannerAd() {
-        runOnUiThread {
-            val adView = AdView(this)
-            val adRequest = AdRequest.Builder().build()
-            val adParams = RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
+        if (!DebugSettings.ALWAYS_DISPLAY_BANNER_ADS && getSharedPreferencesBooleanValue(
+                SharedPreferencesKeys.DISABLE_ADS,
+                false
             )
-            adView.setAdSize(AdSize.BANNER)
-            adView.adUnitId =
-                if (DebugSettings.TEST_ADS) BANNER_AD_UNIT_TEST else BANNER_AD_UNIT_PROD
+        ) return
+
+        runOnUiThread {
+            val adRequest = AdRequest.Builder().build()
+            adView.visibility = VISIBLE
             adView.loadAd(adRequest)
-            adParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-            adParams.addRule(RelativeLayout.CENTER_HORIZONTAL)
-            layout.addView(adView, adParams)
-            defineBannerAdListener(adView)
+        }
+    }
+
+    override fun hideBannerAd() {
+        runOnUiThread {
+            adView.destroy()
+            adView.visibility = GONE
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        runOnUiThread {
+            adView.destroy()
         }
     }
 
@@ -290,7 +330,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     }
 
     companion object {
-        private const val SHARED_PREFERENCES_DATA_NAME = "data"
         private const val FAILURE_MESSAGE_IN_APP_PURCHASE = "אופס! קרתה תקלה..."
         private const val REWARDED_AD_UNIT_TEST = "ca-app-pub-3940256099942544/5224354917"
         private const val REWARDED_AD_UNIT_PROD = "ca-app-pub-2312113291496409/2061684764"

@@ -125,7 +125,7 @@ class GameLogicHandler(
     }
 
     private fun revealLetter(gameModel: GameModel) {
-        gameModel.coins -= gameModel.selectedDifficulty.revealLetterCost
+        addCoinsValueAndSave(gameModel, -gameModel.selectedDifficulty.revealLetterCost)
         val letter = gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()]
         gamePlayScreen.onLetterRevealed(
             suffixLettersReverse[letter] ?: letter,

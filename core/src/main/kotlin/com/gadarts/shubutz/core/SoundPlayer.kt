@@ -2,12 +2,14 @@ package com.gadarts.shubutz.core
 
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.math.MathUtils
+import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 
 class SoundPlayer(android: AndroidInterface) {
     var enabled: Boolean = false
 
     init {
-        enabled = android.getSharedPreferencesBooleanValue(SHARED_PREF_KEY_SOUND_ENABLED, true)
+        enabled =
+            android.getSharedPreferencesBooleanValue(SharedPreferencesKeys.SOUND_ENABLED, true)
     }
 
 
@@ -18,6 +20,5 @@ class SoundPlayer(android: AndroidInterface) {
 
     companion object {
         const val VOLUME = 0.75F
-        const val SHARED_PREF_KEY_SOUND_ENABLED = "sound_enabled"
     }
 }

@@ -22,6 +22,7 @@ import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
+import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SOUND_ENABLED
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.BeginGameAction
@@ -55,7 +56,7 @@ class MenuScreenView(
                 soundPlayer.enabled = !soundPlayer.enabled
                 soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
                 androidInterface.saveSharedPreferencesBooleanValue(
-                    SoundPlayer.SHARED_PREF_KEY_SOUND_ENABLED,
+                    SOUND_ENABLED,
                     soundPlayer.enabled
                 )
             }
