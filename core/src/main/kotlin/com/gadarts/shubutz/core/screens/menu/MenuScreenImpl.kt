@@ -73,15 +73,15 @@ class MenuScreenImpl(
         }
     }
 
-    private fun goToPlayScreenOnClick() = object : BeginGameAction {
-        override fun begin(selectedDifficulty: Difficulties) {
-            gameLifeCycleManager.goToPlayScreen(selectedDifficulty)
-        }
-    }
-
     fun onGameReady() {
         if (menuScreenView.loadingAnimationRenderer.loadingAnimationFinished) {
             menuScreenView.finishLoadingAnimationAndDisplayMenu(goToPlayScreenOnClick())
+        }
+    }
+
+    private fun goToPlayScreenOnClick() = object : BeginGameAction {
+        override fun begin(selectedDifficulty: Difficulties) {
+            gameLifeCycleManager.goToPlayScreen(selectedDifficulty)
         }
     }
 
