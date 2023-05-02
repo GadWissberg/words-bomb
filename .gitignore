@@ -115,3 +115,4 @@ Thumbs.db
 *.jks
 *.pepk
 android/src/debug/
+keys.txt
