@@ -143,7 +143,8 @@ class GamePlayScreenImpl(
         coinsAmount: Int,
         perfectBonusAchieved: Boolean
     ) {
-        gamePlayScreenView.displayCorrectGuess(indices, gameWin, coinsAmount, perfectBonusAchieved)
+        gameLogicHandler.onCorrectGuess(gameWin, gameModel)
+        gamePlayScreenView.onCorrectGuess(indices, gameWin, coinsAmount, perfectBonusAchieved)
     }
 
     override fun onLetterRevealFailedNotEnoughCoins() {

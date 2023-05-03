@@ -43,6 +43,7 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     BUTTON_CIRCLE_DOWN,
     KIDS,
     PERFECT,
+    SCORE,
     POPCORN;
 
     private var path: String =

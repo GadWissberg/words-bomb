@@ -9,6 +9,7 @@ class GameModel(var coins: Int, val selectedDifficulty: Difficulties) {
     lateinit var currentPhrase: String
     var hiddenLettersIndices = mutableListOf<Int>()
     lateinit var options: MutableList<Char>
+    var score = 0
 
     companion object {
         const val LETTERS = "₪-/:םןףץך?!אבגדהוזחטיכלמנסעפצקרשת"

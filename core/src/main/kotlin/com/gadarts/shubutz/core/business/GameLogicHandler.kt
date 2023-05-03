@@ -143,6 +143,12 @@ class GameLogicHandler(
         }
     }
 
+    fun onCorrectGuess(gameWin: Boolean, gameModel: GameModel) {
+        if (gameWin) {
+            gameModel.score += 1
+        }
+    }
+
     companion object {
 
         private val suffixLetters = mapOf(

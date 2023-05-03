@@ -32,6 +32,7 @@ class GamePlayScreenViewComponentsManager(
     gameModel: GameModel
 ) : Disposable {
 
+    private lateinit var scoreView: ScoreView
     private lateinit var revealLetterButton: ImageTextButton
     private var dialogsManager = DialogsManager(globalHandlers, effectsHandler, stage)
     lateinit var targetPhraseView: TargetPhraseView
@@ -54,6 +55,17 @@ class GamePlayScreenViewComponentsManager(
         targetPhraseView.calculateMaxBricksPerLine(am)
         optionsView = OptionsView(stage, globalHandlers.soundPlayer, am, gameModel)
         addRevealLetterButton(am, stage, gameModel.selectedDifficulty)
+        addScoreView(gameModel)
+    }
+
+    private fun addScoreView(gameModel: GameModel) {
+        scoreView = ScoreView(
+            globalHandlers.assetsManager.getTexture(SCORE),
+            globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
+            gameModel.score
+        )
+        scoreView.setPosition(SCORE_VIEW_POSITION_X, SCORE_VIEW_POSITION_Y)
+        stage.addActor(scoreView)
     }
 
     private fun addRevealLetterButton(
@@ -276,10 +288,18 @@ class GamePlayScreenViewComponentsManager(
         revealLetterButton.remove()
     }
 
-    fun onCorrectGuess(coinsAmount: Int, perfectBonusAchieved: Boolean) {
+    fun onCorrectGuess(
+        coinsAmount: Int,
+        perfectBonusAchieved: Boolean,
+        gameWin: Boolean,
+        gameModel: GameModel
+    ) {
         topBarView.onCorrectGuess(coinsAmount)
         if (perfectBonusAchieved) {
             displayPerfect()
+        }
+        if (gameWin) {
+            scoreView.updateLabel(gameModel.score)
         }
     }
 
@@ -357,6 +377,8 @@ class GamePlayScreenViewComponentsManager(
     companion object {
         const val REVEAL_BUTTON_POSITION_X = 800F
         const val REVEAL_BUTTON_POSITION_Y = 1112F
+        const val SCORE_VIEW_POSITION_X = 850F
+        const val SCORE_VIEW_POSITION_Y = 1700F
         val REVEAL_BUTTON_LABEL = "גלה אות".reversed()
     }
 }
