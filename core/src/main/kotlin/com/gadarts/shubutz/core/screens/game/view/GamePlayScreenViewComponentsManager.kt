@@ -286,6 +286,7 @@ class GamePlayScreenViewComponentsManager(
         bombView.clear()
         optionsView.clear()
         revealLetterButton.remove()
+        scoreView.remove()
     }
 
     fun onCorrectGuess(
@@ -299,7 +300,7 @@ class GamePlayScreenViewComponentsManager(
             displayPerfect()
         }
         if (gameWin) {
-            scoreView.updateLabel(gameModel.score)
+            scoreView.onGameWin(gameModel.score)
         }
     }
 
