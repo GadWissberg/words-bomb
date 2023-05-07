@@ -55,14 +55,13 @@ class GamePlayScreenViewComponentsManager(
         targetPhraseView.calculateMaxBricksPerLine(am)
         optionsView = OptionsView(stage, globalHandlers.soundPlayer, am, gameModel)
         addRevealLetterButton(am, stage, gameModel.selectedDifficulty)
-        addScoreView(gameModel)
+        addScoreView()
     }
 
-    private fun addScoreView(gameModel: GameModel) {
+    private fun addScoreView() {
         scoreView = ScoreView(
             globalHandlers.assetsManager.getTexture(SCORE),
-            globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
-            gameModel.score
+            globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80)
         )
         scoreView.setPosition(SCORE_VIEW_POSITION_X, SCORE_VIEW_POSITION_Y)
         stage.addActor(scoreView)

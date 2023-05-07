@@ -13,6 +13,7 @@ import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.Toast
 import com.android.billingclient.api.*
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.gadarts.shubutz.core.AndroidInterface
@@ -30,10 +31,18 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.google.android.gms.games.AuthenticationResult
+import com.google.android.gms.games.GamesSignInClient
+import com.google.android.gms.games.LeaderboardsClient
+import com.google.android.gms.games.PlayGames
+import com.google.android.gms.games.PlayGamesSdk
+import com.google.android.gms.tasks.Task
 
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
+    private lateinit var gamesSignInClient: GamesSignInClient
+    private lateinit var leaderboardsClient: LeaderboardsClient
     private lateinit var adView: AdView
     private lateinit var layout: RelativeLayout
     private lateinit var loadedAd: RewardedAd
@@ -41,9 +50,11 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     private var versionName = "0.0.0"
     private lateinit var purchaseHandler: PurchaseHandler
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        signInToPlayServices()
+        leaderboardsClient = PlayGames.getLeaderboardsClient(this)
+        displayLeaderboard()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         try {
             val pInfo = context.packageManager.getPackageInfoCompat(context.packageName, 0)
@@ -54,6 +65,20 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         game = ShubutzGame(this)
         purchaseHandler = PurchaseHandler(game, this)
         createLayout()
+    }
+
+    private fun signInToPlayServices() {
+        PlayGamesSdk.initialize(this)
+        gamesSignInClient = PlayGames.getGamesSignInClient(this)
+        gamesSignInClient.isAuthenticated.addOnCompleteListener { isAuthenticatedTask: Task<AuthenticationResult> ->
+            val isAuthenticated = isAuthenticatedTask.isSuccessful &&
+                    isAuthenticatedTask.result.isAuthenticated
+            if (isAuthenticated) {
+                Gdx.app.log("Play Services", "Signed in successfully")
+            } else {
+                gamesSignInClient.signIn()
+            }
+        }
     }
 
     private fun createLayout() {
@@ -216,6 +241,21 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         }
     }
 
+    override fun submitScore(score: Long) {
+        leaderboardsClient.submitScore(LEADER_BOARD_ID, score)
+    }
+
+    override fun displayLeaderboard() {
+        gamesSignInClient.isAuthenticated.addOnSuccessListener {
+            if (it.isAuthenticated) {
+                leaderboardsClient.getLeaderboardIntent(LEADER_BOARD_ID)
+                    .addOnSuccessListener { startActivityForResult(intent, 9004); }
+                    .addOnFailureListener { p0 -> Gdx.app.log("test", "$p0") }
+            }
+        }
+
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         runOnUiThread {
@@ -251,5 +291,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         private const val REWARDED_AD_UNIT_PROD = "ca-app-pub-2312113291496409/2061684764"
         private const val BANNER_AD_UNIT_PROD = "ca-app-pub-2312113291496409/7487568541"
         private const val BANNER_AD_UNIT_TEST = "ca-app-pub-3940256099942544/6300978111"
+        private const val LEADER_BOARD_ID = "CgkItLjwycoZEAIQAA"
     }
 }

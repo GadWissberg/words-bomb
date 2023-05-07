@@ -9,9 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 
-class ScoreView(texture: Texture, font: BitmapFont, score: Int) : Table() {
+class ScoreView(texture: Texture, font: BitmapFont) : Table() {
 
-    private val label = Label(score.toString(), Label.LabelStyle(font, Color.WHITE))
+    private val label = Label(0.toString(), Label.LabelStyle(font, Color.WHITE))
 
     init {
         background = TextureRegionDrawable(texture)
@@ -19,11 +19,11 @@ class ScoreView(texture: Texture, font: BitmapFont, score: Int) : Table() {
         pack()
     }
 
-    private fun updateLabel(score: Int) {
-        label.setText(score)
+    private fun updateLabel(score: Long) {
+        label.setText(score.toString())
     }
 
-    fun onGameWin(score: Int) {
+    fun onGameWin(score: Long) {
         updateLabel(score)
 
         addAction(
