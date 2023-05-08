@@ -44,6 +44,7 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     KIDS,
     PERFECT,
     SCORE,
+    ICON_HIGHSCORES,
     POPCORN;
 
     private var path: String =

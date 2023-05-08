@@ -31,18 +31,13 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.google.android.gms.games.AuthenticationResult
-import com.google.android.gms.games.GamesSignInClient
-import com.google.android.gms.games.LeaderboardsClient
-import com.google.android.gms.games.PlayGames
-import com.google.android.gms.games.PlayGamesSdk
-import com.google.android.gms.tasks.Task
+import de.golfgl.gdxgamesvcs.GameServiceException
+import de.golfgl.gdxgamesvcs.GpgsClient
 
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
-    private lateinit var gamesSignInClient: GamesSignInClient
-    private lateinit var leaderboardsClient: LeaderboardsClient
+    private lateinit var gsClient: GpgsClient
     private lateinit var adView: AdView
     private lateinit var layout: RelativeLayout
     private lateinit var loadedAd: RewardedAd
@@ -52,9 +47,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        signInToPlayServices()
-        leaderboardsClient = PlayGames.getLeaderboardsClient(this)
-        displayLeaderboard()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         try {
             val pInfo = context.packageManager.getPackageInfoCompat(context.packageName, 0)
@@ -65,19 +57,16 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         game = ShubutzGame(this)
         purchaseHandler = PurchaseHandler(game, this)
         createLayout()
+        gsClient = GpgsClient().initialize(this, false)
+        signInToPlayServices()
     }
 
     private fun signInToPlayServices() {
-        PlayGamesSdk.initialize(this)
-        gamesSignInClient = PlayGames.getGamesSignInClient(this)
-        gamesSignInClient.isAuthenticated.addOnCompleteListener { isAuthenticatedTask: Task<AuthenticationResult> ->
-            val isAuthenticated = isAuthenticatedTask.isSuccessful &&
-                    isAuthenticatedTask.result.isAuthenticated
-            if (isAuthenticated) {
-                Gdx.app.log("Play Services", "Signed in successfully")
-            } else {
-                gamesSignInClient.signIn()
-            }
+        val loggedIn = gsClient.logIn()
+        if (loggedIn) {
+            Gdx.app.log("Play Services", "Signed in successfully")
+        } else {
+            Gdx.app.log("Play Services", "Did not sign in")
         }
     }
 
@@ -242,18 +231,15 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     }
 
     override fun submitScore(score: Long) {
-        leaderboardsClient.submitScore(LEADER_BOARD_ID, score)
+        gsClient.submitToLeaderboard(LEADER_BOARD_ID, score, null)
     }
 
     override fun displayLeaderboard() {
-        gamesSignInClient.isAuthenticated.addOnSuccessListener {
-            if (it.isAuthenticated) {
-                leaderboardsClient.getLeaderboardIntent(LEADER_BOARD_ID)
-                    .addOnSuccessListener { startActivityForResult(intent, 9004); }
-                    .addOnFailureListener { p0 -> Gdx.app.log("test", "$p0") }
-            }
+        try {
+            gsClient.showLeaderboards(LEADER_BOARD_ID)
+        } catch (ex: GameServiceException) {
+            Gdx.app.error("Play Services", ex.message)
         }
-
     }
 
     override fun onDestroy() {

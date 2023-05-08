@@ -42,6 +42,7 @@ class MenuScreenView(
 
 
     private lateinit var soundButton: ImageButton
+    private lateinit var highscoresButton: ImageButton
     private lateinit var logoTable: Table
     private lateinit var versionLabel: Label
     private var mainMenuTable = Table()
@@ -49,38 +50,63 @@ class MenuScreenView(
     var loadingAnimationRenderer = LoadingAnimationHandler()
 
     private fun addSoundButton() {
-        val imageButton = createSoundButton()
+        val imageButton =
+            createButton(TexturesDefinitions.ICON_SOUND_OFF, TexturesDefinitions.ICON_SOUND_ON)
+        imageButton.setPosition(
+            stage.width - assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_UP).width - ROUND_BUTTON_PADDING_HOR,
+            ROUND_BUTTON_PADDING_VER
+        )
+        imageButton.isChecked = soundPlayer.enabled
         imageButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 super.clicked(event, x, y)
-                soundPlayer.enabled = !soundPlayer.enabled
-                soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
-                androidInterface.saveSharedPreferencesBooleanValue(
-                    SOUND_ENABLED,
-                    soundPlayer.enabled
-                )
+                soundToggle()
             }
         })
         stage.addActor(imageButton)
         soundButton = imageButton
     }
 
-    private fun createSoundButton(): ImageButton {
+    private fun addHighscoresButton() {
+        val imageButton =
+            createButton(TexturesDefinitions.ICON_HIGHSCORES)
+        imageButton.setPosition(
+            ROUND_BUTTON_PADDING_HOR,
+            ROUND_BUTTON_PADDING_VER
+        )
+        imageButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                super.clicked(event, x, y)
+                androidInterface.displayLeaderboard()
+            }
+        })
+        stage.addActor(imageButton)
+        highscoresButton = imageButton
+    }
+
+    private fun soundToggle() {
+        soundPlayer.enabled = !soundPlayer.enabled
+        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
+        androidInterface.saveSharedPreferencesBooleanValue(
+            SOUND_ENABLED,
+            soundPlayer.enabled
+        )
+    }
+
+    private fun createButton(
+        imageUp: TexturesDefinitions,
+        imageChecked: TexturesDefinitions? = null
+    ): ImageButton {
         val texture = assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_UP)
         val style = ImageButton.ImageButtonStyle(
             TextureRegionDrawable(texture),
             TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_DOWN)),
             null,
-            TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.ICON_SOUND_OFF)),
+            TextureRegionDrawable(assetsManager.getTexture(imageUp)),
             null,
-            TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.ICON_SOUND_ON)),
+            if (imageChecked != null) TextureRegionDrawable(assetsManager.getTexture(imageChecked)) else null,
         )
         val imageButton = ImageButton(style)
-        imageButton.isChecked = soundPlayer.enabled
-        imageButton.setPosition(
-            stage.width - texture.width - SOUND_BUTTON_PADDING,
-            SOUND_BUTTON_PADDING
-        )
         return imageButton
     }
 
@@ -100,6 +126,7 @@ class MenuScreenView(
 
     fun finishLoadingAnimationAndDisplayMenu(beginGameAction: BeginGameAction) {
         addSoundButton()
+        addHighscoresButton()
         loadingAnimationRenderer.flyOutBricks(
             assetsManager.getSound(SoundsDefinitions.FLYBY),
             soundPlayer
@@ -121,6 +148,7 @@ class MenuScreenView(
         difficultySelectionTable.remove()
         versionLabel.remove()
         soundButton.remove()
+        highscoresButton.remove()
     }
 
     private fun addUserInterface(beginGameAction: BeginGameAction) {
@@ -286,7 +314,8 @@ class MenuScreenView(
         private const val LABEL_BACK = "חזרה"
         private const val LOGO_PADDING_TOP = 300F
         private const val LOGO_PADDING_BOTTOM = 75F
-        private const val SOUND_BUTTON_PADDING = 20F
+        private const val ROUND_BUTTON_PADDING_HOR = 30F
+        private const val ROUND_BUTTON_PADDING_VER = 60F
     }
 
 }
