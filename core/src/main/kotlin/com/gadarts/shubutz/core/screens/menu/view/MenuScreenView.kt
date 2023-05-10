@@ -77,7 +77,7 @@ class MenuScreenView(
         imageButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 super.clicked(event, x, y)
-                androidInterface.displayLeaderboard()
+                androidInterface.displayLeaderboard(Difficulties.EXPERT.leaderboardsId)
             }
         })
         stage.addActor(imageButton)
@@ -106,8 +106,7 @@ class MenuScreenView(
             null,
             if (imageChecked != null) TextureRegionDrawable(assetsManager.getTexture(imageChecked)) else null,
         )
-        val imageButton = ImageButton(style)
-        return imageButton
+        return ImageButton(style)
     }
 
     fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: BeginGameAction) {

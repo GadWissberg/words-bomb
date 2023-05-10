@@ -230,13 +230,13 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         }
     }
 
-    override fun submitScore(score: Long) {
-        gsClient.submitToLeaderboard(LEADER_BOARD_ID, score, null)
+    override fun submitScore(score: Long, leaderboardsId: String) {
+        gsClient.submitToLeaderboard(leaderboardsId, score, null)
     }
 
-    override fun displayLeaderboard() {
+    override fun displayLeaderboard(leaderboardsId: String) {
         try {
-            gsClient.showLeaderboards(LEADER_BOARD_ID)
+            gsClient.showLeaderboards(leaderboardsId)
         } catch (ex: GameServiceException) {
             Gdx.app.error("Play Services", ex.message)
         }
@@ -277,6 +277,5 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         private const val REWARDED_AD_UNIT_PROD = "ca-app-pub-2312113291496409/2061684764"
         private const val BANNER_AD_UNIT_PROD = "ca-app-pub-2312113291496409/7487568541"
         private const val BANNER_AD_UNIT_TEST = "ca-app-pub-3940256099942544/6300978111"
-        private const val LEADER_BOARD_ID = "CgkItLjwycoZEAIQAA"
     }
 }

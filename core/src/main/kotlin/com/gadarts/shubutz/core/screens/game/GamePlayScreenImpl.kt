@@ -166,8 +166,11 @@ class GamePlayScreenImpl(
     }
 
     override fun onGameOverAnimationDone() {
-        globalHandlers.androidInterface.submitScore(gameModel.score)
-        globalHandlers.androidInterface.displayLeaderboard()
+        globalHandlers.androidInterface.submitScore(
+            gameModel.score,
+            gameModel.selectedDifficulty.leaderboardsId
+        )
+        globalHandlers.androidInterface.displayLeaderboard(gameModel.selectedDifficulty.leaderboardsId)
         lifeCycleManager.goToMenu()
     }
 

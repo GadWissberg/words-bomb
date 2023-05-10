@@ -9,7 +9,8 @@ enum class Difficulties(
     val phrasesFileName: String = "phrases",
     val sharedPreferencesCoinsKey: String = "regular_coins",
     val revealLetterCost: Int = 8,
-    val perfectBonusEnabled: Boolean = true
+    val perfectBonusEnabled: Boolean = true,
+    val leaderboardsId: String
 ) {
 
 
@@ -18,18 +19,41 @@ enum class Difficulties(
         lettersToHideFactor = 0.5F,
         tries = 6,
         winWorth = 1,
-        perfectBonusEnabled = false
+        perfectBonusEnabled = false,
+        leaderboardsId = "CgkItLjwycoZEAIQBA"
     ),
-    INTERMEDIATE("בינוני", 0.8F, 5, 2, 4),
-    ADVANCED("מתקדם", 0.9F, 4, 3, 5),
-    EXPERT("מומחה", 1F, 3, 4, 6),
+    INTERMEDIATE(
+        displayName = "בינוני",
+        lettersToHideFactor = 0.8F,
+        tries = 5,
+        winWorth = 2,
+        minimumLength = 4,
+        leaderboardsId = "CgkItLjwycoZEAIQAw"
+    ),
+    ADVANCED(
+        displayName = "מתקדם",
+        lettersToHideFactor = 0.9F,
+        tries = 4,
+        winWorth = 3,
+        minimumLength = 5,
+        leaderboardsId = "CgkItLjwycoZEAIQAg"
+    ),
+    EXPERT(
+        displayName = "מומחה",
+        lettersToHideFactor = 1F,
+        tries = 3,
+        winWorth = 4,
+        minimumLength = 6,
+        leaderboardsId = "CgkItLjwycoZEAIQAA"
+    ),
     KIDS(
         lettersToHideFactor = 0.6F,
         tries = 6,
         winWorth = 1,
         phrasesFileName = "phrases_kids",
         sharedPreferencesCoinsKey = "kids_coins",
-        revealLetterCost = 4
+        revealLetterCost = 4,
+        leaderboardsId = "CgkItLjwycoZEAIQBQ"
     );
 
 }
