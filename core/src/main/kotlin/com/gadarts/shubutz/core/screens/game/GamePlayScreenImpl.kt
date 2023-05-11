@@ -134,17 +134,11 @@ class GamePlayScreenImpl(
     }
 
     override fun onQuitSession() {
+        val sent = android.submitScore(gameModel.score, gameModel.selectedDifficulty.leaderboardsId)
+        if (sent) {
+            android.displayLeaderboard(gameModel.selectedDifficulty.leaderboardsId)
+        }
         lifeCycleManager.goToMenu()
-    }
-
-    override fun onCorrectGuess(
-        indices: List<Int>,
-        gameWin: Boolean,
-        coinsAmount: Int,
-        perfectBonusAchieved: Boolean
-    ) {
-        gameLogicHandler.onCorrectGuess(gameWin, gameModel)
-        gamePlayScreenView.onCorrectGuess(indices, gameWin, coinsAmount, perfectBonusAchieved)
     }
 
     override fun onLetterRevealFailedNotEnoughCoins() {
@@ -165,12 +159,23 @@ class GamePlayScreenImpl(
         gamePlayScreenView.onIncorrectGuess(gameOver)
     }
 
+    override fun onCorrectGuess(
+        indices: List<Int>,
+        gameWin: Boolean,
+        coinsAmount: Int,
+        perfectBonusAchieved: Boolean
+    ) {
+        gamePlayScreenView.onCorrectGuess(indices, gameWin, coinsAmount, perfectBonusAchieved)
+    }
+
     override fun onGameOverAnimationDone() {
-        globalHandlers.androidInterface.submitScore(
+        val sent = globalHandlers.androidInterface.submitScore(
             gameModel.score,
             gameModel.selectedDifficulty.leaderboardsId
         )
-        globalHandlers.androidInterface.displayLeaderboard(gameModel.selectedDifficulty.leaderboardsId)
+        if (sent) {
+            globalHandlers.androidInterface.displayLeaderboard(gameModel.selectedDifficulty.leaderboardsId)
+        }
         lifeCycleManager.goToMenu()
     }
 

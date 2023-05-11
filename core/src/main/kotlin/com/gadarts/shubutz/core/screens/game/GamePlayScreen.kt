@@ -20,7 +20,7 @@ interface GamePlayScreen {
         indices: List<Int>,
         gameWin: Boolean,
         coinsAmount: Int,
-        perfectBonusAchieved: Boolean
+        perfectBonusAchieved: Boolean,
     )
 
     fun onLetterRevealFailedNotEnoughCoins()

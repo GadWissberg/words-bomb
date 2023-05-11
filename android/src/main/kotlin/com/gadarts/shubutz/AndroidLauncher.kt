@@ -230,8 +230,8 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         }
     }
 
-    override fun submitScore(score: Long, leaderboardsId: String) {
-        gsClient.submitToLeaderboard(leaderboardsId, score, null)
+    override fun submitScore(score: Long, leaderboardsId: String): Boolean {
+        return gsClient.submitToLeaderboard(leaderboardsId, score, null)
     }
 
     override fun displayLeaderboard(leaderboardsId: String) {

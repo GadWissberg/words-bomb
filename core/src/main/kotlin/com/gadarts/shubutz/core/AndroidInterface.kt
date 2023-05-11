@@ -20,6 +20,6 @@ interface AndroidInterface {
     fun displayRewardedAd(onAdCompleted: () -> Unit, onAdDismissed: () -> Unit)
     fun loadBannerAd()
     fun hideBannerAd()
-    fun submitScore(score: Long, leaderboardsId: String)
+    fun submitScore(score: Long, leaderboardsId: String): Boolean
     fun displayLeaderboard(leaderboardsId: String)
 }

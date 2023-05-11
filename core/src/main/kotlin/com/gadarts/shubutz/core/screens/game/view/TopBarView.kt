@@ -125,7 +125,7 @@ class TopBarView(
         add(topPartTable).row()
     }
 
-    private fun addBackButton(
+    private fun addExitButton(
         table: Table,
         assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
@@ -164,7 +164,7 @@ class TopBarView(
     ) {
         val leftSideTable = Table()
         leftSideTable.debug = DebugSettings.SHOW_UI_BORDERS
-        addBackButton(leftSideTable, assetsManager, gamePlayScreen, dialogsManager)
+        addExitButton(leftSideTable, assetsManager, gamePlayScreen, dialogsManager)
         addBuyCoinsButton(leftSideTable, dialogsManager)
         table.add(leftSideTable).expandX().left()
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)

@@ -61,12 +61,15 @@ class GameLogicHandler(
         val gameWin = gameModel.hiddenLettersIndices.isEmpty()
         var coinsAmount = 0
         var perfectBonus = false
+        var scoreWin = 0
         if (gameWin) {
             coinsAmount = gameModel.selectedDifficulty.winWorth
             perfectBonus = isPerfectBonus(gameModel)
             coinsAmount += if (perfectBonus) max(coinsAmount / 2, 1) else 0
+            scoreWin = if (perfectBonus) 2 else 1
             addCoinsValueAndSave(gameModel, coinsAmount)
         }
+        gameModel.score += scoreWin
         gamePlayScreen.onCorrectGuess(indices, gameWin, coinsAmount, perfectBonus)
     }
 
@@ -140,12 +143,6 @@ class GameLogicHandler(
     fun onBuyCoinsDialogOpened(onLoaded: () -> Unit) {
         Gdx.app.postRunnable {
             androidInterface.loadVideoAd(onLoaded)
-        }
-    }
-
-    fun onCorrectGuess(gameWin: Boolean, gameModel: GameModel) {
-        if (gameWin) {
-            gameModel.incrementScore()
         }
     }
 
