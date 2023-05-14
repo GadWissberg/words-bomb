@@ -21,6 +21,7 @@ interface GamePlayScreen {
         gameWin: Boolean,
         coinsAmount: Int,
         perfectBonusAchieved: Boolean,
+        prevScore: Long,
     )
 
     fun onLetterRevealFailedNotEnoughCoins()

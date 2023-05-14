@@ -292,14 +292,15 @@ class GamePlayScreenViewComponentsManager(
         coinsAmount: Int,
         perfectBonusAchieved: Boolean,
         gameWin: Boolean,
-        gameModel: GameModel
+        gameModel: GameModel,
+        prevScore: Long
     ) {
         topBarView.onCorrectGuess(coinsAmount)
         if (perfectBonusAchieved) {
             displayPerfect()
         }
         if (gameWin) {
-            scoreView.onGameWin(gameModel.score)
+            scoreView.onGameWin(gameModel.score, prevScore)
         }
     }
 

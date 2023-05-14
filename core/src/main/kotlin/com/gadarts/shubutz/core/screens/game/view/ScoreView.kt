@@ -23,15 +23,18 @@ class ScoreView(texture: Texture, font: BitmapFont) : Table() {
         label.setText(score.toString())
     }
 
-    fun onGameWin(score: Long) {
-        updateLabel(score)
-
-        addAction(
-            Actions.sequence(
-                Actions.sizeTo(width * WIN_SIZE_FACTOR, height * WIN_SIZE_FACTOR),
-                Actions.sizeTo(width, height, 0.5F, Interpolation.smoother),
+    fun onGameWin(score: Long, prevScore: Long) {
+        val sequence = Actions.sequence()
+        for (i in 1..(score - prevScore)) {
+            sequence.addAction(
+                Actions.sequence(
+                    Actions.run { updateLabel(prevScore + i) },
+                    Actions.sizeTo(width * WIN_SIZE_FACTOR, height * WIN_SIZE_FACTOR),
+                    Actions.sizeTo(width, height, 0.5F, Interpolation.smoother),
+                )
             )
-        )
+        }
+        addAction(sequence)
     }
 
     companion object {

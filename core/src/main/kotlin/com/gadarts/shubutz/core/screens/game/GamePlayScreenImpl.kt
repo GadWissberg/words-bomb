@@ -163,9 +163,16 @@ class GamePlayScreenImpl(
         indices: List<Int>,
         gameWin: Boolean,
         coinsAmount: Int,
-        perfectBonusAchieved: Boolean
+        perfectBonusAchieved: Boolean,
+        prevScore: Long
     ) {
-        gamePlayScreenView.onCorrectGuess(indices, gameWin, coinsAmount, perfectBonusAchieved)
+        gamePlayScreenView.onCorrectGuess(
+            indices,
+            gameWin,
+            coinsAmount,
+            perfectBonusAchieved,
+            prevScore
+        )
     }
 
     override fun onGameOverAnimationDone() {

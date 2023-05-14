@@ -69,8 +69,9 @@ class GameLogicHandler(
             scoreWin = if (perfectBonus) 2 else 1
             addCoinsValueAndSave(gameModel, coinsAmount)
         }
+        val prevScore = gameModel.score
         gameModel.score += scoreWin
-        gamePlayScreen.onCorrectGuess(indices, gameWin, coinsAmount, perfectBonus)
+        gamePlayScreen.onCorrectGuess(indices, gameWin, coinsAmount, perfectBonus, prevScore)
     }
 
     private fun isPerfectBonus(gameModel: GameModel): Boolean {
