@@ -213,6 +213,12 @@ class MenuScreenView(
         ) {
             beginGameAction.begin(Difficulties.KIDS)
         }
+        mainMenuTable.add(
+            ChampionsView(
+                assetsManager.getFont(FontsDefinitions.VARELA_35),
+                androidInterface
+            )
+        )
     }
 
     private fun initMenuTable(table: Table) {

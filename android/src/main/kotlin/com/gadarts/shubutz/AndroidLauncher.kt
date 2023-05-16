@@ -19,9 +19,12 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SHARED_PREFERENCES_DATA_NAME
+import com.gadarts.shubutz.core.screens.menu.view.Champion
+import com.gadarts.shubutz.core.screens.menu.view.OnChampionsFetched
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -239,6 +242,27 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
             gsClient.showLeaderboards(leaderboardsId)
         } catch (ex: GameServiceException) {
             Gdx.app.error("Play Services", ex.message)
+        }
+    }
+
+    override fun fetchChampions(callback: OnChampionsFetched) {
+        if (!gsClient.isSessionActive) return
+
+        postRunnable {
+            Difficulties.values().forEach { difficulty ->
+                gsClient.fetchLeaderboardEntries(difficulty.leaderboardsId, 1, false) {
+                    if (!it.isEmpty) {
+                        val first = it.first()
+                        callback.run(
+                            Champion(
+                                first.userDisplayName,
+                                first.formattedValue,
+                                difficulty
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 

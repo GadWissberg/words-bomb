@@ -98,6 +98,7 @@ class GamePlayScreenView(
     fun clear() {
         uiTable.remove()
         gamePlayScreenViewComponentsManager.clear()
+        stage.root.clearActions()
     }
 
     fun onCorrectGuess(

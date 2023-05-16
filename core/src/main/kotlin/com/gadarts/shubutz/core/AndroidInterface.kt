@@ -1,6 +1,7 @@
 package com.gadarts.shubutz.core
 
 import com.gadarts.shubutz.core.model.Product
+import com.gadarts.shubutz.core.screens.menu.view.OnChampionsFetched
 
 interface AndroidInterface {
     fun toast(msg: String)
@@ -22,4 +23,5 @@ interface AndroidInterface {
     fun hideBannerAd()
     fun submitScore(score: Long, leaderboardsId: String): Boolean
     fun displayLeaderboard(leaderboardsId: String)
+    fun fetchChampions(callback: OnChampionsFetched)
 }
