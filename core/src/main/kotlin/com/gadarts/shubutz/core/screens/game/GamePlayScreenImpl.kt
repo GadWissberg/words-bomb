@@ -13,6 +13,8 @@ import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.DISABLE_ADS
 import com.gadarts.shubutz.core.screens.GameScreen
 import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenView
+import com.gadarts.shubutz.core.screens.menu.view.Champion
+import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class GamePlayScreenImpl(
@@ -176,14 +178,27 @@ class GamePlayScreenImpl(
     }
 
     override fun onGameOverAnimationDone() {
-        val sent = globalHandlers.androidInterface.submitScore(
-            gameModel.score,
-            gameModel.selectedDifficulty.leaderboardsId
-        )
-        if (sent) {
-            globalHandlers.androidInterface.displayLeaderboard(gameModel.selectedDifficulty.leaderboardsId)
-        }
-        lifeCycleManager.goToMenu()
+        globalHandlers.androidInterface.fetchChampion(
+            gameModel.selectedDifficulty,
+            object : OnChampionFetched {
+                override fun run(champion: Champion?) {
+                    globalHandlers.androidInterface.submitScore(
+                        gameModel.score,
+                        gameModel.selectedDifficulty.leaderboardsId
+                    )
+                    if (champion != null && champion.score < gameModel.score) {
+                        gamePlayScreenView.onChampion {
+                            globalHandlers.androidInterface.displayLeaderboard(
+                                gameModel.selectedDifficulty.leaderboardsId
+                            )
+                            lifeCycleManager.goToMenu()
+                        }
+                    } else {
+                        globalHandlers.androidInterface.displayLeaderboard(gameModel.selectedDifficulty.leaderboardsId)
+                        lifeCycleManager.goToMenu()
+                    }
+                }
+            })
     }
 
 

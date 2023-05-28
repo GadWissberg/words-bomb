@@ -15,6 +15,7 @@ enum class SoundsDefinitions : AssetDefinition<Sound> {
     CORRECT,
     PURCHASED,
     PERFECT,
+    CHAMPION,
     HELP;
 
     private var path: String =

@@ -232,6 +232,10 @@ class GamePlayScreenView(
         gamePlayScreenViewComponentsManager.onPhysicalBackClicked()
     }
 
+    fun onChampion(post: () -> Unit) {
+        gamePlayScreenViewComponentsManager.onChampion(post)
+    }
+
     companion object {
         private const val BRICK_SUCCESS_ANIMATION_DURATION = 1F
         private val auxVector = Vector2()

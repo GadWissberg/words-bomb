@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -306,39 +307,50 @@ class GamePlayScreenViewComponentsManager(
 
     private fun displayPerfect() {
         val texture = globalHandlers.assetsManager.getTexture(PERFECT)
-        val perfectImage = Image(texture)
-        perfectImage.setPosition(stage.width / 2F - texture.width / 2F, stage.height)
-        perfectImage.setOrigin(Align.center)
-        val sound = globalHandlers.assetsManager.getSound(SoundsDefinitions.PERFECT)
-        globalHandlers.soundPlayer.playSound(sound)
+        displayBannerWithEffect(
+            SoundsDefinitions.PERFECT,
+            createPerfectAnimation(texture),
+            texture
+        )
+    }
 
-        perfectImage.addAction(
-            Actions.sequence(
-                Actions.moveTo(
-                    stage.width / 2F - texture.width / 2F,
-                    stage.height / 2F,
-                    1F,
-                    Interpolation.bounce
-                ),
-                Actions.delay(1F),
-                Actions.rotateBy(35F, 0.2F, Interpolation.swingIn),
-                Actions.rotateBy(-70F, 0.2F, Interpolation.swingIn),
-                Actions.rotateBy(35F, 0.2F, Interpolation.swingIn),
-                Actions.delay(0.5F),
-                Actions.parallel(
-                    Actions.sizeTo(0F, 0F, 0.5F, Interpolation.swingOut),
-                    Actions.moveBy(
-                        texture.width / 2F,
-                        texture.height / 2F,
-                        0.5F,
-                        Interpolation.swingOut
-                    )
-                ),
-                Actions.removeActor()
-            )
+    private fun createPerfectAnimation(texture: Texture): SequenceAction =
+        Actions.sequence(
+            Actions.moveTo(
+                stage.width / 2F - texture.width / 2F,
+                stage.height / 2F,
+                1F,
+                Interpolation.bounce
+            ),
+            Actions.delay(1F),
+            Actions.rotateBy(35F, 0.2F, Interpolation.swingIn),
+            Actions.rotateBy(-70F, 0.2F, Interpolation.swingIn),
+            Actions.rotateBy(35F, 0.2F, Interpolation.swingIn),
+            Actions.delay(0.5F),
+            Actions.parallel(
+                Actions.sizeTo(0F, 0F, 0.5F, Interpolation.swingOut),
+                Actions.moveBy(
+                    texture.width / 2F,
+                    texture.height / 2F,
+                    0.5F,
+                    Interpolation.swingOut
+                )
+            ),
+            Actions.removeActor()
         )
 
-        stage.addActor(perfectImage)
+    private fun displayBannerWithEffect(
+        soundDefinition: SoundsDefinitions,
+        sequenceAction: SequenceAction,
+        texture: Texture
+    ) {
+        val image = Image(texture)
+        image.setPosition(stage.width / 2F - texture.width / 2F, stage.height)
+        image.setOrigin(Align.center)
+        val sound = globalHandlers.assetsManager.getSound(soundDefinition)
+        globalHandlers.soundPlayer.playSound(sound)
+        image.addAction(sequenceAction)
+        stage.addActor(image)
     }
 
     fun onLetterRevealed(letter: Char, cost: Int) {
@@ -373,6 +385,51 @@ class GamePlayScreenViewComponentsManager(
         } else {
             stage.closeAllDialogs()
         }
+    }
+
+    fun onChampion(post: () -> Unit) {
+        val texture = globalHandlers.assetsManager.getTexture(CHAMPION)
+        displayBannerWithEffect(
+            SoundsDefinitions.CHAMPION,
+            createChampionAnimation(texture, post),
+            texture
+        )
+    }
+
+    private fun createChampionAnimation(texture: Texture, post: () -> Unit): SequenceAction {
+        val centerX = stage.width / 2F - texture.width / 2F
+        return Actions.sequence(
+            Actions.parallel(
+                Actions.sequence(
+                    Actions.moveTo(centerX, 0F),
+                    Actions.moveTo(
+                        centerX,
+                        stage.height / 2F,
+                        2F,
+                        Interpolation.swingIn
+                    ),
+                    Actions.delay(2F),
+                    Actions.parallel(
+                        Actions.sizeTo(0F, 0F, 0.5F, Interpolation.swingOut),
+                        Actions.moveBy(
+                            texture.width / 2F,
+                            texture.height / 2F,
+                            0.5F,
+                            Interpolation.swingOut
+                        )
+                    ),
+                    Actions.run { post.invoke() },
+                    Actions.removeActor()
+                ),
+                Actions.repeat(
+                    5,
+                    Actions.sequence(
+                        Actions.fadeOut(0.5F, Interpolation.smoother),
+                        Actions.fadeIn(0.5F, Interpolation.smoother),
+                    )
+                )
+            )
+        )
     }
 
     companion object {

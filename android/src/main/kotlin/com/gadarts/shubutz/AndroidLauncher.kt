@@ -24,7 +24,7 @@ import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SHARED_PREFERENCES_DATA_NAME
 import com.gadarts.shubutz.core.screens.menu.view.Champion
-import com.gadarts.shubutz.core.screens.menu.view.OnChampionsFetched
+import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -36,6 +36,7 @@ import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import de.golfgl.gdxgamesvcs.GameServiceException
 import de.golfgl.gdxgamesvcs.GpgsClient
+import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry
 
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
@@ -245,25 +246,40 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         }
     }
 
-    override fun fetchChampions(callback: OnChampionsFetched) {
+    override fun fetchChampions(callback: OnChampionFetched) {
         if (!gsClient.isSessionActive) return
 
         postRunnable {
             Difficulties.values().forEach { difficulty ->
-                gsClient.fetchLeaderboardEntries(difficulty.leaderboardsId, 1, false) {
-                    if (!it.isEmpty) {
-                        val first = it.first()
-                        callback.run(
-                            Champion(
-                                first.userDisplayName,
-                                first.formattedValue,
-                                difficulty
-                            )
-                        )
-                    }
-                }
             }
         }
+    }
+
+    override fun fetchChampion(difficulty: Difficulties, callback: OnChampionFetched) {
+        val success = gsClient.fetchLeaderboardEntries(difficulty.leaderboardsId, 1, false) {
+            if (!it.isEmpty) {
+                val first = it.first()
+                callback.run(
+                    tryToConvertEntry(first, difficulty)
+                )
+            }
+        }
+        if (!success) {
+            callback.run(null)
+        }
+    }
+
+    private fun tryToConvertEntry(first: ILeaderBoardEntry?, difficulty: Difficulties): Champion? {
+        var result: Champion? = null
+        try {
+            result = Champion(
+                first!!.userDisplayName,
+                first.formattedValue.toLong(),
+                difficulty
+            )
+        } catch (_: Exception) {
+        }
+        return result
     }
 
     override fun onDestroy() {

@@ -8,15 +8,17 @@ import com.gadarts.shubutz.core.AndroidInterface
 
 class ChampionsView(font: BitmapFont, androidInterface: AndroidInterface) : Table() {
     init {
-        androidInterface.fetchChampions(object : OnChampionsFetched {
+        androidInterface.fetchChampions(object : OnChampionFetched {
 
-            override fun run(champion: Champion) {
-                add(
-                    Label(
-                        "${champion.difficulty}-${champion.name}-${champion.score}",
-                        Label.LabelStyle(font, Color.WHITE)
+            override fun run(champion: Champion?) {
+                if (champion != null) {
+                    add(
+                        Label(
+                            "${champion.difficulty}-${champion.name}-${champion.score}",
+                            Label.LabelStyle(font, Color.WHITE)
+                        )
                     )
-                )
+                }
             }
         })
     }
