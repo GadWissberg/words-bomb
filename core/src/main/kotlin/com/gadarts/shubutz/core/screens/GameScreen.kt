@@ -6,5 +6,6 @@ abstract class GameScreen : Screen {
     abstract fun onSuccessfulPurchase(products: MutableList<String>)
     abstract fun onFailedPurchase(message: String)
     abstract fun onRewardForVideoAd(rewardAmount: Int)
+    abstract fun onLeaderboardClosed()
 
 }

@@ -1,5 +1,6 @@
 package com.gadarts.shubutz
 
+import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
@@ -36,6 +37,7 @@ import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import de.golfgl.gdxgamesvcs.GameServiceException
 import de.golfgl.gdxgamesvcs.GpgsClient
+import de.golfgl.gdxgamesvcs.GpgsClient.RC_LEADERBOARD
 import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry
 
 
@@ -246,12 +248,10 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         }
     }
 
-    override fun fetchChampions(callback: OnChampionFetched) {
-        if (!gsClient.isSessionActive) return
-
-        postRunnable {
-            Difficulties.values().forEach { difficulty ->
-            }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_LEADERBOARD) {
+            game.onLeaderboardClosed()
         }
     }
 
@@ -267,6 +267,10 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         if (!success) {
             callback.run(null)
         }
+    }
+
+    override fun isConnected(): Boolean {
+        return gsClient.isSessionActive
     }
 
     private fun tryToConvertEntry(first: ILeaderBoardEntry?, difficulty: Difficulties): Champion? {

@@ -20,9 +20,10 @@ import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.Difficulties
-import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SOUND_ENABLED
+import com.gadarts.shubutz.core.model.assets.definitions.AtlasesDefinitions
+import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.menu.BeginGameAction
@@ -42,7 +43,6 @@ class MenuScreenView(
 
 
     private lateinit var soundButton: ImageButton
-    private lateinit var highscoresButton: ImageButton
     private lateinit var logoTable: Table
     private lateinit var versionLabel: Label
     private var mainMenuTable = Table()
@@ -65,23 +65,6 @@ class MenuScreenView(
         })
         stage.addActor(imageButton)
         soundButton = imageButton
-    }
-
-    private fun addHighscoresButton() {
-        val imageButton =
-            createButton(TexturesDefinitions.ICON_HIGHSCORES)
-        imageButton.setPosition(
-            ROUND_BUTTON_PADDING_HOR,
-            ROUND_BUTTON_PADDING_VER
-        )
-        imageButton.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                super.clicked(event, x, y)
-                androidInterface.displayLeaderboard(Difficulties.EXPERT.leaderboardsId)
-            }
-        })
-        stage.addActor(imageButton)
-        highscoresButton = imageButton
     }
 
     private fun soundToggle() {
@@ -125,7 +108,6 @@ class MenuScreenView(
 
     fun finishLoadingAnimationAndDisplayMenu(beginGameAction: BeginGameAction) {
         addSoundButton()
-        addHighscoresButton()
         loadingAnimationRenderer.flyOutBricks(
             assetsManager.getSound(SoundsDefinitions.FLYBY),
             soundPlayer
@@ -143,11 +125,11 @@ class MenuScreenView(
     }
 
     fun clearScreen() {
+        mainMenuTable.clear()
         mainMenuTable.remove()
         difficultySelectionTable.remove()
         versionLabel.remove()
         soundButton.remove()
-        highscoresButton.remove()
     }
 
     private fun addUserInterface(beginGameAction: BeginGameAction) {
@@ -163,7 +145,7 @@ class MenuScreenView(
     private fun addDifficultySelectionTable(beginGameAction: BeginGameAction) {
         initMenuTable(difficultySelectionTable)
         addDifficultySelectionLabel()
-        Difficulties.values().filter { it.displayName != null }.forEach {
+        Difficulties.values().filter { it != Difficulties.KIDS }.forEach {
             addButton(
                 difficultySelectionTable,
                 it.displayName,
@@ -213,12 +195,19 @@ class MenuScreenView(
         ) {
             beginGameAction.begin(Difficulties.KIDS)
         }
+        addChampionsView()
+    }
+
+    private fun addChampionsView() {
+        if (!androidInterface.isConnected()) return
         mainMenuTable.add(
             ChampionsView(
                 assetsManager.getFont(FontsDefinitions.VARELA_35),
-                androidInterface
+                androidInterface,
+                assetsManager.getTexture(TexturesDefinitions.ICON_HIGHSCORES),
+                assetsManager.getAtlas(AtlasesDefinitions.LOADING)
             )
-        )
+        ).pad(CHAMPIONS_VIEW_PADDING).expandX().center()
     }
 
     private fun initMenuTable(table: Table) {
@@ -321,6 +310,7 @@ class MenuScreenView(
         private const val LOGO_PADDING_BOTTOM = 75F
         private const val ROUND_BUTTON_PADDING_HOR = 30F
         private const val ROUND_BUTTON_PADDING_VER = 60F
+        private const val CHAMPIONS_VIEW_PADDING = 64F
     }
 
 }

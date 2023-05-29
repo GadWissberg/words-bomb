@@ -28,7 +28,6 @@ class BombComponent(
         val labelStyle = LabelStyle(font, Color.WHITE)
         label = Label("$triesLeft", labelStyle)
         add(label).padTop(NUMBER_PADDING_TOP)
-        debug = DebugSettings.SHOW_UI_BORDERS
     }
 
     fun startFire() {

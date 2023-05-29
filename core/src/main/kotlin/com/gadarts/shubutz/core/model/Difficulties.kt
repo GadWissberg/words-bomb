@@ -1,7 +1,7 @@
 package com.gadarts.shubutz.core.model
 
 enum class Difficulties(
-    val displayName: String? = null,
+    val displayName: String,
     val lettersToHideFactor: Float,
     val tries: Int,
     val winWorth: Int,
@@ -47,6 +47,7 @@ enum class Difficulties(
         leaderboardsId = "CgkItLjwycoZEAIQAA"
     ),
     KIDS(
+        displayName = "ילדים",
         lettersToHideFactor = 0.6F,
         tries = 6,
         winWorth = 1,

@@ -62,6 +62,10 @@ class GamePlayScreenImpl(
         gamePlayScreenView.onRewardForVideoAd(rewardAmount)
     }
 
+    override fun onLeaderboardClosed() {
+        lifeCycleManager.goToMenu()
+    }
+
     override fun show() {
         gameLogicHandler = GameLogicHandler(
             globalHandlers.assetsManager.phrases[selectedDifficulty.phrasesFileName]!!,
@@ -139,8 +143,9 @@ class GamePlayScreenImpl(
         val sent = android.submitScore(gameModel.score, gameModel.selectedDifficulty.leaderboardsId)
         if (sent) {
             android.displayLeaderboard(gameModel.selectedDifficulty.leaderboardsId)
+        } else {
+            lifeCycleManager.goToMenu()
         }
-        lifeCycleManager.goToMenu()
     }
 
     override fun onLetterRevealFailedNotEnoughCoins() {

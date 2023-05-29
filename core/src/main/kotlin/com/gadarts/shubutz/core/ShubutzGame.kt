@@ -79,6 +79,10 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         (screen as GameScreen).onFailedPurchase(message)
     }
 
+    override fun onLeaderboardClosed() {
+        (screen as GameScreen).onLeaderboardClosed()
+    }
+
     fun onRewardForVideoAd(rewardAmount: Int) {
         (screen as GameScreen).onRewardForVideoAd(rewardAmount)
     }
