@@ -27,16 +27,16 @@ class GamePlayScreenImpl(
 
 
     private val gameModel = createGameModel()
-
     private lateinit var gameLogicHandler: GameLogicHandler
-
     private lateinit var gamePlayScreenView: GamePlayScreenView
-
     private fun createGameModel(): GameModel {
         val coins: Int = if (DebugSettings.FORCE_NUMBER_OF_COINS >= 0) {
             DebugSettings.FORCE_NUMBER_OF_COINS
         } else {
-            android.getSharedPreferencesIntValue(selectedDifficulty.sharedPreferencesCoinsKey)
+            android.getSharedPreferencesIntValue(
+                selectedDifficulty.sharedPreferencesCoinsKey,
+                INITIAL_COINS_VALUE
+            )
         }
         return GameModel(coins, selectedDifficulty)
     }
@@ -126,7 +126,6 @@ class GamePlayScreenImpl(
         android.initializeInAppPurchases(onSuccess, onFailure)
     }
 
-
     override fun onPackPurchaseButtonClicked(selectedProduct: Product) {
         android.launchBillingFlow(selectedProduct)
     }
@@ -204,6 +203,10 @@ class GamePlayScreenImpl(
                     }
                 }
             })
+    }
+
+    companion object {
+        private const val INITIAL_COINS_VALUE = 32
     }
 
 

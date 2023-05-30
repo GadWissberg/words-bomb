@@ -123,6 +123,7 @@ class BombView(
     }
 
     fun animateBombVanish(postAction: Runnable) {
+        bombComponent.clearActions()
         bombComponent.addAction(
             Actions.sequence(
                 Actions.fadeOut(1F, swingIn),

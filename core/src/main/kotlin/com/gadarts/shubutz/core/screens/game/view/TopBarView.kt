@@ -210,7 +210,7 @@ class TopBarView(
     private fun createTopPartTexture(stage: GameStage, backgroundColor: String): Texture {
         val pixmap = Pixmap(stage.width.toInt(), TOP_PART_HEIGHT, Pixmap.Format.RGBA8888)
         val color = Color.valueOf(backgroundColor)
-        color.a /= 2F
+        color.a /= 1.5F
         pixmap.setColor(color)
         pixmap.fill()
         val topPartTexture = Texture(pixmap)

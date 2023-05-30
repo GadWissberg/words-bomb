@@ -8,7 +8,7 @@ import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
 interface AndroidInterface {
     fun toast(msg: String)
     fun versionName(): String
-    fun getSharedPreferencesIntValue(key: String): Int
+    fun getSharedPreferencesIntValue(key: String, default: Int = 0): Int
     fun getSharedPreferencesBooleanValue(key: String, default: Boolean): Boolean
     fun saveSharedPreferencesIntValue(key: String, value: Int)
     fun saveSharedPreferencesBooleanValue(key: String, value: Boolean)
