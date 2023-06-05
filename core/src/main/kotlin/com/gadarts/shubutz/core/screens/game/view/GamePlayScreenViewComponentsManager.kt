@@ -84,7 +84,10 @@ class GamePlayScreenViewComponentsManager(
                 if (!revealLetterButton.isVisible || revealLetterButton.alpha < 1F) return
 
                 globalHandlers.soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.HELP))
-                gamePlayScreen.onRevealLetterButtonClicked()
+                val result = gamePlayScreen.onRevealLetterButtonClicked()
+                if (result) {
+                    hideRevealLetterButton()
+                }
             }
         })
     }
@@ -260,7 +263,7 @@ class GamePlayScreenViewComponentsManager(
     fun onIncorrectGuess(gameModel: GameModel) {
         bombView.onIncorrectGuess(gameModel)
         optionsView.onIncorrectGuess()
-        if ((gameModel.selectedDifficulty.tries - gameModel.triesLeft > 1) && !revealLetterButton.isVisible) {
+        if (gameModel.helpAvailable && (gameModel.selectedDifficulty.tries - gameModel.triesLeft > 1) && !revealLetterButton.isVisible) {
             revealLetterButton.addAction(
                 Actions.sequence(
                     Actions.visible(true),

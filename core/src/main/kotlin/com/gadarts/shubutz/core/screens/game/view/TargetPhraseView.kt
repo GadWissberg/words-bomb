@@ -28,6 +28,7 @@ class TargetPhraseView(
     private val soundPlayer: SoundPlayer,
     private val assetsManager: GameAssetManager
 ) {
+    private var gameWinAnimationRuns: Boolean = false
     val wordsTables = ArrayList<Table>()
     private lateinit var targetTable: Table
     var maxBricksPerLine: Int = 0
@@ -196,6 +197,9 @@ class TargetPhraseView(
         stage: GameStage,
         runOnAnimationFinish: Runnable
     ) {
+        if (gameWinAnimationRuns) return
+
+        gameWinAnimationRuns = true
         soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.WIN))
         var i = 0
         val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.STARS)
@@ -238,6 +242,7 @@ class TargetPhraseView(
     }
 
     fun onGameBegin(gameModel: GameModel, assetsManager: GameAssetManager, uiTable: Table) {
+        gameWinAnimationRuns = false
         addTargetTable(uiTable)
         addTargetWordLines(gameModel, assetsManager)
     }

@@ -412,7 +412,7 @@ class DialogsManager(
         private const val COINS_DIALOG_LOADING_NAME = "loading_coins"
         private const val COINS_DIALOG_HEADER = "קבל עוד מטבעות"
         private const val COINS_DIALOG_DESCRIPTION =
-            "לרשותך מס' אפשרויות להשיג\nעוד מטבעות.\nכל רכישה תסיר את כל הפרסומות!"
+            "לרשותך מס' אפשרויות להשיג\nעוד מטבעות.\nכל רכישה תסיר את הפרסומות למשך שבוע!"
         private const val COINS_DIALOG_DESCRIPTION_2 = "או צפייה בסרטון פרסומת עבור 4 מטבעות:"
         private const val COINS_DIALOG_DESCRIPTION_2_TOP_PADDING = 40F
         private const val COINS_DIALOG_BUTTON_VIDEO = "לחץ לצפייה בסרטון פרסומת"

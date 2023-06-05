@@ -10,7 +10,9 @@ interface AndroidInterface {
     fun versionName(): String
     fun getSharedPreferencesIntValue(key: String, default: Int = 0): Int
     fun getSharedPreferencesBooleanValue(key: String, default: Boolean): Boolean
+    fun getSharedPreferencesLongValue(key: String, default: Long): Long
     fun saveSharedPreferencesIntValue(key: String, value: Int)
+    fun saveSharedPreferencesLongValue(key: String, value: Long)
     fun saveSharedPreferencesBooleanValue(key: String, value: Boolean)
     fun initializeInAppPurchases(
         onSuccess: (products: Map<String, Product>) -> Unit,

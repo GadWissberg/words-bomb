@@ -93,7 +93,7 @@ class GameLogicHandler(
         val categoryName = unusedPhrases.keys.random()
         val category = unusedPhrases[categoryName]
         val selected = if (TEST_PHRASE.value.isNotEmpty()) TEST_PHRASE else category!!.random()
-        gameModel.currentPhrase = selected.value.reversed()
+        gameModel.setNewPhrase(selected.value.reversed())
         gameModel.currentCategory = categoryName
         category!!.remove(selected)
         if (category.isEmpty()) {
@@ -118,19 +118,23 @@ class GameLogicHandler(
         addCoinsValueAndSave(gameModel, amount)
     }
 
-    fun onRevealLetterButtonClicked(gameModel: GameModel) {
+    fun onRevealLetterButtonClicked(gameModel: GameModel): Boolean {
+        var result = false
         if (gameModel.coins - gameModel.selectedDifficulty.revealLetterCost >= 0) {
             if (gameModel.hiddenLettersIndices.isNotEmpty()) {
                 revealLetter(gameModel)
+                result = true
             }
         } else {
             gamePlayScreen.onLetterRevealFailedNotEnoughCoins()
         }
+        return result
     }
 
     private fun revealLetter(gameModel: GameModel) {
         addCoinsValueAndSave(gameModel, -gameModel.selectedDifficulty.revealLetterCost)
         val letter = gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()]
+        gameModel.helpAvailable = false
         gamePlayScreen.onLetterRevealed(
             suffixLettersReverse[letter] ?: letter,
             gameModel.selectedDifficulty.revealLetterCost

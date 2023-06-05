@@ -17,6 +17,7 @@ import com.android.billingclient.api.*
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
+import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
@@ -147,10 +148,22 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         return sharedPreferences.getBoolean(key, default)
     }
 
+    override fun getSharedPreferencesLongValue(key: String, default: Long): Long {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_DATA_NAME, MODE_PRIVATE)
+        return sharedPreferences.getLong(key, default)
+    }
+
     override fun saveSharedPreferencesIntValue(key: String, value: Int) {
         val sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_DATA_NAME, MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putInt(key, value)
+        editor.apply()
+    }
+
+    override fun saveSharedPreferencesLongValue(key: String, value: Long) {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_DATA_NAME, MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putLong(key, value)
         editor.apply()
     }
 
@@ -216,18 +229,20 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     }
 
     override fun loadBannerAd() {
-        if (!DebugSettings.ALWAYS_DISPLAY_BANNER_ADS && getSharedPreferencesBooleanValue(
-                SharedPreferencesKeys.DISABLE_ADS,
-                false
-            )
-        ) return
-
-        runOnUiThread {
-            val adRequest = AdRequest.Builder().build()
-            adView.visibility = VISIBLE
-            adView.loadAd(adRequest)
+        if (shouldLoadBannerAd()) {
+            runOnUiThread {
+                val adRequest = AdRequest.Builder().build()
+                adView.visibility = VISIBLE
+                adView.loadAd(adRequest)
+            }
         }
     }
+
+    private fun shouldLoadBannerAd() =
+        DebugSettings.ALWAYS_DISPLAY_BANNER_ADS || getSharedPreferencesLongValue(
+            SharedPreferencesKeys.DISABLE_ADS_DUE_DATE,
+            0
+        ) < TimeUtils.millis()
 
     override fun hideBannerAd() {
         runOnUiThread {

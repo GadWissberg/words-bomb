@@ -13,7 +13,7 @@ interface GamePlayScreen {
     )
 
     fun onPackPurchaseButtonClicked(selectedProduct: Product)
-    fun onRevealLetterButtonClicked()
+    fun onRevealLetterButtonClicked() : Boolean
     fun onLetterRevealed(letter: Char, cost: Int)
     fun onIncorrectGuess(gameOver: Boolean)
     fun onCorrectGuess(

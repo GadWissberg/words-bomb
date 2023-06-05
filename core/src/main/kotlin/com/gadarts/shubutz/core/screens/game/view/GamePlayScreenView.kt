@@ -138,7 +138,6 @@ class GamePlayScreenView(
             }
         }
         val wordTable = gamePlayScreenViewComponentsManager.targetPhraseView.wordsTables[wordCount]
-        val cell = wordTable.cells[letterIndexInWord]
         val selectedBrickScreenCoords =
             gamePlayScreenViewComponentsManager.optionsView.selectedBrick!!.localToStageCoordinates(
                 auxVector.setZero()
@@ -149,6 +148,7 @@ class GamePlayScreenView(
             selectedBrickScreenCoords.x,
             selectedBrickScreenCoords.y,
         )
+        val cell = wordTable.cells[letterIndexInWord]
         val cellActorScreenCoordinates = cell.actor.localToStageCoordinates(auxVector.setZero())
         switchBrickToStage(brick)
         val sequence = Actions.sequence(

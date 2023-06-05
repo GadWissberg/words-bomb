@@ -2,6 +2,7 @@ package com.gadarts.shubutz.core.screens.game
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GameLifeCycleManager
@@ -10,7 +11,7 @@ import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
-import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.DISABLE_ADS
+import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.DISABLE_ADS_DUE_DATE
 import com.gadarts.shubutz.core.screens.GameScreen
 import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenView
 import com.gadarts.shubutz.core.screens.menu.view.Champion
@@ -48,7 +49,10 @@ class GamePlayScreenImpl(
                 val amount = filtered.first().amount
                 gameLogicHandler.onPurchasedCoins(gameModel, amount)
                 gamePlayScreenView.onPurchasedCoins(amount)
-                android.saveSharedPreferencesBooleanValue(DISABLE_ADS, true)
+                android.saveSharedPreferencesLongValue(
+                    DISABLE_ADS_DUE_DATE,
+                    TimeUtils.millis() + ADS_DISABLE_LENGTH
+                )
             }
         }
     }
@@ -130,8 +134,8 @@ class GamePlayScreenImpl(
         android.launchBillingFlow(selectedProduct)
     }
 
-    override fun onRevealLetterButtonClicked() {
-        gameLogicHandler.onRevealLetterButtonClicked(gameModel)
+    override fun onRevealLetterButtonClicked(): Boolean {
+        return gameLogicHandler.onRevealLetterButtonClicked(gameModel)
     }
 
     override fun onLetterRevealed(letter: Char, cost: Int) {
@@ -207,6 +211,7 @@ class GamePlayScreenImpl(
 
     companion object {
         private const val INITIAL_COINS_VALUE = 32
+        private const val ADS_DISABLE_LENGTH = 7 * 24 * 60 * 60 * 1000
     }
 
 
