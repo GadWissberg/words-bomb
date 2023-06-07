@@ -5,16 +5,12 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.Toast
 import com.android.billingclient.api.*
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.badlogic.gdx.utils.TimeUtils
@@ -25,32 +21,18 @@ import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SHARED_PREFERENCES_DATA_NAME
-import com.gadarts.shubutz.core.screens.menu.view.Champion
 import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import de.golfgl.gdxgamesvcs.GameServiceException
-import de.golfgl.gdxgamesvcs.GpgsClient
 import de.golfgl.gdxgamesvcs.GpgsClient.RC_LEADERBOARD
-import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry
 
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
-    private lateinit var gsClient: GpgsClient
-    private lateinit var adView: AdView
-    private lateinit var layout: RelativeLayout
-    private lateinit var loadedAd: RewardedAd
+
+    private val googleServicesHandler = GoogleServicesHandler()
     private lateinit var game: ShubutzGame
     private var versionName = "0.0.0"
-    private lateinit var purchaseHandler: PurchaseHandler
+    private lateinit var layout: RelativeLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,24 +44,19 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
             e.printStackTrace()
         }
         game = ShubutzGame(this)
-        purchaseHandler = PurchaseHandler(game, this)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
         createLayout()
-        gsClient = GpgsClient().initialize(this, false)
-        signInToPlayServices()
+        googleServicesHandler.onCreate(game, this)
     }
 
-    private fun signInToPlayServices() {
-        val loggedIn = gsClient.logIn()
-        if (loggedIn) {
-            Gdx.app.log("Play Services", "Signed in successfully")
-        } else {
-            Gdx.app.log("Play Services", "Did not sign in")
-        }
+    private fun createAndroidApplicationConfig(): AndroidApplicationConfiguration {
+        val config = AndroidApplicationConfiguration()
+        config.numSamples = 2
+        return config
     }
 
     private fun createLayout() {
-        layout = RelativeLayout(this)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        layout = RelativeLayout(context)
         val view = initializeForView(game, createAndroidApplicationConfig())
         layout.addView(view)
         setContentView(layout)
@@ -93,28 +70,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
             )
             window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
         }
-        addBannerAdLayout()
-    }
-
-    private fun addBannerAdLayout() {
-        adView = AdView(this)
-        val adParams = RelativeLayout.LayoutParams(
-            RelativeLayout.LayoutParams.WRAP_CONTENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT
-        )
-        adView.setAdSize(AdSize.BANNER)
-        adView.adUnitId =
-            if (DebugSettings.TEST_ADS) BANNER_AD_UNIT_TEST else BANNER_AD_UNIT_PROD
-        adParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-        adParams.addRule(RelativeLayout.CENTER_HORIZONTAL)
-        layout.addView(adView, adParams)
-        defineBannerAdListener(adView)
-    }
-
-    private fun createAndroidApplicationConfig(): AndroidApplicationConfiguration {
-        val config = AndroidApplicationConfiguration()
-        config.numSamples = 2
-        return config
+        googleServicesHandler.addBannerAdLayout(this, layout)
     }
 
     private fun PackageManager.getPackageInfoCompat(
@@ -126,7 +82,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         } else {
             @Suppress("DEPRECATION") getPackageInfo(packageName, flags)
         }
-
 
     override fun toast(msg: String) {
         runOnUiThread {
@@ -178,11 +133,11 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         onSuccess: (products: Map<String, Product>) -> Unit,
         onFailure: (message: String) -> Unit
     ) {
-        purchaseHandler.initializeInAppPurchases(onSuccess, onFailure)
+        googleServicesHandler.initializeInAppPurchases(onSuccess, onFailure)
     }
 
     override fun launchBillingFlow(selectedProduct: Product) {
-        purchaseHandler.launchBillingFlow(selectedProduct)
+        googleServicesHandler.launchBillingFlow(selectedProduct)
     }
 
     override fun initializeAds(onFinish: () -> Unit) {
@@ -190,50 +145,21 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     }
 
     override fun loadVideoAd(onLoaded: () -> Unit) {
-        val adRequest = AdRequest.Builder().build()
         runOnUiThread {
-            RewardedAd.load(
-                this,
-                if (DebugSettings.TEST_ADS) REWARDED_AD_UNIT_TEST else REWARDED_AD_UNIT_PROD,
-                adRequest,
-                object : RewardedAdLoadCallback() {
-                    override fun onAdFailedToLoad(adError: LoadAdError) {
-                        adError.toString().let { Log.d("Rewarded Ad", it) }
-                    }
-
-                    override fun onAdLoaded(ad: RewardedAd) {
-                        loadedAd = ad
-                        onLoaded.invoke()
-                    }
-                })
+            googleServicesHandler.loadVideoAd(onLoaded, this)
         }
-
     }
 
     override fun displayRewardedAd(onAdCompleted: () -> Unit, onAdDismissed: () -> Unit) {
-        val activity = this
         runOnUiThread {
-            loadedAd.fullScreenContentCallback = object : FullScreenContentCallback() {
-                override fun onAdDismissedFullScreenContent() {
-                    onAdDismissed.invoke()
-                }
-            }
-            loadedAd.let {
-                it.show(activity) { rewardItem ->
-                    val rewardAmount = rewardItem.amount
-                    game.onRewardForVideoAd(rewardAmount)
-                    onAdCompleted.invoke()
-                }
-            }
+            googleServicesHandler.displayRewardedAd(onAdCompleted, onAdDismissed, this, game)
         }
     }
 
     override fun loadBannerAd() {
         if (shouldLoadBannerAd()) {
             runOnUiThread {
-                val adRequest = AdRequest.Builder().build()
-                adView.visibility = VISIBLE
-                adView.loadAd(adRequest)
+                googleServicesHandler.loadBannerAd()
             }
         }
     }
@@ -246,21 +172,16 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
     override fun hideBannerAd() {
         runOnUiThread {
-            adView.destroy()
-            adView.visibility = GONE
+            googleServicesHandler.hideBannerAd()
         }
     }
 
     override fun submitScore(score: Long, leaderboardsId: String): Boolean {
-        return gsClient.submitToLeaderboard(leaderboardsId, score, null)
+        return googleServicesHandler.submitScore(score, leaderboardsId)
     }
 
     override fun displayLeaderboard(leaderboardsId: String) {
-        try {
-            gsClient.showLeaderboards(leaderboardsId)
-        } catch (ex: GameServiceException) {
-            Gdx.app.error("Play Services", ex.message)
-        }
+        googleServicesHandler.displayLeaderboard(leaderboardsId)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -271,70 +192,19 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     }
 
     override fun fetchChampion(difficulty: Difficulties, callback: OnChampionFetched) {
-        val success = gsClient.fetchLeaderboardEntries(difficulty.leaderboardsId, 1, false) {
-            if (!it.isEmpty) {
-                val first = it.first()
-                callback.run(
-                    tryToConvertEntry(first, difficulty)
-                )
-            }
-        }
-        if (!success) {
-            callback.run(null)
-        }
+        googleServicesHandler.fetchChampion(difficulty, callback)
     }
 
     override fun isConnected(): Boolean {
-        return gsClient.isSessionActive
-    }
-
-    private fun tryToConvertEntry(first: ILeaderBoardEntry?, difficulty: Difficulties): Champion? {
-        var result: Champion? = null
-        try {
-            result = Champion(
-                first!!.userDisplayName,
-                first.formattedValue.toLong(),
-                difficulty
-            )
-        } catch (_: Exception) {
-        }
-        return result
+        return googleServicesHandler.isConnected()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         runOnUiThread {
-            adView.destroy()
-        }
-    }
-
-    private fun defineBannerAdListener(adView: AdView) {
-        adView.adListener = object : AdListener() {
-            override fun onAdClicked() {
-            }
-
-            override fun onAdClosed() {
-            }
-
-            override fun onAdFailedToLoad(adError: LoadAdError) {
-            }
-
-            override fun onAdImpression() {
-            }
-
-            override fun onAdLoaded() {
-            }
-
-            override fun onAdOpened() {
-            }
+            googleServicesHandler.onDestroy()
         }
     }
 
 
-    companion object {
-        private const val REWARDED_AD_UNIT_TEST = "ca-app-pub-3940256099942544/5224354917"
-        private const val REWARDED_AD_UNIT_PROD = "ca-app-pub-2312113291496409/2061684764"
-        private const val BANNER_AD_UNIT_PROD = "ca-app-pub-2312113291496409/7487568541"
-        private const val BANNER_AD_UNIT_TEST = "ca-app-pub-3940256099942544/6300978111"
-    }
 }

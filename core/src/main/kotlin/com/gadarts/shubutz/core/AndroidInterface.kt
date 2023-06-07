@@ -2,7 +2,6 @@ package com.gadarts.shubutz.core
 
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.Product
-import com.gadarts.shubutz.core.screens.menu.view.Champion
 import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
 
 interface AndroidInterface {

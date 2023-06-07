@@ -52,10 +52,9 @@ class PurchaseHandler(private val game: ShubutzGame, private val context: Activi
         onSuccess: (products: Map<String, Product>) -> Unit,
         onFailure: (message: String) -> Unit
     ) {
-        val newBuilder = QueryProductDetailsParams.Product.newBuilder()
         val queryProductDetailsParams = QueryProductDetailsParams.newBuilder().setProductList(
             InAppProducts.values().map {
-                newBuilder
+                QueryProductDetailsParams.Product.newBuilder()
                     .setProductId(it.name.lowercase())
                     .setProductType(BillingClient.ProductType.INAPP)
                     .build()
@@ -68,7 +67,8 @@ class PurchaseHandler(private val game: ShubutzGame, private val context: Activi
                     val oneTimePurchaseOfferDetails = it.oneTimePurchaseOfferDetails
                     it.productId to Product(
                         it.productId,
-                        oneTimePurchaseOfferDetails?.formattedPrice ?: ""
+                        oneTimePurchaseOfferDetails?.formattedPrice ?: "",
+                        it
                     )
                 })
             } else {
@@ -108,7 +108,7 @@ class PurchaseHandler(private val game: ShubutzGame, private val context: Activi
     fun launchBillingFlow(selectedProduct: Product) {
         val productDetailsParamsList = listOf(
             BillingFlowParams.ProductDetailsParams.newBuilder()
-                .setProductDetails(selectedProduct.formattedPrice as ProductDetails)
+                .setProductDetails(selectedProduct.productDetails as ProductDetails)
                 .build()
         )
         val billingFlowParams = BillingFlowParams.newBuilder()

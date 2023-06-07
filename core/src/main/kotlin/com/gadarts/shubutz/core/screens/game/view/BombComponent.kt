@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.gadarts.shubutz.core.model.GameModel
-import com.gadarts.shubutz.core.DebugSettings
 
 class BombComponent(
     texture: Texture,

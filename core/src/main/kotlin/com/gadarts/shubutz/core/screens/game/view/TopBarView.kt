@@ -40,6 +40,10 @@ class TopBarView(
     private lateinit var categoryBackgroundTexture: Texture
     private var coinsLabelHandler = CoinsLabelHandler()
 
+    fun getCoinsIcon(): Image {
+        return coinsLabelHandler.coinsIcon
+    }
+
     override fun dispose() {
         topPartTexture.dispose()
         categoryBackgroundTexture.dispose()
@@ -73,10 +77,10 @@ class TopBarView(
         coinsLabelHandler.act(topPartTable, gameModel, globalHandlers)
     }
 
+
     fun onLetterRevealed(cost: Int) {
         coinsLabelHandler.onLetterRevealed(cost)
     }
-
 
     fun onRewardForVideoAd(rewardAmount: Int) {
         coinsLabelHandler.onRewardForVideoAd(rewardAmount)
@@ -86,10 +90,10 @@ class TopBarView(
         coinsLabelHandler.onPurchasedCoins(amount)
     }
 
+
     fun onGameWin() {
         coinsLabelHandler.onGameWin(globalHandlers, stage)
     }
-
 
     private fun addCategoryLabel(
         gameModel: GameModel,
@@ -157,6 +161,7 @@ class TopBarView(
         })
     }
 
+
     private fun addTopPartComponents(
         table: Table,
         assetsManager: GameAssetManager,
@@ -173,13 +178,12 @@ class TopBarView(
         coinsLabelHandler.addCoinsLabel(gameModel, font80, table, assetsManager, topPartTexture)
     }
 
-
     private fun addBuyCoinsButton(
         table: Table,
         dialogsManager: DialogsManager,
     ) {
         val coinsButton = createBuyCoinsButton(table, dialogsManager)
-        coinsButton.setOrigin(Align.center);
+        coinsButton.setOrigin(Align.center)
         coinsButton.isTransform = true
         table.add(coinsButton).pad(
             COINS_BUTTON_PAD_TOP,
@@ -204,6 +208,7 @@ class TopBarView(
         )
     }
 
+
     private fun createBuyCoinsButton(
         table: Table,
         dialogsManager: DialogsManager,
@@ -225,7 +230,6 @@ class TopBarView(
         return coinsButton
     }
 
-
     private fun createTopPartTexture(stage: GameStage, backgroundColor: String): Texture {
         val pixmap = Pixmap(stage.width.toInt(), TOP_PART_HEIGHT, Pixmap.Format.RGBA8888)
         val color = Color.valueOf(backgroundColor)
@@ -235,10 +239,6 @@ class TopBarView(
         val topPartTexture = Texture(pixmap)
         pixmap.dispose()
         return topPartTexture
-    }
-
-    fun getCoinsIcon(): Image {
-        return coinsLabelHandler.coinsIcon
     }
 
 
