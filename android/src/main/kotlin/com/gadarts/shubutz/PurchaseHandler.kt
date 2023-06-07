@@ -65,7 +65,11 @@ class PurchaseHandler(private val game: ShubutzGame, private val context: Activi
                                                                             productDetailsList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 onSuccess.invoke(productDetailsList.associate {
-                    it.productId to Product(it.productId, it)
+                    val oneTimePurchaseOfferDetails = it.oneTimePurchaseOfferDetails
+                    it.productId to Product(
+                        it.productId,
+                        oneTimePurchaseOfferDetails?.formattedPrice ?: ""
+                    )
                 })
             } else {
                 onFailure.invoke(FAILURE_MESSAGE_IN_APP_PURCHASE)
@@ -104,7 +108,7 @@ class PurchaseHandler(private val game: ShubutzGame, private val context: Activi
     fun launchBillingFlow(selectedProduct: Product) {
         val productDetailsParamsList = listOf(
             BillingFlowParams.ProductDetailsParams.newBuilder()
-                .setProductDetails(selectedProduct.productDetails as ProductDetails)
+                .setProductDetails(selectedProduct.formattedPrice as ProductDetails)
                 .build()
         )
         val billingFlowParams = BillingFlowParams.newBuilder()

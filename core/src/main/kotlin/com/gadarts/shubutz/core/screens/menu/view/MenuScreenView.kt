@@ -162,8 +162,8 @@ class MenuScreenView(
             assetsManager.getFont(FontsDefinitions.VARELA_40),
             scale = 0.5F
         ) {
-            difficultySelectionTable.isVisible = false
-            mainMenuTable.isVisible = true
+            fadeOutTable(difficultySelectionTable)
+            fadeInTable(mainMenuTable)
         }
     }
 
@@ -184,8 +184,8 @@ class MenuScreenView(
             label = LABEL_BEGIN_GAME,
             font = assetsManager.getFont(FontsDefinitions.VARELA_80)
         ) {
-            mainMenuTable.isVisible = false
-            difficultySelectionTable.isVisible = true
+            fadeOutTable(mainMenuTable)
+            fadeInTable(difficultySelectionTable)
         }
         addButton(
             table = mainMenuTable,
@@ -196,6 +196,24 @@ class MenuScreenView(
             beginGameAction.begin(Difficulties.KIDS)
         }
         addChampionsView()
+    }
+
+    private fun fadeInTable(table: Table) {
+        table.addAction(
+            Actions.sequence(
+                Actions.alpha(0F),
+                Actions.run { table.isVisible = true },
+                Actions.fadeIn(FADE_ANIMATION_DURATION)
+            )
+        )
+    }
+
+    private fun fadeOutTable(table: Table) {
+        table.addAction(
+            Actions.sequence(
+                Actions.fadeOut(FADE_ANIMATION_DURATION),
+                Actions.run { table.isVisible = false })
+        )
     }
 
     private fun addChampionsView() {
@@ -311,6 +329,7 @@ class MenuScreenView(
         private const val ROUND_BUTTON_PADDING_HOR = 30F
         private const val ROUND_BUTTON_PADDING_VER = 60F
         private const val CHAMPIONS_VIEW_PADDING = 64F
+        private const val FADE_ANIMATION_DURATION = 0.3F
     }
 
 }

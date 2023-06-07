@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.NinePatch
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -177,11 +179,28 @@ class TopBarView(
         dialogsManager: DialogsManager,
     ) {
         val coinsButton = createBuyCoinsButton(table, dialogsManager)
+        coinsButton.setOrigin(Align.center);
+        coinsButton.isTransform = true
         table.add(coinsButton).pad(
             COINS_BUTTON_PAD_TOP,
             COINS_BUTTON_PAD_LEFT,
             COINS_BUTTON_PAD_BOTTOM,
             COINS_BUTTON_PAD_RIGHT
+        )
+        coinsButton.addAction(
+            Actions.forever(
+                Actions.sequence(
+                    Actions.delay(20F),
+                    Actions.sizeBy(
+                        -COINS_BUTTON_ANIMATION_SIZE_BY, -COINS_BUTTON_ANIMATION_SIZE_BY, 2F,
+                        Interpolation.slowFast
+                    ),
+                    Actions.sizeBy(
+                        COINS_BUTTON_ANIMATION_SIZE_BY, COINS_BUTTON_ANIMATION_SIZE_BY, 0.5F,
+                        Interpolation.pow5
+                    ),
+                ),
+            )
         )
     }
 
@@ -231,5 +250,6 @@ class TopBarView(
         private const val COINS_BUTTON_PAD_RIGHT = 20F
         private const val COINS_BUTTON_PAD_LEFT = 20F
         private const val COINS_BUTTON_PAD_BOTTOM = 20F
+        private const val COINS_BUTTON_ANIMATION_SIZE_BY = 40F
     }
 }

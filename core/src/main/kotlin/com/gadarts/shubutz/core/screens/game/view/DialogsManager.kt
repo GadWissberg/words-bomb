@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Scaling
+import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -137,8 +138,20 @@ class DialogsManager(
             text = definition.label.format(definition.amount.toString().reversed()),
             dialogName = COINS_DIALOG_NAME
         )
+        button.debug = DebugSettings.SHOW_UI_BORDERS
         val stack = Stack()
-        button.add(stack)
+        button.add(stack).row()
+        val label = Label(
+            product?.formattedPrice ?: "",
+            Label.LabelStyle(
+                globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_35),
+                Color.WHITE
+            )
+        )
+        label.setAlignment(Align.center)
+        button.add(
+            label
+        ).colspan(2).center()
         addFlashEffect(definition, stack, gameAssetManager)
         val image = addPurchaseIcon(definition, stack, gameAssetManager)
 
