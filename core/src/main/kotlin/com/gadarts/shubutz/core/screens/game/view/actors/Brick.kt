@@ -6,9 +6,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 
-/**
- * Represents a letter brick that can be placed in the deck and in the board.
- */
 open class Brick(
     val letter: String,
     brickTexture: Texture,
@@ -18,15 +15,14 @@ open class Brick(
     Image(brickTexture) {
 
 
+    var helped: Boolean = false
+
     override fun draw(batch: Batch?, parentAlpha: Float) {
         super.draw(batch, parentAlpha)
         drawLetter(batch, x, y, font80)
     }
 
 
-    /**
-     * Draws a letter inside the brick.
-     */
     private fun drawLetter(batch: Batch?, x: Float, y: Float, bitmapFont: BitmapFont) {
         val bias = if (letter == "ו" || letter == "י") letterSize.x / 4F else 0F
         drawChar(

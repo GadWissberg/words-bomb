@@ -49,7 +49,7 @@ class OptionsView(
         lettersOptionsTable.pack()
     }
 
-    fun clearSelectedBrick() {
+    fun onCorrectGuess() {
         selectedBrick!!.listeners.clear()
         markBrick(selectedBrick!!, true)
         selectedBrick = null
@@ -173,7 +173,7 @@ class OptionsView(
         brick.addAction(
             Actions.sequence(
                 Actions.color(
-                    if (correct) BRICK_MARK_COLOR_CORRECT else BRICK_MARK_COLOR_INCORRECT,
+                    if (correct) (if (brick.helped) BRICK_MARK_COLOR_HELPED else BRICK_MARK_COLOR_CORRECT) else BRICK_MARK_COLOR_INCORRECT,
                     1F,
                     Interpolation.slowFast
                 ),
@@ -191,14 +191,15 @@ class OptionsView(
         if (filter.isNotEmpty()) {
             val brick = filter.first().actor
             addEffectForRevealedLetter(brick)
-            triggerBrick(brick)
+            triggerBrick(brick as Brick)
         }
     }
 
-    private fun triggerBrick(brick: Actor) {
+    private fun triggerBrick(brick: Brick) {
+        brick.helped = true
         val down = InputEvent()
         down.type = InputEvent.Type.touchDown
-        (brick as Brick).fire(down)
+        brick.fire(down)
         val up = InputEvent()
         up.type = InputEvent.Type.touchUp
         brick.fire(up)
@@ -219,6 +220,7 @@ class OptionsView(
     companion object {
         private val BRICK_MARK_COLOR_INCORRECT = Color.valueOf("#7D0000")
         private val BRICK_MARK_COLOR_CORRECT = Color.valueOf("#007D00")
+        private val BRICK_MARK_COLOR_HELPED = Color.valueOf("#bdc22e")
         private const val BRICK_FAIL_ANIMATION_DURATION = 1F
     }
 

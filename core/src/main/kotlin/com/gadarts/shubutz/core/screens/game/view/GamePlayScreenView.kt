@@ -121,7 +121,7 @@ class GamePlayScreenView(
             indices.forEach {
                 animateBrickSuccess(it, gameWin, brickTexture)
             }
-            gamePlayScreenViewComponentsManager.optionsView.clearSelectedBrick()
+            gamePlayScreenViewComponentsManager.optionsView.onCorrectGuess()
         }
     }
 
