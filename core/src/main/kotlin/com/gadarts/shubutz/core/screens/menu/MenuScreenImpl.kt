@@ -19,12 +19,12 @@ class MenuScreenImpl(
     GameScreen(), MenuScreen {
 
     private val menuScreenView = MenuScreenView(
-        globalHandlers.assetsManager,
+        globalHandlers,
         androidInterface.versionName(),
         stage,
-        globalHandlers.soundPlayer,
         this,
-        androidInterface
+        androidInterface,
+        globalHandlers.dialogsHandler
     )
 
     override fun onSuccessfulPurchase(products: MutableList<String>) {

@@ -10,7 +10,12 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.Button
+import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
@@ -23,24 +28,23 @@ import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 
-class GameStage(stretchViewport: StretchViewport, assetsManager: GameAssetManager) : Stage(
+class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetManager) : Stage(
     stretchViewport,
     SpriteBatch(),
 ) {
-
     val openDialogs = HashMap<String, Table>()
     private lateinit var dialogButtonDown: NinePatchDrawable
     private lateinit var dialogButtonUp: NinePatchDrawable
 
     init {
-        addCloud(assetsManager, TexturesDefinitions.CLOUD_1, 0)
-        addCloud(assetsManager, TexturesDefinitions.CLOUD_2, 1)
-        addCloud(assetsManager, TexturesDefinitions.CLOUD_3, 2)
-        addCloud(assetsManager, TexturesDefinitions.CLOUD_4, 3)
+        addCloud(gameAssetManager, TexturesDefinitions.CLOUD_1, 0)
+        addCloud(gameAssetManager, TexturesDefinitions.CLOUD_2, 1)
+        addCloud(gameAssetManager, TexturesDefinitions.CLOUD_3, 2)
+        addCloud(gameAssetManager, TexturesDefinitions.CLOUD_4, 3)
     }
 
     init {
-        createDialogNinePatches(assetsManager)
+        createDialogNinePatches(gameAssetManager)
     }
 
     fun createNinePatchButtonStyle(assetsManager: GameAssetManager) =

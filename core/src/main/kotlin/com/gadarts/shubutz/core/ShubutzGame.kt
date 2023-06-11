@@ -3,25 +3,29 @@ package com.gadarts.shubutz.core
 import com.badlogic.gdx.*
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.gadarts.shubutz.core.model.Difficulties
+import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.screens.GameScreen
 import com.gadarts.shubutz.core.screens.game.GamePlayScreenImpl
 import com.gadarts.shubutz.core.screens.game.GlobalHandlers
+import com.gadarts.shubutz.core.screens.game.view.EffectsHandler
 import com.gadarts.shubutz.core.screens.menu.MenuScreenImpl
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 
 class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycleManager {
 
+    private lateinit var effectsHandler: EffectsHandler
     private lateinit var globalHandlers: GlobalHandlers
     private lateinit var stage: GameStage
     override var loadingDone: Boolean = false
 
     override fun create() {
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
-        globalHandlers = GlobalHandlers(android)
-        loadAssets()
-        Gdx.input.inputProcessor = InputMultiplexer()
-        createStage()
+        val assetsManager = GameAssetManager()
+        assetsManager.loadAssets()
+        assetsManager.finishLoading()
+        createStage(assetsManager)
+        globalHandlers = GlobalHandlers(android, stage, assetsManager)
         goToMenu()
         android.initializeAds { gameReady() }
     }
@@ -31,11 +35,11 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         (screen as MenuScreenImpl).onGameReady()
     }
 
-    private fun createStage() {
+    private fun createStage(assetsManager: GameAssetManager) {
         stage =
             GameStage(
                 StretchViewport(RESOLUTION_WIDTH.toFloat(), RESOLUTION_HEIGHT.toFloat()),
-                globalHandlers.assetsManager
+                assetsManager
             )
         stage.setDebugInvisible(DebugSettings.SHOW_UI_BORDERS)
         Gdx.input.inputProcessor = stage
@@ -49,10 +53,6 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         currentScreen?.dispose()
     }
 
-    private fun loadAssets() {
-        globalHandlers.assetsManager.loadAssets()
-        globalHandlers.assetsManager.finishLoading()
-    }
 
     override fun dispose() {
         super.dispose()
@@ -93,7 +93,8 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
             this,
             this.android,
             stage,
-            selectedDifficulty
+            selectedDifficulty,
+            effectsHandler,
         )
 
     companion object {

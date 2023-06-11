@@ -29,13 +29,11 @@ class GamePlayScreenViewComponentsManager(
     private val globalHandlers: GlobalHandlers,
     private val gamePlayScreen: GamePlayScreen,
     private val stage: GameStage,
-    effectsHandler: EffectsHandler,
     gameModel: GameModel
 ) : Disposable {
 
     private lateinit var scoreView: ScoreView
     private lateinit var revealLetterButton: ImageTextButton
-    private var dialogsManager = DialogsManager(globalHandlers, effectsHandler, stage)
     lateinit var targetPhraseView: TargetPhraseView
     lateinit var optionsView: OptionsView
     val bombView = BombView(globalHandlers)
@@ -49,7 +47,7 @@ class GamePlayScreenViewComponentsManager(
         gameModel: GameModel,
         gamePlayScreen: GamePlayScreen,
     ) {
-        topBarView.addTopBar(am, gameModel, gamePlayScreen, stage, dialogsManager)
+        topBarView.addTopBar(am, gameModel, gamePlayScreen, stage, globalHandlers.dialogsHandler)
         val font80 = am.getFont(FontsDefinitions.VARELA_80)
         targetPhraseView =
             TargetPhraseView(letterSize, font80, globalHandlers.soundPlayer, am)
@@ -362,12 +360,12 @@ class GamePlayScreenViewComponentsManager(
     }
 
     fun onLetterRevealFailedNotEnoughCoins() {
-        dialogsManager.openBuyCoinsDialog(stage, gamePlayScreen)
+        globalHandlers.dialogsHandler.openBuyCoinsDialog(stage, gamePlayScreen)
     }
 
     fun onPurchasedCoins(amount: Int) {
         topBarView.onPurchasedCoins(amount)
-        dialogsManager.openCoinsPurchasedSuccessfully(
+        globalHandlers.dialogsHandler.openCoinsPurchasedSuccessfully(
             globalHandlers.assetsManager,
             stage,
             amount
@@ -384,7 +382,7 @@ class GamePlayScreenViewComponentsManager(
 
     fun onPhysicalBackClicked() {
         if (stage.openDialogs.isEmpty()) {
-            dialogsManager.openExitDialog(stage, globalHandlers.assetsManager, gamePlayScreen)
+            globalHandlers.dialogsHandler.openExitDialog(stage, globalHandlers.assetsManager, gamePlayScreen)
         } else {
             stage.closeAllDialogs()
         }

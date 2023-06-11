@@ -27,17 +27,16 @@ class GamePlayScreenView(
     private val gameModel: GameModel,
     private val gamePlayScreen: GamePlayScreen,
     private val stage: GameStage,
+    private val effectsHandler: EffectsHandler,
 ) :
     Disposable {
 
-    private val effectsHandler = EffectsHandler()
     private val gamePlayScreenViewComponentsManager =
         GamePlayScreenViewComponentsManager(
             globalHandlers,
             gamePlayScreen,
             stage,
-            effectsHandler,
-            gameModel
+            gameModel,
         )
     private lateinit var uiTable: Table
     private var font80: BitmapFont =
@@ -206,7 +205,7 @@ class GamePlayScreenView(
 
     fun onPurchasedCoins(amount: Int) {
         gamePlayScreenViewComponentsManager.onPurchasedCoins(amount)
-        effectsHandler.applyPartyEffect(globalHandlers, stage)
+        effectsHandler.applyPartyEffect(globalHandlers.assetsManager, globalHandlers.soundPlayer, stage)
     }
 
 

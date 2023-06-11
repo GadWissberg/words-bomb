@@ -63,10 +63,10 @@ class TopBarView(
         gameModel: GameModel,
         gamePlayScreen: GamePlayScreen,
         stage: GameStage,
-        dialogsManager: DialogsManager,
+        dialogsHandler: DialogsHandler,
     ) {
         stage.addActor(this)
-        addTopPart(stage, assetsManager, gamePlayScreen, gameModel, dialogsManager)
+        addTopPart(stage, assetsManager, gamePlayScreen, gameModel, dialogsHandler)
         addCategoryLabel(gameModel, assetsManager)
         setPosition(stage.width / 2F, stage.height - prefHeight / 2F)
         setDebug(DebugSettings.SHOW_UI_BORDERS, true)
@@ -119,7 +119,7 @@ class TopBarView(
         am: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
         gameModel: GameModel,
-        dialogs: DialogsManager,
+        dialogs: DialogsHandler,
     ) {
         topPartTexture = createTopPartTexture(stage, TOP_BAR_COLOR)
         categoryBackgroundTexture = createTopPartTexture(stage, CATEGORY_BACKGROUND_COLOR)
@@ -135,7 +135,7 @@ class TopBarView(
         table: Table,
         assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
-        dialogsManager: DialogsManager
+        dialogsHandler: DialogsHandler
     ) {
         val texture = assetsManager.getTexture(BACK_BUTTON)
         val button = ImageButton(TextureRegionDrawable(texture))
@@ -143,7 +143,7 @@ class TopBarView(
         addClickListenerToButton(
             button,
             assetsManager
-        ) { dialogsManager.openExitDialog(stage as GameStage, assetsManager, gamePlayScreen) }
+        ) { dialogsHandler.openExitDialog(stage as GameStage, assetsManager, gamePlayScreen) }
         table.add(button).left()
     }
 
@@ -167,12 +167,12 @@ class TopBarView(
         assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen,
         gameModel: GameModel,
-        dialogsManager: DialogsManager,
+        dialogsHandler: DialogsHandler,
     ) {
         val leftSideTable = Table()
         leftSideTable.debug = DebugSettings.SHOW_UI_BORDERS
-        addExitButton(leftSideTable, assetsManager, gamePlayScreen, dialogsManager)
-        addBuyCoinsButton(leftSideTable, dialogsManager)
+        addExitButton(leftSideTable, assetsManager, gamePlayScreen, dialogsHandler)
+        addBuyCoinsButton(leftSideTable, dialogsHandler)
         table.add(leftSideTable).expandX().left()
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
         coinsLabelHandler.addCoinsLabel(gameModel, font80, table, assetsManager, topPartTexture)
@@ -180,9 +180,9 @@ class TopBarView(
 
     private fun addBuyCoinsButton(
         table: Table,
-        dialogsManager: DialogsManager,
+        dialogsHandler: DialogsHandler,
     ) {
-        val coinsButton = createBuyCoinsButton(table, dialogsManager)
+        val coinsButton = createBuyCoinsButton(table, dialogsHandler)
         coinsButton.setOrigin(Align.center)
         coinsButton.isTransform = true
         table.add(coinsButton).pad(
@@ -211,7 +211,7 @@ class TopBarView(
 
     private fun createBuyCoinsButton(
         table: Table,
-        dialogsManager: DialogsManager,
+        dialogsHandler: DialogsHandler,
     ): ImageButton {
         val up =
             if (gameModel.selectedDifficulty != Difficulties.KIDS) COINS_BUTTON_UP else CANDY_BUTTON_UP
@@ -225,7 +225,7 @@ class TopBarView(
             coinsButton,
             globalHandlers.assetsManager
         ) {
-            dialogsManager.openBuyCoinsDialog(table.stage as GameStage, gamePlayScreen)
+            dialogsHandler.openBuyCoinsDialog(table.stage as GameStage, gamePlayScreen)
         }
         return coinsButton
     }

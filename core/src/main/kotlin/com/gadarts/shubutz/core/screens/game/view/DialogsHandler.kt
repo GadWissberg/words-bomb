@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Scaling
 import com.gadarts.shubutz.core.DebugSettings
+import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -19,14 +20,14 @@ import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
-import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import java.util.*
 
-class DialogsManager(
-    private val globalHandlers: GlobalHandlers,
+class DialogsHandler(
+    private val assetsManager: GameAssetManager,
     private val effectsHandler: EffectsHandler,
-    private val stage: GameStage
+    private val stage: GameStage,
+    private val soundPlayer: SoundPlayer
 ) {
     fun openBuyCoinsDialog(
         stage: GameStage,
@@ -35,15 +36,16 @@ class DialogsManager(
         val loadingAnimation = createLoadingAnimation()
         val layout = Table()
         layout.add(loadingAnimation).row()
-        stage.addDialog(layout, COINS_DIALOG_LOADING_NAME, globalHandlers.assetsManager) {
+        stage.addDialog(layout, COINS_DIALOG_LOADING_NAME, assetsManager) {
             gamePlayScreen.onOpenProductsMenu({
                 loadingAnimation.remove()
                 layout.remove()
-                stage.addDialog(layout, COINS_DIALOG_NAME, globalHandlers.assetsManager)
+                stage.addDialog(layout, COINS_DIALOG_NAME, assetsManager)
                 if (it.isNotEmpty()) {
                     addCoinsDialogComponents(layout, it, gamePlayScreen) {
                         effectsHandler.applyPartyEffect(
-                            globalHandlers,
+                            assetsManager,
+                            soundPlayer,
                             stage
                         )
                     }
@@ -52,7 +54,7 @@ class DialogsManager(
                 stage.closeDialog(COINS_DIALOG_LOADING_NAME)
             }, {
                 loadingAnimation.remove()
-                layout.add(ViewUtils.createDialogLabel(it, globalHandlers.assetsManager))
+                layout.add(ViewUtils.createDialogLabel(it, assetsManager))
                 layout.pack()
             })
         }
@@ -144,7 +146,7 @@ class DialogsManager(
         val label = Label(
             product?.formattedPrice ?: "",
             Label.LabelStyle(
-                globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_35),
+                assetsManager.getFont(FontsDefinitions.VARELA_35),
                 Color.WHITE
             )
         )
@@ -238,7 +240,7 @@ class DialogsManager(
         onClick: (() -> Unit)
     ): ImageTextButton {
         val button =
-            ImageTextButton(text, stage.createNinePatchButtonStyle(globalHandlers.assetsManager))
+            ImageTextButton(text, stage.createNinePatchButtonStyle(assetsManager))
         addClickListenerToButton(button, onClick)
         return button
     }
@@ -251,8 +253,8 @@ class DialogsManager(
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 super.clicked(event, x, y)
                 runnable.run()
-                globalHandlers.soundPlayer.playSound(
-                    globalHandlers.assetsManager.getSound(
+                soundPlayer.playSound(
+                    assetsManager.getSound(
                         SoundsDefinitions.BUTTON
                     )
                 )
@@ -266,8 +268,8 @@ class DialogsManager(
         gamePlayScreen: GamePlayScreen,
         onVideoDone: () -> Unit,
     ) {
-        addHeaderToDialog(globalHandlers.assetsManager, layout, COINS_DIALOG_HEADER)
-        addDialogText(globalHandlers.assetsManager, layout, COINS_DIALOG_DESCRIPTION)
+        addHeaderToDialog(assetsManager, layout, COINS_DIALOG_HEADER)
+        addDialogText(assetsManager, layout, COINS_DIALOG_DESCRIPTION)
         InAppProducts.values().forEach {
             val id = it.name.lowercase(Locale.ROOT)
             if (products.containsKey(id)) {
@@ -275,7 +277,7 @@ class DialogsManager(
                     dialog = layout,
                     product = products[id],
                     definition = it,
-                    gameAssetManager = globalHandlers.assetsManager,
+                    gameAssetManager = assetsManager,
                     gamePlayScreen = gamePlayScreen
                 )
             }
@@ -292,7 +294,7 @@ class DialogsManager(
         val stack = Stack()
         val table = Table()
         addDialogText(
-            assetsManager = globalHandlers.assetsManager,
+            assetsManager = assetsManager,
             dialog = table,
             description = COINS_DIALOG_DESCRIPTION_2,
             topPadding = COINS_DIALOG_DESCRIPTION_2_TOP_PADDING,
@@ -329,14 +331,14 @@ class DialogsManager(
                 })
             }
         )
-        val image = Image(globalHandlers.assetsManager.getTexture(TexturesDefinitions.POPCORN))
+        val image = Image(assetsManager.getTexture(TexturesDefinitions.POPCORN))
         image.setScaling(Scaling.none)
         val cell = button.add(image).pad(COINS_DIALOG_BUTTON_VIDEO_ICON_PADDING)
         cell.size(cell.prefWidth, COINS_DIALOG_BUTTON_VIDEO_PADDING)
     }
 
     private fun createLoadingAnimation(): LoadingAnimation {
-        val keyFrames = globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING).regions
+        val keyFrames = assetsManager.getAtlas(AtlasesDefinitions.LOADING).regions
         return LoadingAnimation(keyFrames)
     }
 
@@ -409,6 +411,23 @@ class DialogsManager(
         return dialogView
     }
 
+    fun openHelpDialog(stage: GameStage, assetsManager: GameAssetManager) {
+        val dialogView = createDialogLayout(
+            assetsManager,
+            HELP_DIALOG_HEADER,
+            HELP_DIALOG_DESCRIPTION
+        )
+        addDialogText(assetsManager, dialogView, HELP_DIALOG_CREDITS)
+        addDialogButton(
+            dialogLayout = dialogView,
+            text = HELP_DIALOG_BUTTON_OK,
+            dialogName = HELP_DIALOG_NAME,
+            width = EXIT_DIALOG_BUTTON_WIDTH
+        )
+        stage.addDialog(dialogView, HELP_DIALOG_NAME, assetsManager)
+        placeDialogInTheMiddle(dialogView)
+    }
+
     companion object {
         private const val COINS_PURCHASED_DIALOG_HEADER = "נהנים!"
         private const val COINS_PURCHASED_DIALOG_DESCRIPTION = "רכישה של %s מטבעות\nבוצעה בהצלחה!"
@@ -416,6 +435,13 @@ class DialogsManager(
         private const val COINS_PURCHASED_DIALOG_BUTTON_OK = "מעולה"
         private const val EXIT_DIALOG_NAME = "exit"
         private const val EXIT_DIALOG_HEADER = "חכה!"
+        private const val HELP_DIALOG_HEADER = "איך משחקים?"
+        private const val HELP_DIALOG_DESCRIPTION =
+            "בכל שלב תופיע מילה עם\nאותיות חסרות, עליכם לגלות את\nהמילה לפני שיגמרו מס' הניסיונות."
+        private const val HELP_DIALOG_CREDITS =
+            "גד וייסברג - תוכן, תכנות ועיצוב\nמעוז שחם - איסוף מילים עבור רמת ילדים\nכל הזכויות שמורות - 3202"
+        private const val HELP_DIALOG_BUTTON_OK = "סבבה"
+        private const val HELP_DIALOG_NAME = "help"
         private const val EXIT_DIALOG_DESCRIPTION = "אתה בטוח שאתה רוצה\nלסיים את המשחק?"
         private const val EXIT_DIALOG_BUTTON_OK = "כן"
         private const val EXIT_DIALOG_BUTTON_NO = "לא"

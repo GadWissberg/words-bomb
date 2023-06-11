@@ -18,14 +18,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
-import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.Difficulties
-import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SOUND_ENABLED
 import com.gadarts.shubutz.core.model.assets.definitions.AtlasesDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
+import com.gadarts.shubutz.core.screens.game.GlobalHandlers
+import com.gadarts.shubutz.core.screens.game.view.DialogsHandler
 import com.gadarts.shubutz.core.screens.menu.BeginGameAction
 import com.gadarts.shubutz.core.screens.menu.LoadingAnimationHandler
 import com.gadarts.shubutz.core.screens.menu.MenuScreen
@@ -33,16 +33,17 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage.Companion.BUTTON_PADDING
 
 class MenuScreenView(
-    private val assetsManager: GameAssetManager,
+    private val globalHandlers: GlobalHandlers,
     private val versionName: String,
     private val stage: GameStage,
-    private val soundPlayer: SoundPlayer,
     private val menuScreen: MenuScreen,
-    private val androidInterface: AndroidInterface
+    private val androidInterface: AndroidInterface,
+    private val dialogsHandler: DialogsHandler
 ) : Disposable {
 
 
     private lateinit var soundButton: ImageButton
+    private lateinit var helpButton: ImageButton
     private lateinit var logoTable: Table
     private lateinit var versionLabel: Label
     private var mainMenuTable = Table()
@@ -50,29 +51,42 @@ class MenuScreenView(
     var loadingAnimationRenderer = LoadingAnimationHandler()
 
     private fun addSoundButton() {
-        val imageButton =
-            createButton(TexturesDefinitions.ICON_SOUND_OFF, TexturesDefinitions.ICON_SOUND_ON)
-        imageButton.setPosition(
-            stage.width - assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_UP).width - ROUND_BUTTON_PADDING_HOR,
-            ROUND_BUTTON_PADDING_VER
+        val imageButton = addRoundButton(
+            TexturesDefinitions.ICON_SOUND_OFF,
+            stage.width - globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_UP).width - ROUND_BUTTON_PADDING_HOR,
+            ROUND_BUTTON_PADDING_VER,
+            object : ClickListener() {
+                override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                    super.clicked(event, x, y)
+                    soundToggle()
+                }
+            },
+            TexturesDefinitions.ICON_SOUND_ON,
         )
-        imageButton.isChecked = soundPlayer.enabled
-        imageButton.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                super.clicked(event, x, y)
-                soundToggle()
-            }
-        })
-        stage.addActor(imageButton)
+        imageButton.isChecked = globalHandlers.soundPlayer.enabled
         soundButton = imageButton
     }
 
+    private fun addRoundButton(
+        up: TexturesDefinitions,
+        x: Float,
+        y: Float,
+        clickListener: ClickListener,
+        checked: TexturesDefinitions? = null,
+    ): ImageButton {
+        val imageButton = createButton(up, checked)
+        imageButton.setPosition(x, y)
+        imageButton.addListener(clickListener)
+        stage.addActor(imageButton)
+        return imageButton
+    }
+
     private fun soundToggle() {
-        soundPlayer.enabled = !soundPlayer.enabled
-        soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
+        globalHandlers.soundPlayer.enabled = !globalHandlers.soundPlayer.enabled
+        globalHandlers.soundPlayer.playSound(globalHandlers.assetsManager.getSound(SoundsDefinitions.BUTTON))
         androidInterface.saveSharedPreferencesBooleanValue(
             SOUND_ENABLED,
-            soundPlayer.enabled
+            globalHandlers.soundPlayer.enabled
         )
     }
 
@@ -80,21 +94,25 @@ class MenuScreenView(
         imageUp: TexturesDefinitions,
         imageChecked: TexturesDefinitions? = null
     ): ImageButton {
-        val texture = assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_UP)
+        val texture = globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_UP)
         val style = ImageButton.ImageButtonStyle(
             TextureRegionDrawable(texture),
-            TextureRegionDrawable(assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_DOWN)),
+            TextureRegionDrawable(globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_DOWN)),
             null,
-            TextureRegionDrawable(assetsManager.getTexture(imageUp)),
+            TextureRegionDrawable(globalHandlers.assetsManager.getTexture(imageUp)),
             null,
-            if (imageChecked != null) TextureRegionDrawable(assetsManager.getTexture(imageChecked)) else null,
+            if (imageChecked != null) TextureRegionDrawable(
+                globalHandlers.assetsManager.getTexture(
+                    imageChecked
+                )
+            ) else null,
         )
         return ImageButton(style)
     }
 
     fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: BeginGameAction) {
         if (!loadingDone) {
-            loadingAnimationRenderer.addLoadingAnimation(assetsManager, stage)
+            loadingAnimationRenderer.addLoadingAnimation(globalHandlers.assetsManager, stage)
         } else {
             finishLoadingAnimationAndDisplayMenu(goToPlayScreenOnClick)
         }
@@ -108,9 +126,10 @@ class MenuScreenView(
 
     fun finishLoadingAnimationAndDisplayMenu(beginGameAction: BeginGameAction) {
         addSoundButton()
+        addHelpButton()
         loadingAnimationRenderer.flyOutBricks(
-            assetsManager.getSound(SoundsDefinitions.FLYBY),
-            soundPlayer
+            globalHandlers.assetsManager.getSound(SoundsDefinitions.FLYBY),
+            globalHandlers.soundPlayer
         )
         Gdx.app.postRunnable {
             addUserInterface(beginGameAction)
@@ -118,6 +137,16 @@ class MenuScreenView(
             difficultySelectionTable.isVisible = false
             stage.addActor(difficultySelectionTable)
         }
+    }
+
+    private fun addHelpButton() {
+        addRoundButton(TexturesDefinitions.ICON_HELP, ROUND_BUTTON_PADDING_HOR,
+            ROUND_BUTTON_PADDING_VER, object : ClickListener() {
+                override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                    super.clicked(event, x, y)
+                    dialogsHandler.openHelpDialog(stage, globalHandlers.assetsManager)
+                }
+            })
     }
 
     override fun dispose() {
@@ -130,6 +159,7 @@ class MenuScreenView(
         difficultySelectionTable.remove()
         versionLabel.remove()
         soundButton.remove()
+        helpButton.remove()
     }
 
     private fun addUserInterface(beginGameAction: BeginGameAction) {
@@ -137,7 +167,10 @@ class MenuScreenView(
         addDifficultySelectionTable(beginGameAction)
         versionLabel = Label(
             "v$versionName",
-            Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_35), Color.BLACK)
+            Label.LabelStyle(
+                globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_35),
+                Color.BLACK
+            )
         )
         stage.addActor(versionLabel)
     }
@@ -159,7 +192,7 @@ class MenuScreenView(
             difficultySelectionTable,
             LABEL_BACK,
             160,
-            assetsManager.getFont(FontsDefinitions.VARELA_40),
+            globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_40),
             scale = 0.5F
         ) {
             fadeOutTable(difficultySelectionTable)
@@ -171,7 +204,10 @@ class MenuScreenView(
         difficultySelectionTable.add(
             Label(
                 LABEL_DIFFICULTY_SELECT.reversed(),
-                Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_80), Color.WHITE)
+                Label.LabelStyle(
+                    globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
+                    Color.WHITE
+                )
             )
         ).pad(20F).row()
     }
@@ -182,7 +218,7 @@ class MenuScreenView(
         addButton(
             table = mainMenuTable,
             label = LABEL_BEGIN_GAME,
-            font = assetsManager.getFont(FontsDefinitions.VARELA_80)
+            font = globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80)
         ) {
             fadeOutTable(mainMenuTable)
             fadeInTable(difficultySelectionTable)
@@ -190,8 +226,8 @@ class MenuScreenView(
         addButton(
             table = mainMenuTable,
             label = null,
-            font = assetsManager.getFont(FontsDefinitions.VARELA_80),
-            image = assetsManager.getTexture(TexturesDefinitions.KIDS)
+            font = globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
+            image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.KIDS)
         ) {
             beginGameAction.begin(Difficulties.KIDS)
         }
@@ -220,10 +256,10 @@ class MenuScreenView(
         if (!androidInterface.isConnected()) return
         mainMenuTable.add(
             ChampionsView(
-                assetsManager.getFont(FontsDefinitions.VARELA_35),
+                globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_35),
                 androidInterface,
-                assetsManager.getTexture(TexturesDefinitions.ICON_HIGHSCORES),
-                assetsManager.getAtlas(AtlasesDefinitions.LOADING)
+                globalHandlers.assetsManager.getTexture(TexturesDefinitions.ICON_HIGHSCORES),
+                globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING)
             )
         ).pad(CHAMPIONS_VIEW_PADDING).expandX().center()
     }
@@ -238,7 +274,7 @@ class MenuScreenView(
         table: Table,
         label: String?,
         topPadding: Int = BUTTON_PADDING,
-        font: BitmapFont = assetsManager.getFont(FontsDefinitions.VARELA_80),
+        font: BitmapFont = globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
         scale: Float = 1F,
         image: Texture? = null,
         onClick: Runnable
@@ -249,13 +285,17 @@ class MenuScreenView(
                 override fun clicked(event: InputEvent?, x: Float, y: Float) {
                     super.clicked(event, x, y)
                     onClick.run()
-                    soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUTTON))
+                    globalHandlers.soundPlayer.playSound(
+                        globalHandlers.assetsManager.getSound(
+                            SoundsDefinitions.BUTTON
+                        )
+                    )
                 }
             },
             label?.reversed(),
             span = 2,
-            up = assetsManager.getTexture(TexturesDefinitions.BUTTON_UP),
-            down = assetsManager.getTexture(TexturesDefinitions.BUTTON_DOWN),
+            up = globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_UP),
+            down = globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_DOWN),
             bitmapFont = font,
             topPadding = topPadding,
             scale = scale,
@@ -268,7 +308,7 @@ class MenuScreenView(
         index: Int,
         textureDefinition: TexturesDefinitions
     ) {
-        val texture = assetsManager.getTexture(textureDefinition)
+        val texture = globalHandlers.assetsManager.getTexture(textureDefinition)
         val image = Image(texture)
         logoTable.add(image).size(
             texture.width.toFloat(),
@@ -283,7 +323,11 @@ class MenuScreenView(
                 Actions.scaleTo(0F, 0F),
                 Actions.delay(0.2F * index),
                 Actions.run {
-                    soundPlayer.playSound(assetsManager.getSound(SoundsDefinitions.BUBBLE), true)
+                    globalHandlers.soundPlayer.playSound(
+                        globalHandlers.assetsManager.getSound(
+                            SoundsDefinitions.BUBBLE
+                        ), true
+                    )
                 },
                 Actions.scaleTo(1F, 1F, 0.5F, Interpolation.exp10),
                 Actions.forever(
