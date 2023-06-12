@@ -13,7 +13,7 @@ class GlobalHandlers(
     stage: GameStage,
     val assetsManager: GameAssetManager
 ) : Disposable {
-    private val effectsHandler: EffectsHandler = EffectsHandler()
+    val effectsHandler: EffectsHandler = EffectsHandler()
     val dialogsHandler: DialogsHandler
     val soundPlayer: SoundPlayer = SoundPlayer(androidInterface)
 

@@ -13,7 +13,6 @@ import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.DISABLE_ADS_DUE_DATE
 import com.gadarts.shubutz.core.screens.GameScreen
-import com.gadarts.shubutz.core.screens.game.view.EffectsHandler
 import com.gadarts.shubutz.core.screens.game.view.GamePlayScreenView
 import com.gadarts.shubutz.core.screens.menu.view.Champion
 import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
@@ -25,7 +24,6 @@ class GamePlayScreenImpl(
     private val android: AndroidInterface,
     private val stage: GameStage,
     private val selectedDifficulty: Difficulties,
-    private val effectsHandler: EffectsHandler,
 ) : GameScreen(), GamePlayScreen {
 
 
@@ -51,6 +49,7 @@ class GamePlayScreenImpl(
                 val amount = filtered.first().amount
                 gameLogicHandler.onPurchasedCoins(gameModel, amount)
                 gamePlayScreenView.onPurchasedCoins(amount)
+                android.hideBannerAd()
                 android.saveSharedPreferencesLongValue(
                     DISABLE_ADS_DUE_DATE,
                     TimeUtils.millis() + ADS_DISABLE_LENGTH
@@ -89,7 +88,6 @@ class GamePlayScreenImpl(
         gameModel,
         this,
         stage,
-        effectsHandler,
     )
 
     override fun render(delta: Float) {

@@ -1,6 +1,7 @@
 package com.gadarts.shubutz
 
 import android.app.Activity
+import android.view.View
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
@@ -14,8 +15,12 @@ import com.badlogic.gdx.Gdx
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
+import com.google.android.gms.ads.AdView
 
-class PurchaseHandler(private val game: ShubutzGame, private val context: Activity) {
+class PurchaseHandler(
+    private val game: ShubutzGame,
+    private val context: Activity,
+) {
 
     private val purchasesUpdatedListener =
         PurchasesUpdatedListener { billingResult, purchases ->

@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.AndroidInterface
+import com.gadarts.shubutz.core.ShubutzGame.Companion.lastChampionsFetch
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.screens.game.view.LoadingAnimation
 
@@ -186,7 +187,6 @@ class ChampionsView(
         private const val INTERVAL = 5F
         private const val CACHE_TTL = 10 * 60 * 1000
         private val champions = HashMap<Difficulties, Champion>()
-        private var lastChampionsFetch = 0L
     }
 }
 

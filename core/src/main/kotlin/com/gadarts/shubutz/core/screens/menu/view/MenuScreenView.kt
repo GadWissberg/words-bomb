@@ -140,7 +140,7 @@ class MenuScreenView(
     }
 
     private fun addHelpButton() {
-        addRoundButton(TexturesDefinitions.ICON_HELP, ROUND_BUTTON_PADDING_HOR,
+        helpButton = addRoundButton(TexturesDefinitions.ICON_HELP, ROUND_BUTTON_PADDING_HOR,
             ROUND_BUTTON_PADDING_VER, object : ClickListener() {
                 override fun clicked(event: InputEvent?, x: Float, y: Float) {
                     super.clicked(event, x, y)

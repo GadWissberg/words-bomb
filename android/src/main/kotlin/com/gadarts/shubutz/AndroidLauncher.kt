@@ -33,6 +33,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     private lateinit var game: ShubutzGame
     private var versionName = "0.0.0"
     private lateinit var layout: RelativeLayout
+    private var lastChampionsFetch = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -27,7 +27,6 @@ class GamePlayScreenView(
     private val gameModel: GameModel,
     private val gamePlayScreen: GamePlayScreen,
     private val stage: GameStage,
-    private val effectsHandler: EffectsHandler,
 ) :
     Disposable {
 
@@ -205,7 +204,11 @@ class GamePlayScreenView(
 
     fun onPurchasedCoins(amount: Int) {
         gamePlayScreenViewComponentsManager.onPurchasedCoins(amount)
-        effectsHandler.applyPartyEffect(globalHandlers.assetsManager, globalHandlers.soundPlayer, stage)
+        globalHandlers.effectsHandler.applyPartyEffect(
+            globalHandlers.assetsManager,
+            globalHandlers.soundPlayer,
+            stage
+        )
     }
 
 

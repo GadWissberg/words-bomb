@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
+import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -382,13 +383,18 @@ class GamePlayScreenViewComponentsManager(
 
     fun onPhysicalBackClicked() {
         if (stage.openDialogs.isEmpty()) {
-            globalHandlers.dialogsHandler.openExitDialog(stage, globalHandlers.assetsManager, gamePlayScreen)
+            globalHandlers.dialogsHandler.openExitDialog(
+                stage,
+                globalHandlers.assetsManager,
+                gamePlayScreen
+            )
         } else {
             stage.closeAllDialogs()
         }
     }
 
     fun onChampion(post: () -> Unit) {
+        ShubutzGame.lastChampionsFetch = 0L
         val texture = globalHandlers.assetsManager.getTexture(CHAMPION)
         displayBannerWithEffect(
             SoundsDefinitions.CHAMPION,
