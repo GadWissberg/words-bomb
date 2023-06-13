@@ -144,7 +144,10 @@ class GamePlayScreenImpl(
     }
 
     override fun onQuitSession() {
-        val sent = android.submitScore(gameModel.score, gameModel.selectedDifficulty.leaderboardsId)
+        var sent = false
+        if (gameModel.score <= 0) {
+            sent = android.submitScore(gameModel.score, gameModel.selectedDifficulty.leaderboardsId)
+        }
         if (sent) {
             android.displayLeaderboard(gameModel.selectedDifficulty.leaderboardsId)
         } else {
@@ -191,10 +194,12 @@ class GamePlayScreenImpl(
             gameModel.selectedDifficulty,
             object : OnChampionFetched {
                 override fun run(champion: Champion?) {
-                    globalHandlers.androidInterface.submitScore(
-                        gameModel.score,
-                        gameModel.selectedDifficulty.leaderboardsId
-                    )
+                    if (gameModel.score <= 0) {
+                        globalHandlers.androidInterface.submitScore(
+                            gameModel.score,
+                            gameModel.selectedDifficulty.leaderboardsId
+                        )
+                    }
                     if (champion != null && champion.score < gameModel.score) {
                         gamePlayScreenView.onChampion {
                             globalHandlers.androidInterface.displayLeaderboard(

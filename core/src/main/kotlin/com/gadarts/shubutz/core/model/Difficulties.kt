@@ -8,7 +8,7 @@ enum class Difficulties(
     val minimumLength: Int = 2,
     val phrasesFileName: String = "phrases",
     val sharedPreferencesCoinsKey: String = "regular_coins",
-    val revealLetterCost: Int = 8,
+    val revealLetterCost: Int = 9,
     val perfectBonusEnabled: Boolean = true,
     val leaderboardsId: String
 ) {
@@ -53,7 +53,7 @@ enum class Difficulties(
         winWorth = 1,
         phrasesFileName = "phrases_kids",
         sharedPreferencesCoinsKey = "kids_coins",
-        revealLetterCost = 4,
+        revealLetterCost = 5,
         leaderboardsId = "CgkItLjwycoZEAIQBQ"
     );
 

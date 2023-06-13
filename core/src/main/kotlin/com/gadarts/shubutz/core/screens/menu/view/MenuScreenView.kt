@@ -125,8 +125,6 @@ class MenuScreenView(
     }
 
     fun finishLoadingAnimationAndDisplayMenu(beginGameAction: BeginGameAction) {
-        addSoundButton()
-        addHelpButton()
         loadingAnimationRenderer.flyOutBricks(
             globalHandlers.assetsManager.getSound(SoundsDefinitions.FLYBY),
             globalHandlers.soundPlayer
@@ -163,6 +161,8 @@ class MenuScreenView(
     }
 
     private fun addUserInterface(beginGameAction: BeginGameAction) {
+        addSoundButton()
+        addHelpButton()
         addMainMenuTable(beginGameAction)
         addDifficultySelectionTable(beginGameAction)
         versionLabel = Label(

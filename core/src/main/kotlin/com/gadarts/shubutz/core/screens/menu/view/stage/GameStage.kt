@@ -104,11 +104,16 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
             val imageComponent = Image(image)
             imageComponent.setScaling(Scaling.none)
             button.add(imageComponent)
+        } else {
+            button.labelCell.pad(BUTTON_LABEL_PADDING)
         }
         addButtonToTable(
-            button, onClick,
-            uiTable, newLineAfter,
-            span = span, topPadding = topPadding.toFloat(),
+            button,
+            onClick,
+            uiTable,
+            newLineAfter,
+            span = span,
+            topPadding = topPadding.toFloat(),
             scale = scale
         )
         return button
@@ -291,15 +296,17 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
     }
 
     companion object {
-        val BACKGROUND_COLOR: Color = Color.valueOf("B5EAEA")
-        const val NUMBER_OF_CLOUDS = 4
-        private val BUTTON_FONT_COLOR_DISABLED = Color.LIGHT_GRAY
         const val BUTTON_PADDING = 20
-        const val CLOUDS_SCALE = 0.1F
-        const val CLOUDS_SCALE_DURATION_MIN = 15F
-        const val CLOUDS_SCALE_DURATION_MAX = 25F
-        const val CLOUDS_MOVEMENT_DUR_MIN = 25F
-        const val CLOUDS_MOVEMENT_DUR_MAX = 35F
+        private val BACKGROUND_COLOR: Color = Color.valueOf("B5EAEA")
+        private val BUTTON_FONT_COLOR_DISABLED = Color.LIGHT_GRAY
+        private const val NUMBER_OF_CLOUDS = 4
+        private const val BUTTON_LABEL_PADDING = 40F
+        private const val BUTTON_IMAGE_PADDING = 10F
+        private const val CLOUDS_SCALE = 0.1F
+        private const val CLOUDS_SCALE_DURATION_MIN = 15F
+        private const val CLOUDS_SCALE_DURATION_MAX = 25F
+        private const val CLOUDS_MOVEMENT_DUR_MIN = 25F
+        private const val CLOUDS_MOVEMENT_DUR_MAX = 35F
         private const val COINS_DIALOG_PADDING = 64
         private const val DLG_BUT_NP_PAD = 25
     }
