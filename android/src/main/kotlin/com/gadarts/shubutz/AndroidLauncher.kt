@@ -33,7 +33,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     private lateinit var game: ShubutzGame
     private var versionName = "0.0.0"
     private lateinit var layout: RelativeLayout
-    private var lastChampionsFetch = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,40 +48,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         createLayout()
         googleServicesHandler.onCreate(game, this)
     }
-
-    private fun createAndroidApplicationConfig(): AndroidApplicationConfiguration {
-        val config = AndroidApplicationConfiguration()
-        config.numSamples = 2
-        return config
-    }
-
-    private fun createLayout() {
-        layout = RelativeLayout(context)
-        val view = initializeForView(game, createAndroidApplicationConfig())
-        layout.addView(view)
-        setContentView(layout)
-        @Suppress("DEPRECATION")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.hide(WindowInsets.Type.statusBars())
-        } else {
-            window.setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN
-            )
-            window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
-        }
-        googleServicesHandler.addBannerAdLayout(this, layout)
-    }
-
-    private fun PackageManager.getPackageInfoCompat(
-        packageName: String,
-        flags: Int = 0
-    ): PackageInfo =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags.toLong()))
-        } else {
-            @Suppress("DEPRECATION") getPackageInfo(packageName, flags)
-        }
 
     override fun toast(msg: String) {
         runOnUiThread {
@@ -165,12 +130,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         }
     }
 
-    private fun shouldLoadBannerAd() =
-        DebugSettings.ALWAYS_DISPLAY_BANNER_ADS || getSharedPreferencesLongValue(
-            SharedPreferencesKeys.DISABLE_ADS_DUE_DATE,
-            0
-        ) < TimeUtils.millis()
-
     override fun hideBannerAd() {
         runOnUiThread {
             googleServicesHandler.hideBannerAd()
@@ -207,5 +166,43 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         }
     }
 
+    private fun createAndroidApplicationConfig(): AndroidApplicationConfiguration {
+        val config = AndroidApplicationConfiguration()
+        config.numSamples = 2
+        return config
+    }
 
+    private fun createLayout() {
+        layout = RelativeLayout(context)
+        val view = initializeForView(game, createAndroidApplicationConfig())
+        layout.addView(view)
+        setContentView(layout)
+        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.hide(WindowInsets.Type.statusBars())
+        } else {
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
+        }
+        googleServicesHandler.addBannerAdLayout(this, layout)
+    }
+
+    private fun PackageManager.getPackageInfoCompat(
+        packageName: String,
+        flags: Int = 0
+    ): PackageInfo =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags.toLong()))
+        } else {
+            @Suppress("DEPRECATION") getPackageInfo(packageName, flags)
+        }
+
+    private fun shouldLoadBannerAd() =
+        DebugSettings.ALWAYS_DISPLAY_BANNER_ADS || getSharedPreferencesLongValue(
+            SharedPreferencesKeys.DISABLE_ADS_DUE_DATE,
+            0
+        ) < TimeUtils.millis()
 }

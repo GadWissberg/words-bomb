@@ -24,7 +24,6 @@ class MenuScreenImpl(
         stage,
         this,
         androidInterface,
-        globalHandlers.dialogsHandler
     )
 
     override fun onSuccessfulPurchase(products: MutableList<String>) {

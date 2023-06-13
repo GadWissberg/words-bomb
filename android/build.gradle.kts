@@ -54,8 +54,8 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
-    implementation("com.android.billingclient:billing:5.2.0")
-    implementation("com.google.android.gms:play-services-ads:22.0.0")
+    implementation("com.android.billingclient:billing:6.0.0")
+    implementation("com.google.android.gms:play-services-ads:22.1.0")
     implementation("de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:1.1.0")
 //    implementation("com.google.android.gms:play-services-games-v2:17.0.0")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi")

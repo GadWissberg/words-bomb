@@ -66,7 +66,7 @@ class GoogleServicesHandler {
 
 
     private fun signInToPlayServices() {
-        val loggedIn = gsClient.logIn()
+        val loggedIn = gsClient.connect(true)
         if (loggedIn) {
             Gdx.app.log("Play Services", "Signed in successfully")
         } else {
@@ -142,13 +142,17 @@ class GoogleServicesHandler {
         try {
             gsClient.showLeaderboards(leaderboardsId)
         } catch (ex: GameServiceException) {
-            Gdx.app.error("Play Services", ex.message)
+            var message = "Failed to display the leaderboards!"
+            if (ex.message != null) {
+                message = ex.message!!
+            }
+            Gdx.app.error("Play Services", message)
         }
     }
 
     fun fetchChampion(difficulty: Difficulties, callback: OnChampionFetched) {
         val success = gsClient.fetchLeaderboardEntries(difficulty.leaderboardsId, 1, false) {
-            if (!it.isEmpty) {
+            if (it != null && !it.isEmpty) {
                 val first = it.first()
                 callback.run(
                     tryToConvertEntry(first, difficulty)

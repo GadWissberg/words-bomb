@@ -143,6 +143,15 @@ class DialogsHandler(
         button.debug = DebugSettings.SHOW_UI_BORDERS
         val stack = Stack()
         button.add(stack).row()
+        addLabelToPackButton(product, button)
+        addFlashEffect(definition, stack, gameAssetManager)
+        animatePackButton(definition, addPurchaseIcon(definition, stack, gameAssetManager))
+    }
+
+    private fun addLabelToPackButton(
+        product: Product?,
+        button: ImageTextButton
+    ) {
         val label = Label(
             product?.formattedPrice ?: "",
             Label.LabelStyle(
@@ -154,9 +163,12 @@ class DialogsHandler(
         button.add(
             label
         ).colspan(2).center()
-        addFlashEffect(definition, stack, gameAssetManager)
-        val image = addPurchaseIcon(definition, stack, gameAssetManager)
+    }
 
+    private fun animatePackButton(
+        definition: InAppProducts,
+        image: Image
+    ) {
         if (definition.applyAnimation) {
             image.addAction(
                 Actions.forever(
