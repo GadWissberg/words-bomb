@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.gadarts.shubutz.core.DebugSettings
@@ -29,7 +30,7 @@ class TargetPhraseView(
     private val assetsManager: GameAssetManager
 ) {
     private var gameWinAnimationRuns: Boolean = false
-    val wordsTables = ArrayList<Table>()
+    private val wordsTables = ArrayList<Table>()
     private lateinit var targetTable: Table
     var maxBricksPerLine: Int = 0
     private var targetWordLines = ArrayList<Table>()
@@ -49,13 +50,13 @@ class TargetPhraseView(
     private fun addGivenLetter(
         gameModel: GameModel,
         i: Int,
-        texture: Texture,
+        brickTexture: Texture,
         wordTable: Table,
     ) {
         val isLetter = i >= 0 && i < gameModel.currentPhrase.length
         val brick = Brick(
             if (isLetter) gameModel.currentPhrase[i].toString() else " ",
-            texture,
+            brickTexture,
             letterSize,
             font80
         )
@@ -66,13 +67,13 @@ class TargetPhraseView(
 
     private fun addLetterToTarget(
         index: Int,
-        texture: Texture,
+        cellTexture: Texture,
         brickTexture: Texture,
         wordTable: Table,
         gameModel: GameModel,
     ) {
         if (gameModel.hiddenLettersIndices.contains(index)) {
-            addBrickCell(texture, wordTable)
+            addBrickCell(cellTexture, wordTable)
         } else {
             addGivenLetter(gameModel, index, brickTexture, wordTable)
         }
@@ -245,6 +246,39 @@ class TargetPhraseView(
         gameWinAnimationRuns = false
         addTargetTable(uiTable)
         addTargetWordLines(gameModel, assetsManager)
+    }
+
+    fun onGameOver(gameModel: GameModel, stage: GameStage) {
+        gameModel.hiddenLettersIndices.clear()
+        targetWordLines.forEach {
+            it.addAction(
+                Actions.sequence(
+                    Actions.delay(2F),
+                    Actions.fadeOut(1F),
+                    Actions.run {
+                        it.clear()
+                        targetWordLines.remove(it)
+                    })
+            )
+        }
+        stage.addAction(Actions.delay(4F, Actions.run {
+            addTargetWordLines(gameModel, assetsManager)
+        }))
+    }
+
+    fun findCellByIndex(index: Int, gameModel: GameModel): Cell<Actor> {
+        var wordCount = 0
+        var letterIndexInWord = 0
+        for (i in 0 until index) {
+            if (gameModel.currentPhrase[i] == ' ') {
+                wordCount++
+                letterIndexInWord = 0
+            } else {
+                letterIndexInWord++
+            }
+        }
+        val wordTable = wordsTables[wordCount]
+        return wordTable.cells[letterIndexInWord]
     }
 
 

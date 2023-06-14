@@ -125,17 +125,8 @@ class GamePlayScreenView(
 
 
     private fun animateBrickSuccess(index: Int, gameWin: Boolean, brickTexture: Texture) {
-        var wordCount = 0
-        var letterIndexInWord = 0
-        for (i in 0 until index) {
-            if (gameModel.currentPhrase[i] == ' ') {
-                wordCount++
-                letterIndexInWord = 0
-            } else {
-                letterIndexInWord++
-            }
-        }
-        val wordTable = gamePlayScreenViewComponentsManager.targetPhraseView.wordsTables[wordCount]
+        val cell =
+            gamePlayScreenViewComponentsManager.targetPhraseView.findCellByIndex(index, gameModel)
         val selectedBrickScreenCoords =
             gamePlayScreenViewComponentsManager.optionsView.selectedBrick!!.localToStageCoordinates(
                 auxVector.setZero()
@@ -146,7 +137,6 @@ class GamePlayScreenView(
             selectedBrickScreenCoords.x,
             selectedBrickScreenCoords.y,
         )
-        val cell = wordTable.cells[letterIndexInWord]
         val cellActorScreenCoordinates = cell.actor.localToStageCoordinates(auxVector.setZero())
         switchBrickToStage(brick)
         val sequence = Actions.sequence(
@@ -198,8 +188,12 @@ class GamePlayScreenView(
     }
 
     private fun gameOver() {
-        gamePlayScreenViewComponentsManager.onGameOver(stage)
-        stage.addAction(Actions.delay(5F, Actions.run { gamePlayScreen.onGameOverAnimationDone() }))
+        gamePlayScreenViewComponentsManager.onGameOver(stage, gameModel)
+        stage.addAction(
+            Actions.delay(
+                GAME_OVER_DURATION,
+                Actions.run { gamePlayScreen.onGameOverAnimationDone() })
+        )
     }
 
     fun onPurchasedCoins(amount: Int) {
@@ -240,6 +234,7 @@ class GamePlayScreenView(
 
     companion object {
         private const val BRICK_SUCCESS_ANIMATION_DURATION = 1F
+        private const val GAME_OVER_DURATION = 10F
         private val auxVector = Vector2()
     }
 }

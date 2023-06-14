@@ -273,10 +273,11 @@ class GamePlayScreenViewComponentsManager(
         }
     }
 
-    fun onGameOver(stage: GameStage) {
+    fun onGameOver(stage: GameStage, gameModel: GameModel) {
         bombView.onGameOverAnimation(globalHandlers.assetsManager, stage)
         optionsView.clearAllOptions()
         hideRevealLetterButton()
+        targetPhraseView.onGameOver(gameModel, stage)
     }
 
     override fun dispose() {
