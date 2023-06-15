@@ -21,5 +21,7 @@ class GameModel(var coins: Int, val selectedDifficulty: Difficulties) {
     companion object {
         const val LETTERS = "₪-/:םןףץך?!אבגדהוזחטיכלמנסעפצקרשת"
         val allowedLetters = LETTERS.subSequence(11, LETTERS.length)
+        var wordRevealFree = true
+        const val DISPLAY_TARGET_COST = 4
     }
 }

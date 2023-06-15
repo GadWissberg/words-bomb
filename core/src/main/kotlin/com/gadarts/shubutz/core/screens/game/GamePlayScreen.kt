@@ -27,5 +27,8 @@ interface GamePlayScreen {
     fun onLetterRevealFailedNotEnoughCoins()
     fun onBuyCoinsDialogOpened(onLoaded: () -> Unit)
     fun onShowVideoAdClicked(onAdCompleted: () -> Unit, onAdDismissed: () -> Unit)
+    fun onClickedToRevealWordOnGameOver()
+    fun onRevealedWordOnGameOver(cost: Int)
+    fun onFailedToRevealWordOnGameOver()
 
 }

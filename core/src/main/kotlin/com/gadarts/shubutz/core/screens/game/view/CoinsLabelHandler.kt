@@ -162,6 +162,10 @@ class CoinsLabelHandler {
         addStarsEffectToCoinsLabel(globalHandlers, stage)
     }
 
+    fun displayCoinsConsumed(cost: Int) {
+        applyCoinsChange(-cost)
+    }
+
     companion object {
         private val auxVector = Vector2()
         private const val WIN_COIN_LABEL_ANIMATION_DURATION = 4F

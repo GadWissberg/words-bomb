@@ -5,6 +5,7 @@ import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.DebugSettings.TEST_PHRASE
 import com.gadarts.shubutz.core.model.GameModel
+import com.gadarts.shubutz.core.model.GameModel.Companion.DISPLAY_TARGET_COST
 import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
 import com.gadarts.shubutz.core.model.Phrase
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
@@ -148,6 +149,15 @@ class GameLogicHandler(
     fun onBuyCoinsDialogOpened(onLoaded: () -> Unit) {
         Gdx.app.postRunnable {
             androidInterface.loadVideoAd(onLoaded)
+        }
+    }
+
+    fun onClickedToRevealWordOnGameOver(gameModel: GameModel) {
+        if (gameModel.coins >= DISPLAY_TARGET_COST) {
+            addCoinsValueAndSave(gameModel, -DISPLAY_TARGET_COST)
+            gamePlayScreen.onRevealedWordOnGameOver(DISPLAY_TARGET_COST)
+        } else {
+            gamePlayScreen.onFailedToRevealWordOnGameOver()
         }
     }
 

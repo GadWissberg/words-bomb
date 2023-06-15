@@ -143,7 +143,7 @@ class TopBarView(
         addClickListenerToButton(
             button,
             assetsManager
-        ) { dialogsHandler.openExitDialog(stage as GameStage, assetsManager, gamePlayScreen) }
+        ) { dialogsHandler.openExitDialog(gamePlayScreen) }
         table.add(button).left()
     }
 
@@ -172,7 +172,7 @@ class TopBarView(
         val leftSideTable = Table()
         leftSideTable.debug = DebugSettings.SHOW_UI_BORDERS
         addExitButton(leftSideTable, assetsManager, gamePlayScreen, dialogsHandler)
-        addBuyCoinsButton(leftSideTable, dialogsHandler)
+        addBuyCoinsButton(leftSideTable)
         table.add(leftSideTable).expandX().left()
         val font80 = assetsManager.getFont(FontsDefinitions.VARELA_80)
         coinsLabelHandler.addCoinsLabel(gameModel, font80, table, assetsManager, topPartTexture)
@@ -180,9 +180,8 @@ class TopBarView(
 
     private fun addBuyCoinsButton(
         table: Table,
-        dialogsHandler: DialogsHandler,
     ) {
-        val coinsButton = createBuyCoinsButton(table, dialogsHandler)
+        val coinsButton = createBuyCoinsButton()
         coinsButton.setOrigin(Align.center)
         coinsButton.isTransform = true
         table.add(coinsButton).pad(
@@ -209,10 +208,7 @@ class TopBarView(
     }
 
 
-    private fun createBuyCoinsButton(
-        table: Table,
-        dialogsHandler: DialogsHandler,
-    ): ImageButton {
+    private fun createBuyCoinsButton(): ImageButton {
         val up =
             if (gameModel.selectedDifficulty != Difficulties.KIDS) COINS_BUTTON_UP else CANDY_BUTTON_UP
         val down =
@@ -225,7 +221,7 @@ class TopBarView(
             coinsButton,
             globalHandlers.assetsManager
         ) {
-            dialogsHandler.openBuyCoinsDialog(table.stage as GameStage, gamePlayScreen)
+            globalHandlers.dialogsHandler.openBuyCoinsDialog(gamePlayScreen)
         }
         return coinsButton
     }
@@ -239,6 +235,10 @@ class TopBarView(
         val topPartTexture = Texture(pixmap)
         pixmap.dispose()
         return topPartTexture
+    }
+
+    fun displayCoinsConsumed(cost: Int) {
+        coinsLabelHandler.displayCoinsConsumed(cost)
     }
 
 

@@ -10,7 +10,7 @@ dependencies {
     implementation("com.badlogicgames.gdx:gdx-freetype:$gdxVersion")
 
     implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.21")
 
     // LibKTX kotlin extensions, optional but recommended.
     // The complete list of modules is available at https://github.com/libktx/ktx

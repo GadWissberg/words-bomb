@@ -188,12 +188,18 @@ class GamePlayScreenView(
     }
 
     private fun gameOver() {
-        gamePlayScreenViewComponentsManager.onGameOver(stage, gameModel)
-        stage.addAction(
-            Actions.delay(
-                GAME_OVER_DURATION,
-                Actions.run { gamePlayScreen.onGameOverAnimationDone() })
-        )
+        displayTargetAndFinishGame()
+    }
+
+    private fun displayTargetAndFinishGame() {
+        if (GameModel.wordRevealFree) {
+            stage.addAction(
+                Actions.delay(
+                    GAME_OVER_DURATION,
+                    Actions.run { gamePlayScreen.onGameOverAnimationDone() })
+            )
+        }
+        gamePlayScreenViewComponentsManager.gameOver(stage, gameModel)
     }
 
     fun onPurchasedCoins(amount: Int) {
@@ -230,6 +236,15 @@ class GamePlayScreenView(
 
     fun onChampion(post: () -> Unit) {
         gamePlayScreenViewComponentsManager.onChampion(post)
+    }
+
+    fun onRevealedWordOnGameOver(cost: Int) {
+        gamePlayScreenViewComponentsManager.displayCoinsConsumed(cost)
+        displayTargetAndFinishGame()
+    }
+
+    fun onFailedToRevealWordOnGameOver() {
+        globalHandlers.dialogsHandler.openBuyCoinsDialog(gamePlayScreen)
     }
 
     companion object {

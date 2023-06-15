@@ -10,7 +10,7 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class GlobalHandlers(
     val androidInterface: AndroidInterface,
-    stage: GameStage,
+    val stage: GameStage,
     val assetsManager: GameAssetManager
 ) : Disposable {
     val effectsHandler: EffectsHandler = EffectsHandler()

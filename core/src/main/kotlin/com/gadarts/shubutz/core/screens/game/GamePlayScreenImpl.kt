@@ -169,6 +169,18 @@ class GamePlayScreenImpl(
         }
     }
 
+    override fun onClickedToRevealWordOnGameOver() {
+        gameLogicHandler.onClickedToRevealWordOnGameOver(gameModel)
+    }
+
+    override fun onRevealedWordOnGameOver(cost: Int) {
+        gamePlayScreenView.onRevealedWordOnGameOver(cost)
+    }
+
+    override fun onFailedToRevealWordOnGameOver() {
+        gamePlayScreenView.onFailedToRevealWordOnGameOver()
+    }
+
     override fun onIncorrectGuess(gameOver: Boolean) {
         gamePlayScreenView.onIncorrectGuess(gameOver)
     }

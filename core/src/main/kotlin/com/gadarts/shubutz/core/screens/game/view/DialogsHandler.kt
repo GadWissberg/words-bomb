@@ -5,13 +5,18 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.Button
+import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Scaling
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.SoundPlayer
+import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -21,7 +26,7 @@ import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
-import java.util.*
+import java.util.Locale
 
 class DialogsHandler(
     private val assetsManager: GameAssetManager,
@@ -30,7 +35,6 @@ class DialogsHandler(
     private val soundPlayer: SoundPlayer
 ) {
     fun openBuyCoinsDialog(
-        stage: GameStage,
         gamePlayScreen: GamePlayScreen,
     ) {
         val loadingAnimation = createLoadingAnimation()
@@ -67,14 +71,11 @@ class DialogsHandler(
     ) {
         val dialogView =
             createCoinsPurchasedSuccessfullyDialog(assetsManager, amount)
-        stage.addDialog(dialogView, COINS_PURCHASED_DIALOG_NAME, assetsManager)
-        placeDialogInTheMiddle(dialogView)
+        finalizeDialog(dialogView, COINS_PURCHASED_DIALOG_NAME)
         stage.closeDialog(COINS_DIALOG_NAME)
     }
 
     fun openExitDialog(
-        stage: GameStage,
-        assetsManager: GameAssetManager,
         gamePlayScreen: GamePlayScreen
     ) {
         val dialogView = createDialogLayout(
@@ -83,8 +84,7 @@ class DialogsHandler(
             EXIT_DIALOG_DESCRIPTION
         )
         addExitDialogButtons(gamePlayScreen, dialogView)
-        stage.addDialog(dialogView, EXIT_DIALOG_NAME, assetsManager)
-        placeDialogInTheMiddle(dialogView)
+        finalizeDialog(dialogView, EXIT_DIALOG_NAME)
     }
 
     private fun addDialogText(
@@ -385,13 +385,13 @@ class DialogsHandler(
             text = EXIT_DIALOG_BUTTON_OK,
             newRowAfter = false,
             dialogName = EXIT_DIALOG_NAME,
-            width = EXIT_DIALOG_BUTTON_WIDTH
+            width = DIALOG_BUTTON_WIDTH
         )
         addDialogButton(
             dialogLayout = layout,
             text = EXIT_DIALOG_BUTTON_NO,
             dialogName = EXIT_DIALOG_NAME,
-            width = EXIT_DIALOG_BUTTON_WIDTH
+            width = DIALOG_BUTTON_WIDTH
         )
     }
 
@@ -423,7 +423,7 @@ class DialogsHandler(
         return dialogView
     }
 
-    fun openHelpDialog(stage: GameStage, assetsManager: GameAssetManager) {
+    fun openHelpDialog() {
         val dialogView = createDialogLayout(
             assetsManager,
             HELP_DIALOG_HEADER,
@@ -432,12 +432,43 @@ class DialogsHandler(
         addDialogText(assetsManager, dialogView, HELP_DIALOG_CREDITS)
         addDialogButton(
             dialogLayout = dialogView,
-            text = HELP_DIALOG_BUTTON_OK,
+            text = DIALOG_BUTTON_OK,
             dialogName = HELP_DIALOG_NAME,
-            width = EXIT_DIALOG_BUTTON_WIDTH
+            width = DIALOG_BUTTON_WIDTH
         )
-        stage.addDialog(dialogView, HELP_DIALOG_NAME, assetsManager)
+        finalizeDialog(dialogView, HELP_DIALOG_NAME)
+    }
+
+    private fun finalizeDialog(
+        dialogView: Table,
+        dialogName: String
+    ) {
+        stage.addDialog(dialogView, dialogName, assetsManager)
         placeDialogInTheMiddle(dialogView)
+    }
+
+    fun openRevealWordDialog(onYes: () -> Unit, onNo: () -> Unit) {
+        val dialogView = createDialogLayout(
+            assetsManager,
+            REVEAL_WORD_DIALOG_HEADER,
+            REVEAL_WORD_DIALOG_DESCRIPTION.format(GameModel.DISPLAY_TARGET_COST)
+        )
+        addDialogButton(
+            dialogLayout = dialogView,
+            onClick = onYes,
+            text = DIALOG_BUTTON_OK,
+            dialogName = REVEAL_WORD_DIALOG_NAME,
+            width = DIALOG_BUTTON_WIDTH,
+            newRowAfter = false
+        )
+        addDialogButton(
+            dialogLayout = dialogView,
+            onClick = onNo,
+            text = DIALOG_BUTTON_NO,
+            dialogName = REVEAL_WORD_DIALOG_NAME,
+            width = DIALOG_BUTTON_WIDTH
+        )
+        finalizeDialog(dialogView, REVEAL_WORD_DIALOG_NAME)
     }
 
     companion object {
@@ -447,17 +478,21 @@ class DialogsHandler(
         private const val COINS_PURCHASED_DIALOG_BUTTON_OK = "מעולה"
         private const val EXIT_DIALOG_NAME = "exit"
         private const val EXIT_DIALOG_HEADER = "חכה!"
+        private const val REVEAL_WORD_DIALOG_HEADER = "רוצה לדעת את המילה?"
+        private const val REVEAL_WORD_DIALOG_DESCRIPTION = "ניתן להציג את המילה עבור %s מטבעות"
+        private const val REVEAL_WORD_DIALOG_NAME = "help"
         private const val HELP_DIALOG_HEADER = "איך משחקים?"
         private const val HELP_DIALOG_DESCRIPTION =
             "בכל שלב תופיע מילה עם\nאותיות חסרות, עליכם לגלות את\nהמילה לפני שיגמרו מס' הניסיונות."
         private const val HELP_DIALOG_CREDITS =
             "גד וייסברג - תוכן, תכנות ועיצוב\nמעוז שחם - איסוף מילים עבור רמת ילדים\nכל הזכויות שמורות - 3202"
-        private const val HELP_DIALOG_BUTTON_OK = "סבבה"
+        private const val DIALOG_BUTTON_OK = "סבבה"
+        private const val DIALOG_BUTTON_NO = "לא תודה"
         private const val HELP_DIALOG_NAME = "help"
         private const val EXIT_DIALOG_DESCRIPTION = "אתה בטוח שאתה רוצה\nלסיים את המשחק?"
         private const val EXIT_DIALOG_BUTTON_OK = "כן"
         private const val EXIT_DIALOG_BUTTON_NO = "לא"
-        private const val EXIT_DIALOG_BUTTON_WIDTH = 200F
+        private const val DIALOG_BUTTON_WIDTH = 200F
         private const val DIALOG_HEADER_PADDING_BOTTOM = 64F
         private const val COINS_DIALOG_NAME = "coins"
         private const val COINS_DIALOG_LOADING_NAME = "loading_coins"

@@ -273,11 +273,11 @@ class GamePlayScreenViewComponentsManager(
         }
     }
 
-    fun onGameOver(stage: GameStage, gameModel: GameModel) {
+    fun gameOver(stage: GameStage, gameModel: GameModel) {
         bombView.onGameOverAnimation(globalHandlers.assetsManager, stage)
         optionsView.clearAllOptions()
         hideRevealLetterButton()
-        targetPhraseView.onGameOver(gameModel, stage)
+        targetPhraseView.revealWordOnGameOver(gameModel, globalHandlers, gamePlayScreen)
     }
 
     override fun dispose() {
@@ -362,7 +362,7 @@ class GamePlayScreenViewComponentsManager(
     }
 
     fun onLetterRevealFailedNotEnoughCoins() {
-        globalHandlers.dialogsHandler.openBuyCoinsDialog(stage, gamePlayScreen)
+        globalHandlers.dialogsHandler.openBuyCoinsDialog(gamePlayScreen)
     }
 
     fun onPurchasedCoins(amount: Int) {
@@ -384,11 +384,7 @@ class GamePlayScreenViewComponentsManager(
 
     fun onPhysicalBackClicked() {
         if (stage.openDialogs.isEmpty()) {
-            globalHandlers.dialogsHandler.openExitDialog(
-                stage,
-                globalHandlers.assetsManager,
-                gamePlayScreen
-            )
+            globalHandlers.dialogsHandler.openExitDialog(gamePlayScreen)
         } else {
             stage.closeAllDialogs()
         }
@@ -438,6 +434,10 @@ class GamePlayScreenViewComponentsManager(
                 )
             )
         )
+    }
+
+    fun displayCoinsConsumed(cost: Int) {
+        topBarView.displayCoinsConsumed(cost)
     }
 
     companion object {

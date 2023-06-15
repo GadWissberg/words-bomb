@@ -14,10 +14,13 @@ import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
+import com.gadarts.shubutz.core.model.GameModel.Companion.wordRevealFree
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.ParticleEffectsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
+import com.gadarts.shubutz.core.screens.game.GamePlayScreen
+import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.game.view.actors.Brick
 import com.gadarts.shubutz.core.screens.game.view.actors.BrickCell
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
@@ -248,7 +251,11 @@ class TargetPhraseView(
         addTargetWordLines(gameModel, assetsManager)
     }
 
-    fun onGameOver(gameModel: GameModel, stage: GameStage) {
+    fun revealWordOnGameOver(
+        gameModel: GameModel,
+        globalHandlers: GlobalHandlers,
+        gamePlayScreen: GamePlayScreen
+    ) {
         gameModel.hiddenLettersIndices.clear()
         targetWordLines.forEach {
             it.addAction(
@@ -261,8 +268,18 @@ class TargetPhraseView(
                     })
             )
         }
-        stage.addAction(Actions.delay(4F, Actions.run {
-            addTargetWordLines(gameModel, assetsManager)
+        globalHandlers.stage.addAction(Actions.delay(REVEAL_WORD_ON_GAME_OVER_DELAY, Actions.run {
+            if (wordRevealFree) {
+                addTargetWordLines(gameModel, assetsManager)
+            } else {
+                globalHandlers.dialogsHandler.openRevealWordDialog({
+                    gamePlayScreen.onClickedToRevealWordOnGameOver()
+                    globalHandlers.stage.closeAllDialogs()
+                }, {
+                    gamePlayScreen.onGameOverAnimationDone()
+                })
+            }
+            wordRevealFree = !wordRevealFree
         }))
     }
 
@@ -289,6 +306,7 @@ class TargetPhraseView(
         private const val GAME_WIN_ANIMATION_LETTER_MOVE_DURATION = 0.25F
         private const val LETTER_PADDING = 5F
         private const val WIN_DELAY = 2F
+        private const val REVEAL_WORD_ON_GAME_OVER_DELAY = 4F
         private val auxVector = Vector2()
 
     }

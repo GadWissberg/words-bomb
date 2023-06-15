@@ -153,10 +153,7 @@ class MainMenuScreenButtons(
             object : ClickListener() {
                 override fun clicked(event: InputEvent?, x: Float, y: Float) {
                     super.clicked(event, x, y)
-                    globalHandlers.dialogsHandler.openHelpDialog(
-                        stage,
-                        globalHandlers.assetsManager
-                    )
+                    globalHandlers.dialogsHandler.openHelpDialog()
                 }
             })
     }
@@ -179,7 +176,6 @@ class MainMenuScreenButtons(
             fadeInTable(mainMenuTable)
         }
     }
-
 
 
     fun onLoadingAnimationDone(
