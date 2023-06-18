@@ -441,9 +441,16 @@ class DialogsHandler(
 
     private fun finalizeDialog(
         dialogView: Table,
-        dialogName: String
+        dialogName: String,
+        onCloseButtonClick: (() -> Unit)? = null
     ) {
-        stage.addDialog(dialogView, dialogName, assetsManager)
+        stage.addDialog(
+            dialogView,
+            dialogName,
+            assetsManager,
+            onCloseButtonClick = onCloseButtonClick,
+            null,
+        )
         placeDialogInTheMiddle(dialogView)
     }
 
@@ -468,7 +475,7 @@ class DialogsHandler(
             dialogName = REVEAL_WORD_DIALOG_NAME,
             width = DIALOG_BUTTON_WIDTH
         )
-        finalizeDialog(dialogView, REVEAL_WORD_DIALOG_NAME)
+        finalizeDialog(dialogView, REVEAL_WORD_DIALOG_NAME, onNo)
     }
 
     companion object {

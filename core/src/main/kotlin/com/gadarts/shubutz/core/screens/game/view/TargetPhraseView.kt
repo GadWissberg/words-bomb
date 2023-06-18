@@ -254,7 +254,8 @@ class TargetPhraseView(
     fun revealWordOnGameOver(
         gameModel: GameModel,
         globalHandlers: GlobalHandlers,
-        gamePlayScreen: GamePlayScreen
+        gamePlayScreen: GamePlayScreen,
+        revealWordWithDelay: Boolean
     ) {
         gameModel.hiddenLettersIndices.clear()
         targetWordLines.forEach {
@@ -268,19 +269,22 @@ class TargetPhraseView(
                     })
             )
         }
-        globalHandlers.stage.addAction(Actions.delay(REVEAL_WORD_ON_GAME_OVER_DELAY, Actions.run {
-            if (wordRevealFree) {
-                addTargetWordLines(gameModel, assetsManager)
-            } else {
-                globalHandlers.dialogsHandler.openRevealWordDialog({
-                    gamePlayScreen.onClickedToRevealWordOnGameOver()
-                    globalHandlers.stage.closeAllDialogs()
-                }, {
-                    gamePlayScreen.onGameOverAnimationDone()
+        globalHandlers.stage.addAction(
+            Actions.delay(
+                if (revealWordWithDelay) REVEAL_WORD_ON_GAME_OVER_DELAY else 0F,
+                Actions.run {
+                    if (wordRevealFree) {
+                        addTargetWordLines(gameModel, assetsManager)
+                    } else {
+                        globalHandlers.dialogsHandler.openRevealWordDialog({
+                            gamePlayScreen.onClickedToRevealWordOnGameOver()
+                        }, {
+                            gamePlayScreen.onGameOverAnimationDone()
+                        })
+                    }
+                    wordRevealFree = !wordRevealFree
                 })
-            }
-            wordRevealFree = !wordRevealFree
-        }))
+        )
     }
 
     fun findCellByIndex(index: Int, gameModel: GameModel): Cell<Actor> {

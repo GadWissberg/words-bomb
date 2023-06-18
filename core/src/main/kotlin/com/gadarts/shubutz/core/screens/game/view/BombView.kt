@@ -92,6 +92,8 @@ class BombView(
         assetsManager: GameAssetManager,
         stage: GameStage
     ) {
+        if (!bombComponent.hasParent()) return
+
         fireParticleEffectActor.stop()
         val particleEffect = assetsManager.getParticleEffect(ParticleEffectsDefinitions.EXP)
         val bombPosition = bombComponent.localToStageCoordinates(auxVector.setZero())

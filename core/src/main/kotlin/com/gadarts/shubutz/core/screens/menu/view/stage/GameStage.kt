@@ -64,7 +64,8 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
         dialogView: Table,
         name: String,
         assetsManager: GameAssetManager,
-        onDialogReady: (() -> Unit)? = null
+        onCloseButtonClick: (() -> Unit)? = null,
+        onDialogReady: (() -> Unit)? = null,
     ) {
         if (openDialogs.containsKey(name)) return
         val dialog = Table()
@@ -77,7 +78,7 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
             )
         )
 
-        initDialog(assetsManager, dialog, name)
+        initDialog(assetsManager, dialog, name, onCloseButtonClick)
         dialog.add(dialogView).expand()
         dialog.pack()
         dialog.setPosition(width / 2F - dialog.width / 2F, height / 2F - dialog.height / 2F)
@@ -227,10 +228,11 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
         assetsManager: GameAssetManager,
         dialog: Table,
         name: String,
+        onCloseButtonClick: (() -> Unit)?,
     ) {
         dialog.name = name
         dialog.debug = DebugSettings.SHOW_UI_BORDERS
-        addCloseButtonToDialog(assetsManager, dialog)
+        addCloseButtonToDialog(assetsManager, dialog, onCloseButtonClick)
         val dialogTexture = assetsManager.getTexture(TexturesDefinitions.DIALOG)
         applyDialogBackground(dialogTexture, dialog)
         openDialogs[name] = dialog
@@ -242,7 +244,8 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
 
     private fun addCloseButtonToDialog(
         assetsManager: GameAssetManager,
-        dialog: Table
+        dialog: Table,
+        onCloseButtonClick: (() -> Unit)?
     ) {
         val closeButtonTexture = assetsManager.getTexture(TexturesDefinitions.DIALOG_CLOSE_BUTTON)
         val closeButton = ImageButton(TextureRegionDrawable(closeButtonTexture))
@@ -251,6 +254,7 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 if (dialog.hasActions()) return
                 closeDialog(dialog)
+                onCloseButtonClick?.invoke()
             }
         })
     }

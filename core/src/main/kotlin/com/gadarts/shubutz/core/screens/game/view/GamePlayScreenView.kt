@@ -239,6 +239,7 @@ class GamePlayScreenView(
     }
 
     fun onRevealedWordOnGameOver(cost: Int) {
+        globalHandlers.stage.closeAllDialogs()
         gamePlayScreenViewComponentsManager.displayCoinsConsumed(cost)
         displayTargetAndFinishGame()
     }
@@ -249,7 +250,7 @@ class GamePlayScreenView(
 
     companion object {
         private const val BRICK_SUCCESS_ANIMATION_DURATION = 1F
-        private const val GAME_OVER_DURATION = 10F
+        private const val GAME_OVER_DURATION = 8F
         private val auxVector = Vector2()
     }
 }

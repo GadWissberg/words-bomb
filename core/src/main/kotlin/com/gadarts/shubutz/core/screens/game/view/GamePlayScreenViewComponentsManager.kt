@@ -277,7 +277,12 @@ class GamePlayScreenViewComponentsManager(
         bombView.onGameOverAnimation(globalHandlers.assetsManager, stage)
         optionsView.clearAllOptions()
         hideRevealLetterButton()
-        targetPhraseView.revealWordOnGameOver(gameModel, globalHandlers, gamePlayScreen)
+        targetPhraseView.revealWordOnGameOver(
+            gameModel,
+            globalHandlers,
+            gamePlayScreen,
+            bombView.bombComponent.hasParent()
+        )
     }
 
     override fun dispose() {
