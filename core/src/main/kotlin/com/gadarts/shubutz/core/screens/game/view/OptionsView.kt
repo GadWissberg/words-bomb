@@ -121,7 +121,7 @@ class OptionsView(
         if (letter != ' ') {
             brick.addListener(object : ClickListener() {
                 override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                    if (gameModel.triesLeft == 0 || stage.openDialogs.isNotEmpty() || gameModel.hiddenLettersIndices.isEmpty()) return
+                    if (gameModel.triesLeft == 0 || stage.openDialogs.isNotEmpty() || gameModel.currentTargetData.hiddenLettersIndices.isEmpty()) return
                     super.clicked(event, x, y)
                     selectedBrick = brick
                     gamePlayScreen.onBrickClicked(brick.letter[0])

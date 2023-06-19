@@ -120,6 +120,14 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
         return button
     }
 
+    fun closeDialog(dialogName: String) {
+        openDialogs[dialogName]?.let { closeDialog(it) }
+    }
+
+    fun closeAllDialogs() {
+        openDialogs.forEach { closeDialog(it.value) }
+    }
+
     private fun createButtonStyle(
         up: Texture,
         down: Texture,
@@ -164,14 +172,18 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
 
     private fun addCloud(assetsManager: GameAssetManager, texture: TexturesDefinitions, i: Int) {
         val cloud = Image(assetsManager.getTexture(texture))
+        val heightDivision = ShubutzGame.RESOLUTION_HEIGHT.toFloat() / NUMBER_OF_CLOUDS.toFloat()
         val screenWidth = ShubutzGame.RESOLUTION_WIDTH.toFloat()
         val x = MathUtils.random(0F, screenWidth - cloud.width)
-        val heightDivision = ShubutzGame.RESOLUTION_HEIGHT.toFloat() / NUMBER_OF_CLOUDS.toFloat()
         val minY = heightDivision * i
         val maxY = minY + heightDivision - cloud.height
         val y = MathUtils.random(minY, maxY)
         cloud.setPosition(x, y)
         addActor(cloud)
+        animateCloud(cloud, screenWidth)
+    }
+
+    private fun animateCloud(cloud: Image, screenWidth: Float) {
         cloud.addAction(
             Actions.parallel(
                 Actions.forever(
@@ -238,10 +250,6 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
         openDialogs[name] = dialog
     }
 
-    fun closeAllDialogs() {
-        openDialogs.forEach { closeDialog(it.value) }
-    }
-
     private fun addCloseButtonToDialog(
         assetsManager: GameAssetManager,
         dialog: Table,
@@ -269,10 +277,6 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
                 }
             ),
         )
-    }
-
-    fun closeDialog(dialogName: String) {
-        openDialogs[dialogName]?.let { closeDialog(it) }
     }
 
     private fun addButtonToTable(
@@ -305,7 +309,6 @@ class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetMan
         private val BUTTON_FONT_COLOR_DISABLED = Color.LIGHT_GRAY
         private const val NUMBER_OF_CLOUDS = 4
         private const val BUTTON_LABEL_PADDING = 40F
-        private const val BUTTON_IMAGE_PADDING = 10F
         private const val CLOUDS_SCALE = 0.1F
         private const val CLOUDS_SCALE_DURATION_MIN = 15F
         private const val CLOUDS_SCALE_DURATION_MAX = 25F

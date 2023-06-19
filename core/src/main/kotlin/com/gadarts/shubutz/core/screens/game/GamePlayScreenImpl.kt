@@ -30,6 +30,7 @@ class GamePlayScreenImpl(
     private val gameModel = createGameModel()
     private lateinit var gameLogicHandler: GameLogicHandler
     private lateinit var gamePlayScreenView: GamePlayScreenView
+
     private fun createGameModel(): GameModel {
         val coins: Int = if (DebugSettings.FORCE_NUMBER_OF_COINS >= 0) {
             DebugSettings.FORCE_NUMBER_OF_COINS
@@ -119,7 +120,7 @@ class GamePlayScreenImpl(
     }
 
     override fun onScreenEmpty() {
-        if (gameModel.hiddenLettersIndices.isNotEmpty()) return
+        if (gameModel.currentTargetData.hiddenLettersIndices.isNotEmpty()) return
         gameLogicHandler.beginRound(gameModel)
         gamePlayScreenView.initializeForGameBegin()
     }

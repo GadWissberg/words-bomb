@@ -132,7 +132,7 @@ class GamePlayScreenView(
                 auxVector.setZero()
             )
         val brick =
-            Brick(gameModel.currentPhrase[index].toString(), brickTexture, letterSize, font80)
+            Brick(gameModel.currentTargetData.currentPhrase[index].toString(), brickTexture, letterSize, font80)
         brick.setPosition(
             selectedBrickScreenCoords.x,
             selectedBrickScreenCoords.y,

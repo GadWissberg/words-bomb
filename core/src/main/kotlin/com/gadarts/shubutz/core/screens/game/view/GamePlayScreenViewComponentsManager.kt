@@ -149,7 +149,7 @@ class GamePlayScreenViewComponentsManager(
             letterSize,
             gamePlayScreen,
         )
-        topBarView.setCategoryLabelText(gameModel.currentCategory)
+        topBarView.setCategoryLabelText(gameModel.currentTargetData.currentCategory)
         hideRevealLetterButton()
     }
 

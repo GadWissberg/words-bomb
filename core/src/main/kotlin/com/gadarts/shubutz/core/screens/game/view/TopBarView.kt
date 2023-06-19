@@ -104,7 +104,7 @@ class TopBarView(
             NinePatch(categoryBackgroundTexture, 10, 10, 10, 10)
         )
         categoryLabel = Label(
-            gameModel.currentCategory,
+            gameModel.currentTargetData.currentCategory,
             labelStyle
         )
         categoryLabel.setAlignment(Align.center)

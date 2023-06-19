@@ -42,8 +42,8 @@ class GameLogicHandler(
     }
 
     fun onBrickClicked(selectedLetter: Char, gameModel: GameModel) {
-        val indices = gameModel.hiddenLettersIndices.filter {
-            val currentLetter = gameModel.currentPhrase[it]
+        val indices = gameModel.currentTargetData.hiddenLettersIndices.filter {
+            val currentLetter = gameModel.currentTargetData.currentPhrase[it]
             currentLetter == selectedLetter || suffixLetters[selectedLetter] == currentLetter
         }
         if (indices.isNotEmpty()) {
@@ -58,8 +58,8 @@ class GameLogicHandler(
         gameModel: GameModel,
         indices: List<Int>
     ) {
-        gameModel.hiddenLettersIndices.removeAll(indices.toSet())
-        val gameWin = gameModel.hiddenLettersIndices.isEmpty()
+        gameModel.currentTargetData.hiddenLettersIndices.removeAll(indices.toSet())
+        val gameWin = gameModel.currentTargetData.hiddenLettersIndices.isEmpty()
         var coinsAmount = 0
         var perfectBonus = false
         var scoreWin = 0
@@ -95,7 +95,7 @@ class GameLogicHandler(
         val category = unusedPhrases[categoryName]
         val selected = if (TEST_PHRASE.value.isNotEmpty()) TEST_PHRASE else category!!.random()
         gameModel.setNewPhrase(selected.value.reversed())
-        gameModel.currentCategory = categoryName
+        gameModel.currentTargetData.currentCategory = categoryName
         category!!.remove(selected)
         if (category.isEmpty()) {
             unusedPhrases.remove(categoryName)
@@ -104,14 +104,14 @@ class GameLogicHandler(
 
     private fun decideHiddenLetters(model: GameModel) {
         val indices = mutableListOf<Int>()
-        for (i in 0 until model.currentPhrase.length) {
-            if (model.currentPhrase[i] != ' ') {
+        for (i in 0 until model.currentTargetData.currentPhrase.length) {
+            if (model.currentTargetData.currentPhrase[i] != ' ') {
                 indices.add(i)
             }
         }
-        model.hiddenLettersIndices = indices.shuffled()
+        model.currentTargetData.hiddenLettersIndices = indices.shuffled()
             .toMutableList()
-            .drop((model.currentPhrase.length - model.currentPhrase.length * model.selectedDifficulty.lettersToHideFactor).toInt())
+            .drop((model.currentTargetData.currentPhrase.length - model.currentTargetData.currentPhrase.length * model.selectedDifficulty.lettersToHideFactor).toInt())
             .toMutableList()
     }
 
@@ -122,7 +122,7 @@ class GameLogicHandler(
     fun onRevealLetterButtonClicked(gameModel: GameModel): Boolean {
         var result = false
         if (gameModel.coins - gameModel.selectedDifficulty.revealLetterCost >= 0) {
-            if (gameModel.hiddenLettersIndices.isNotEmpty()) {
+            if (gameModel.currentTargetData.hiddenLettersIndices.isNotEmpty()) {
                 revealLetter(gameModel)
                 result = true
             }
@@ -134,7 +134,8 @@ class GameLogicHandler(
 
     private fun revealLetter(gameModel: GameModel) {
         addCoinsValueAndSave(gameModel, -gameModel.selectedDifficulty.revealLetterCost)
-        val letter = gameModel.currentPhrase[gameModel.hiddenLettersIndices.random()]
+        val letter =
+            gameModel.currentTargetData.currentPhrase[gameModel.currentTargetData.hiddenLettersIndices.random()]
         gameModel.helpAvailable = false
         gamePlayScreen.onLetterRevealed(
             suffixLettersReverse[letter] ?: letter,

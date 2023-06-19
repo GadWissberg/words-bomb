@@ -56,9 +56,9 @@ class TargetPhraseView(
         brickTexture: Texture,
         wordTable: Table,
     ) {
-        val isLetter = i >= 0 && i < gameModel.currentPhrase.length
+        val isLetter = i >= 0 && i < gameModel.currentTargetData.currentPhrase.length
         val brick = Brick(
-            if (isLetter) gameModel.currentPhrase[i].toString() else " ",
+            if (isLetter) gameModel.currentTargetData.currentPhrase[i].toString() else " ",
             brickTexture,
             letterSize,
             font80
@@ -75,7 +75,7 @@ class TargetPhraseView(
         wordTable: Table,
         gameModel: GameModel,
     ) {
-        if (gameModel.hiddenLettersIndices.contains(index)) {
+        if (gameModel.currentTargetData.hiddenLettersIndices.contains(index)) {
             addBrickCell(cellTexture, wordTable)
         } else {
             addGivenLetter(gameModel, index, brickTexture, wordTable)
@@ -102,7 +102,7 @@ class TargetPhraseView(
     private fun addTargetWordLines(gameModel: GameModel, assetsManager: GameAssetManager) {
         val cellTexture = assetsManager.getTexture(TexturesDefinitions.CELL)
         val brickTexture = assetsManager.getTexture(TexturesDefinitions.BRICK)
-        val words = gameModel.currentPhrase.split(' ')
+        val words = gameModel.currentTargetData.currentPhrase.split(' ')
         var letterIndexInCurrentLine = 0
         var globalIndex = 0
         addLineToTargetTable()
@@ -257,7 +257,7 @@ class TargetPhraseView(
         gamePlayScreen: GamePlayScreen,
         revealWordWithDelay: Boolean
     ) {
-        gameModel.hiddenLettersIndices.clear()
+        gameModel.currentTargetData.hiddenLettersIndices.clear()
         targetWordLines.forEach {
             it.addAction(
                 Actions.sequence(
@@ -274,10 +274,7 @@ class TargetPhraseView(
                 if (revealWordWithDelay) REVEAL_WORD_ON_GAME_OVER_DELAY else 0F,
                 Actions.run {
                     if (wordRevealFree) {
-                        globalHandlers.stage.addAction(Actions.delay(1F, Actions.run {
-                            addTargetWordLines(gameModel, assetsManager)
-                            gamePlayScreen.onGameOverAnimationDone()
-                        }))
+                        addTargetWordLines(gameModel, assetsManager)
                     } else {
                         globalHandlers.dialogsHandler.openRevealWordDialog({
                             gamePlayScreen.onClickedToRevealWordOnGameOver()
@@ -294,7 +291,7 @@ class TargetPhraseView(
         var wordCount = 0
         var letterIndexInWord = 0
         for (i in 0 until index) {
-            if (gameModel.currentPhrase[i] == ' ') {
+            if (gameModel.currentTargetData.currentPhrase[i] == ' ') {
                 wordCount++
                 letterIndexInWord = 0
             } else {
