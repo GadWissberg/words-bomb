@@ -83,6 +83,7 @@ class ChampionsView(
         rightCup: Image,
         labelsTable: Table
     ) {
+        stack.clearActions()
         stack.addAction(
             Actions.forever(
                 Actions.sequence(

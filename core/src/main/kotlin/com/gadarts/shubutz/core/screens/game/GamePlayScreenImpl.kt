@@ -206,7 +206,7 @@ class GamePlayScreenImpl(
             gameModel.selectedDifficulty,
             object : OnChampionFetched {
                 override fun run(champion: Champion?) {
-                    if (gameModel.score <= 0) {
+                    if (gameModel.score >= 0) {
                         globalHandlers.androidInterface.submitScore(
                             gameModel.score,
                             gameModel.selectedDifficulty.leaderboardsId

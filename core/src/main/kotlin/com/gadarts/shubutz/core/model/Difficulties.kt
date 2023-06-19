@@ -44,7 +44,7 @@ enum class Difficulties(
         tries = 3,
         winWorth = 4,
         minimumLength = 6,
-        leaderboardsId = "CgkItLjwycoZEAIQAA"
+        leaderboardsId = "CgkItLjwycoZEAIQBg"
     ),
     KIDS(
         displayName = "ילדים",

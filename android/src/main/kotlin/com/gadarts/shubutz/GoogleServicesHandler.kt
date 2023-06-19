@@ -157,6 +157,8 @@ class GoogleServicesHandler {
                 callback.run(
                     tryToConvertEntry(first, difficulty)
                 )
+            } else {
+                callback.run(null)
             }
         }
         if (!success) {

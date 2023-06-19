@@ -274,7 +274,10 @@ class TargetPhraseView(
                 if (revealWordWithDelay) REVEAL_WORD_ON_GAME_OVER_DELAY else 0F,
                 Actions.run {
                     if (wordRevealFree) {
-                        addTargetWordLines(gameModel, assetsManager)
+                        globalHandlers.stage.addAction(Actions.delay(1F, Actions.run {
+                            addTargetWordLines(gameModel, assetsManager)
+                            gamePlayScreen.onGameOverAnimationDone()
+                        }))
                     } else {
                         globalHandlers.dialogsHandler.openRevealWordDialog({
                             gamePlayScreen.onClickedToRevealWordOnGameOver()
