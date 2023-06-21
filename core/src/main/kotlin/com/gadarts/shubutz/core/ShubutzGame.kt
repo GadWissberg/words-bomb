@@ -12,6 +12,7 @@ import com.gadarts.shubutz.core.screens.game.GamePlayScreenImpl
 import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.menu.MenuScreenImpl
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
+import pl.mk5.gdx.fireapp.GdxFIRApp
 
 
 class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycleManager {
@@ -21,6 +22,7 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     override var loadingDone: Boolean = false
 
     override fun create() {
+        GdxFIRApp.inst().configure()
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
         val assetsManager = GameAssetManager()
         assetsManager.loadAssets()

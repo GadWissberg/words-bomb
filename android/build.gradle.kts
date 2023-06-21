@@ -1,5 +1,7 @@
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
     kotlin("android")
 }
 
@@ -48,6 +50,7 @@ val natives: Configuration by configurations.creating
 
 dependencies {
     val gdxVersion: String by project
+    val gdxFireappVersion: String by project
 
     implementation(project(":core"))
 
@@ -57,7 +60,10 @@ dependencies {
     implementation("com.android.billingclient:billing:6.0.0")
     implementation("com.google.android.gms:play-services-ads:22.1.0")
     implementation("de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:1.1.0")
-//    implementation("com.google.android.gms:play-services-games-v2:17.0.0")
+    implementation("pl.mk5.gdx-fireapp:gdx-fireapp-android:$gdxFireappVersion")
+    implementation(platform("com.google.firebase:firebase-bom:25.12.0"))
+//    implementation("com.google.firebase:firebase-core")
+    implementation("com.google.firebase:firebase-crashlytics")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a")
