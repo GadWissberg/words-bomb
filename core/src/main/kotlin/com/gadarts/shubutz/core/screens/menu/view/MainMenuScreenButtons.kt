@@ -199,7 +199,14 @@ class MainMenuScreenButtons(
         addButton(
             table = mainMenuTable,
             label = null,
-            font = globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
+            image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.GPT)
+        ) {
+            fadeOutTable(mainMenuTable)
+            fadeInTable(difficultySelectionTable)
+        }
+        addButton(
+            table = mainMenuTable,
+            label = null,
             image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.KIDS)
         ) {
             beginGameAction.begin(Difficulties.KIDS)
