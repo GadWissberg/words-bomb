@@ -9,7 +9,7 @@ enum class InAppProducts(
     val applyAnimation: Boolean = true,
     val flashEffect: Boolean = false
 ) {
-    PACK_0("אוסף של %s מטבעות", TexturesDefinitions.ICON_PACK_1, 8, false),
-    PACK_1("שק של %s מטבעות", TexturesDefinitions.ICON_PACK_2, 16),
-    PACK_2("תיבה של %s מטבעות", TexturesDefinitions.ICON_PACK_3, 32, flashEffect = true),
+    PACK_0("אוסף של %s מטבעות", TexturesDefinitions.ICON_PACK_1, 9, false),
+    PACK_1("שק של %s מטבעות", TexturesDefinitions.ICON_PACK_2, 18),
+    PACK_2("תיבה של %s מטבעות", TexturesDefinitions.ICON_PACK_3, 36, flashEffect = true),
 }

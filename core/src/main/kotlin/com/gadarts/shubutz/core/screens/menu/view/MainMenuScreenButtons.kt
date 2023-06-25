@@ -92,7 +92,7 @@ class MainMenuScreenButtons(
 
     private fun addButton(
         table: Table,
-        label: String?,
+        label: String? = null,
         topPadding: Int = GameStage.BUTTON_PADDING,
         font: BitmapFont = globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
         scale: Float = 1F,
@@ -198,15 +198,6 @@ class MainMenuScreenButtons(
         }
         addButton(
             table = mainMenuTable,
-            label = null,
-            image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.GPT)
-        ) {
-            fadeOutTable(mainMenuTable)
-            fadeInTable(difficultySelectionTable)
-        }
-        addButton(
-            table = mainMenuTable,
-            label = null,
             image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.KIDS)
         ) {
             beginGameAction.begin(Difficulties.KIDS)
