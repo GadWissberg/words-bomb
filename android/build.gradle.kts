@@ -62,7 +62,6 @@ dependencies {
     implementation("de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:1.1.0")
     implementation("pl.mk5.gdx-fireapp:gdx-fireapp-android:$gdxFireappVersion")
     implementation(platform("com.google.firebase:firebase-bom:25.12.0"))
-//    implementation("com.google.firebase:firebase-core")
     implementation("com.google.firebase:firebase-crashlytics")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")

@@ -8,7 +8,7 @@ object DebugSettings {
     const val SHOW_UI_BORDERS = false
     const val ENABLE_SOUNDS = true
     const val FORCE_NUMBER_OF_COINS = -1
-    const val TEST_ADS = true
+    const val TEST_ADS = false
     const val ALWAYS_DISPLAY_BANNER_ADS = false
 }
 
