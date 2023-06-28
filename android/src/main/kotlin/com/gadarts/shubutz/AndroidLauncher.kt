@@ -23,6 +23,7 @@ import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SHARED_PREFERENCES_DATA_NAME
 import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import de.golfgl.gdxgamesvcs.GpgsClient.RC_LEADERBOARD
 
 
@@ -107,6 +108,14 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     }
 
     override fun initializeAds(onFinish: () -> Unit) {
+        val requestConfiguration = MobileAds.getRequestConfiguration()
+            .toBuilder()
+            .setTagForChildDirectedTreatment(
+                RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE
+            )
+            .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
+            .build()
+        MobileAds.setRequestConfiguration(requestConfiguration)
         MobileAds.initialize(this) { onFinish.invoke() }
     }
 
