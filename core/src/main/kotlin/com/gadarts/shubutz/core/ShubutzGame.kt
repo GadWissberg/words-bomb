@@ -34,6 +34,8 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     }
 
     private fun gameReady() {
+        if (screen == null) return
+
         loadingDone = true
         (screen as MenuScreenImpl).onGameReady()
     }
@@ -75,18 +77,26 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     }
 
     override fun onSuccessfulPurchase(products: MutableList<String>) {
+        if (screen == null) return
+
         (screen as GameScreen).onSuccessfulPurchase(products)
     }
 
     override fun onFailedPurchase(message: String) {
+        if (screen == null) return
+
         (screen as GameScreen).onFailedPurchase(message)
     }
 
     override fun onLeaderboardClosed() {
+        if (screen == null) return
+
         (screen as GameScreen).onLeaderboardClosed()
     }
 
     fun onRewardForVideoAd(rewardAmount: Int) {
+        if (screen == null) return
+
         (screen as GameScreen).onRewardForVideoAd(rewardAmount)
     }
 

@@ -66,11 +66,15 @@ class GoogleServicesHandler {
 
 
     private fun signInToPlayServices() {
-        val loggedIn = gsClient.connect(true)
+        gsClient.connect(true)
+        val loggedIn = gsClient.isSessionActive
         if (loggedIn) {
             Gdx.app.log("Play Services", "Signed in successfully")
         } else {
-            Gdx.app.log("Play Services", "Did not sign in")
+            val loginSucceeded = gsClient.logIn()
+            if (!loginSucceeded) {
+                Gdx.app.error("Play Services", "Did not sign in")
+            }
         }
     }
 

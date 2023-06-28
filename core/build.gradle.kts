@@ -25,10 +25,12 @@ dependencies {
     implementation("pl.mk5.gdx-fireapp:gdx-fireapp-core:$gdxFireappVersion")
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     implementation("com.google.code.gson:gson:2.10.1")
-    testImplementation("io.mockk:mockk:1.12.0")
-
+    testImplementation(kotlin("test"))
+    testImplementation("io.mockk:mockk:1.12.4")
 }
-
+tasks.test {
+    useJUnitPlatform()
+}
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
