@@ -33,7 +33,7 @@ class MenuScreenView(
     private var mainMenuTable = Table()
     private var difficultySelectionTable = Table()
     private var mainMenuScreenButtons =
-        MainMenuScreenButtons(mainMenuTable, difficultySelectionTable, globalHandlers, stage)
+        MainMenuScreenButtons(mainMenuTable, difficultySelectionTable, globalHandlers)
     private lateinit var logoTable: Table
     private lateinit var versionLabel: Label
     var loadingAnimationRenderer = LoadingAnimationHandler()
@@ -84,7 +84,7 @@ class MenuScreenView(
             globalHandlers.soundPlayer
         )
         Gdx.app.postRunnable {
-            mainMenuScreenButtons.onLoadingAnimationDone(stage, globalHandlers, androidInterface)
+            mainMenuScreenButtons.onLoadingAnimationDone()
             addMainMenuTable(beginGameAction)
             addDifficultySelectionTable(beginGameAction)
             versionLabel = Label(

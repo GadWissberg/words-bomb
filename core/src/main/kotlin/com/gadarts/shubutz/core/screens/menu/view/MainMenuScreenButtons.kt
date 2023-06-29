@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
@@ -22,14 +21,12 @@ class MainMenuScreenButtons(
     private val mainMenuTable: Table,
     private val difficultySelectionTable: Table,
     private val globalHandlers: GlobalHandlers,
-    private val stage: GameStage
 ) {
 
-    private lateinit var soundButton: ImageButton
-    private lateinit var helpButton: ImageButton
+    private var soundButton: ImageButton? = null
+    private var helpButton: ImageButton? = null
 
     private fun addRoundButton(
-        stage: GameStage,
         up: TexturesDefinitions,
         x: Float,
         y: Float,
@@ -39,14 +36,14 @@ class MainMenuScreenButtons(
         val imageButton = createButton(up, checked)
         imageButton.setPosition(x, y)
         imageButton.addListener(clickListener)
-        stage.addActor(imageButton)
+        globalHandlers.stage.addActor(imageButton)
         return imageButton
     }
 
-    private fun soundToggle(globalHandlers: GlobalHandlers, androidInterface: AndroidInterface) {
+    private fun soundToggle(globalHandlers: GlobalHandlers) {
         globalHandlers.soundPlayer.enabled = !globalHandlers.soundPlayer.enabled
         globalHandlers.soundPlayer.playSound(globalHandlers.assetsManager.getSound(SoundsDefinitions.BUTTON))
-        androidInterface.saveSharedPreferencesBooleanValue(
+        globalHandlers.androidInterface.saveSharedPreferencesBooleanValue(
             SharedPreferencesKeys.SOUND_ENABLED,
             globalHandlers.soundPlayer.enabled
         )
@@ -99,7 +96,7 @@ class MainMenuScreenButtons(
         image: Texture? = null,
         onClick: Runnable
     ) {
-        stage.addButton(
+        globalHandlers.stage.addButton(
             table,
             object : ClickListener() {
                 override fun clicked(event: InputEvent?, x: Float, y: Float) {
@@ -123,20 +120,15 @@ class MainMenuScreenButtons(
         )
     }
 
-    private fun addSoundButton(
-        stage: GameStage,
-        globalHandlers: GlobalHandlers,
-        androidInterface: AndroidInterface
-    ) {
+    private fun addSoundButton() {
         val imageButton = addRoundButton(
-            stage,
             TexturesDefinitions.ICON_SOUND_OFF,
-            stage.width - globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_UP).width - ROUND_BUTTON_PADDING_HOR,
+            globalHandlers.stage.width - globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_UP).width - ROUND_BUTTON_PADDING_HOR,
             ROUND_BUTTON_PADDING_VER,
             object : ClickListener() {
                 override fun clicked(event: InputEvent?, x: Float, y: Float) {
                     super.clicked(event, x, y)
-                    soundToggle(globalHandlers, androidInterface)
+                    soundToggle(globalHandlers)
                 }
             },
             TexturesDefinitions.ICON_SOUND_ON,
@@ -145,9 +137,8 @@ class MainMenuScreenButtons(
         soundButton = imageButton
     }
 
-    private fun addHelpButton(stage: GameStage, globalHandlers: GlobalHandlers) {
-        helpButton = addRoundButton(stage,
-            TexturesDefinitions.ICON_HELP,
+    private fun addHelpButton() {
+        helpButton = addRoundButton(TexturesDefinitions.ICON_HELP,
             ROUND_BUTTON_PADDING_HOR,
             ROUND_BUTTON_PADDING_VER,
             object : ClickListener() {
@@ -159,8 +150,8 @@ class MainMenuScreenButtons(
     }
 
     fun clear() {
-        soundButton.remove()
-        helpButton.remove()
+        soundButton?.remove()
+        helpButton?.remove()
     }
 
 
@@ -178,13 +169,9 @@ class MainMenuScreenButtons(
     }
 
 
-    fun onLoadingAnimationDone(
-        stage: GameStage,
-        globalHandlers: GlobalHandlers,
-        androidInterface: AndroidInterface
-    ) {
-        addSoundButton(stage, globalHandlers, androidInterface)
-        addHelpButton(stage, globalHandlers)
+    fun onLoadingAnimationDone() {
+        addSoundButton()
+        addHelpButton()
     }
 
     fun fillMainMenuTable(beginGameAction: BeginGameAction) {
