@@ -8,10 +8,16 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.gadarts.shubutz.core.AndroidInterface
 
-class ScoreView(texture: Texture, font: BitmapFont) : Table() {
+class ScoreView(
+    texture: Texture,
+    font: BitmapFont,
+    androidInterface: AndroidInterface
+) : Table() {
 
-    private val label = Label(0.toString(), Label.LabelStyle(font, Color.WHITE))
+    private val label =
+        GameLabel(0.toString(), Label.LabelStyle(font, Color.WHITE), androidInterface)
 
     init {
         background = TextureRegionDrawable(texture)

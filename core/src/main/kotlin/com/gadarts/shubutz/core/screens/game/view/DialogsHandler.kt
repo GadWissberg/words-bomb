@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Scaling
+import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
@@ -32,7 +33,8 @@ class DialogsHandler(
     private val assetsManager: GameAssetManager,
     private val effectsHandler: EffectsHandler,
     private val stage: GameStage,
-    private val soundPlayer: SoundPlayer
+    private val soundPlayer: SoundPlayer,
+    private val androidInterface: AndroidInterface
 ) {
     fun openBuyCoinsDialog(
         gamePlayScreen: GamePlayScreen,
@@ -58,7 +60,7 @@ class DialogsHandler(
                 stage.closeDialog(COINS_DIALOG_LOADING_NAME)
             }, {
                 loadingAnimation.remove()
-                layout.add(ViewUtils.createDialogLabel(it, assetsManager))
+                layout.add(ViewUtils.createDialogLabel(it, assetsManager, androidInterface))
                 layout.pack()
             })
         }
@@ -96,7 +98,7 @@ class DialogsHandler(
         bottomPadding: Float = DIALOG_DESCRIPTION_PADDING_BOTTOM
     ) {
         val style = Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
-        val text = Label(fixHebrewDescription(description), style)
+        val text = GameLabel(fixHebrewDescription(description), style, androidInterface)
         text.setAlignment(Align.right)
         dialog.add(text).pad(topPadding, 0F, bottomPadding, 0F).colspan(colSpan)
             .row()
@@ -152,12 +154,13 @@ class DialogsHandler(
         product: Product?,
         button: ImageTextButton
     ) {
-        val label = Label(
+        val label = GameLabel(
             product?.formattedPrice ?: "",
             Label.LabelStyle(
                 assetsManager.getFont(FontsDefinitions.VARELA_35),
                 Color.WHITE
-            )
+            ),
+            androidInterface
         )
         label.setAlignment(Align.center)
         button.add(

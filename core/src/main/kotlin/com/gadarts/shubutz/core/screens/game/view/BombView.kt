@@ -44,7 +44,8 @@ class BombView(
             bombTexture,
             fireParticleEffectActor,
             assetsManager.getFont(FontsDefinitions.VARELA_320),
-            gameModel.triesLeft
+            gameModel.triesLeft,
+            globalHandlers.androidInterface
         )
         bombComponent.addAction(
             Actions.forever(

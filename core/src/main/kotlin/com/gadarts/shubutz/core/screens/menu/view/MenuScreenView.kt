@@ -17,6 +17,7 @@ import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GlobalHandlers
+import com.gadarts.shubutz.core.screens.game.view.GameLabel
 import com.gadarts.shubutz.core.screens.menu.BeginGameAction
 import com.gadarts.shubutz.core.screens.menu.LoadingAnimationHandler
 import com.gadarts.shubutz.core.screens.menu.MenuScreen
@@ -36,7 +37,7 @@ class MenuScreenView(
         MainMenuScreenButtons(mainMenuTable, difficultySelectionTable, globalHandlers)
     private lateinit var logoTable: Table
     private lateinit var versionLabel: Label
-    var loadingAnimationRenderer = LoadingAnimationHandler()
+    var loadingAnimationRenderer = LoadingAnimationHandler(androidInterface)
 
 
     fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: BeginGameAction) {
@@ -62,12 +63,13 @@ class MenuScreenView(
 
     private fun addDifficultySelectionLabel() {
         difficultySelectionTable.add(
-            Label(
+            GameLabel(
                 LABEL_DIFFICULTY_SELECT.reversed(),
                 Label.LabelStyle(
                     globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
                     Color.WHITE
-                )
+                ),
+                globalHandlers.androidInterface
             )
         ).pad(20F).row()
     }
@@ -87,12 +89,13 @@ class MenuScreenView(
             mainMenuScreenButtons.onLoadingAnimationDone()
             addMainMenuTable(beginGameAction)
             addDifficultySelectionTable(beginGameAction)
-            versionLabel = Label(
+            versionLabel = GameLabel(
                 "v$versionName",
                 Label.LabelStyle(
                     globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_35),
                     Color.BLACK
-                )
+                ),
+                androidInterface
             )
             stage.addActor(versionLabel)
             stage.addActor(mainMenuTable)

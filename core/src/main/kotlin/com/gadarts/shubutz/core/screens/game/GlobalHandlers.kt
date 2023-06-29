@@ -22,7 +22,8 @@ class GlobalHandlers(
             assetsManager,
             effectsHandler,
             stage,
-            soundPlayer
+            soundPlayer,
+            androidInterface
         )
     }
 

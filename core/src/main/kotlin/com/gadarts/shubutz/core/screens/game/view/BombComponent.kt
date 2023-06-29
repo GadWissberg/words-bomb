@@ -6,26 +6,27 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.model.GameModel
 
 class BombComponent(
     texture: Texture,
     private val particleEffectActor: ParticleEffectActor,
     font: BitmapFont,
-    triesLeft: Int
+    triesLeft: Int,
+    private val androidInterface: AndroidInterface
 ) :
     Table() {
-    private var label: Label
+    private var label: GameLabel
 
     init {
         setOrigin(texture.width / 2F, texture.height / 2F)
         background = TextureRegionDrawable(texture)
         val labelStyle = LabelStyle(font, Color.WHITE)
-        label = Label("$triesLeft", labelStyle)
+        label = GameLabel("$triesLeft", labelStyle, androidInterface)
         add(label).padTop(NUMBER_PADDING_TOP)
     }
 

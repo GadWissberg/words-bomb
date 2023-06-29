@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.ShubutzGame.Companion.lastChampionsFetch
 import com.gadarts.shubutz.core.model.Difficulties
+import com.gadarts.shubutz.core.screens.game.view.GameLabel
 import com.gadarts.shubutz.core.screens.game.view.LoadingAnimation
 
 class ChampionsView(
@@ -134,13 +135,13 @@ class ChampionsView(
     private fun addLabels(font: BitmapFont, viewTable: Table): Table {
         val labelsTable = Table()
         val labelStyle = Label.LabelStyle(font, Color.WHITE)
-        headerLabel = Label("רמה", labelStyle)
+        headerLabel = GameLabel("רמה", labelStyle, androidInterface)
         labelsTable.add(headerLabel).row()
-        nameLabel = Label("שם", labelStyle)
+        nameLabel = GameLabel("שם", labelStyle, androidInterface)
         labelsTable.add(nameLabel).row()
-        scoreLabel = Label("10", labelStyle)
+        scoreLabel = GameLabel("10", labelStyle, androidInterface)
         labelsTable.add(scoreLabel).row()
-        val fullTable = Label(TEXT_CLICK_FOR_MORE.reversed(), labelStyle)
+        val fullTable = GameLabel(TEXT_CLICK_FOR_MORE.reversed(), labelStyle, androidInterface)
         labelsTable.add(fullTable)
         viewTable.add(labelsTable)
         labelsTable.isVisible = false

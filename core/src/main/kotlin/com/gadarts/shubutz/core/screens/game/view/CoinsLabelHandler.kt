@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Queue
 import com.badlogic.gdx.utils.TimeUtils
+import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -20,7 +21,7 @@ import com.gadarts.shubutz.core.model.assets.definitions.ParticleEffectsDefiniti
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 
-class CoinsLabelHandler {
+class CoinsLabelHandler(private val androidInterface: AndroidInterface) {
     lateinit var coinsIcon: Image
     private lateinit var coinsLabel: Label
     private var applyCoinsChangeAnimation = false
@@ -59,7 +60,11 @@ class CoinsLabelHandler {
         assetsManager: GameAssetManager,
         topPartTexture: Texture,
     ) {
-        coinsLabel = Label(gameModel.coins.toString(), Label.LabelStyle(font80, Color.WHITE))
+        coinsLabel = GameLabel(
+            gameModel.coins.toString(),
+            Label.LabelStyle(font80, Color.WHITE),
+            androidInterface
+        )
         table.add(coinsLabel).pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
         val icon =
             if (gameModel.selectedDifficulty != Difficulties.KIDS) TexturesDefinitions.COINS_ICON else TexturesDefinitions.CANDY
@@ -106,12 +111,13 @@ class CoinsLabelHandler {
         }
     }
 
-    private fun createDeltaCoinsLabel(coinsAmount: Int, globalHandlers: GlobalHandlers) = Label(
+    private fun createDeltaCoinsLabel(coinsAmount: Int, globalHandlers: GlobalHandlers) = GameLabel(
         "${if (coinsAmount > 0) "+" else ""}$coinsAmount",
         Label.LabelStyle(
             globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
             if (coinsAmount > 0) Color.GOLD else Color.RED
-        )
+        ),
+        androidInterface
     )
 
     private fun applyNextCoinsValueChangeLabel(

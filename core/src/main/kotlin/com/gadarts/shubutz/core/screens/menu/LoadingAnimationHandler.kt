@@ -10,14 +10,16 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.Align
+import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
+import com.gadarts.shubutz.core.screens.game.view.GameLabel
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 
-class LoadingAnimationHandler {
+class LoadingAnimationHandler(private val androidInterface: AndroidInterface) {
     var loadingAnimationFinished: Boolean = false
     private var brick1: MenuScreenView.BrickAnimation? = null
     private var brick2: MenuScreenView.BrickAnimation? = null
@@ -147,7 +149,7 @@ class LoadingAnimationHandler {
         brickTexture: Texture,
     ): MenuScreenView.BrickAnimation {
         val brickTable = MenuScreenView.BrickAnimation()
-        val letterView = Label(letter, style)
+        val letterView = GameLabel(letter, style, androidInterface)
         letterView.setAlignment(Align.center)
         brickTable.stack(Image(brickTexture), letterView)
             .center()

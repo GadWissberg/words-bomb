@@ -44,7 +44,7 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         stage =
             GameStage(
                 StretchViewport(RESOLUTION_WIDTH.toFloat(), RESOLUTION_HEIGHT.toFloat()),
-                assetsManager
+                assetsManager,
             )
         stage.setDebugInvisible(DebugSettings.SHOW_UI_BORDERS)
         Gdx.input.inputProcessor = stage

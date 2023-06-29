@@ -61,7 +61,8 @@ class GamePlayScreenViewComponentsManager(
     private fun addScoreView() {
         scoreView = ScoreView(
             globalHandlers.assetsManager.getTexture(SCORE),
-            globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80)
+            globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
+            globalHandlers.androidInterface
         )
         scoreView.setPosition(SCORE_VIEW_POSITION_X, SCORE_VIEW_POSITION_Y)
         stage.addActor(scoreView)
@@ -127,7 +128,11 @@ class GamePlayScreenViewComponentsManager(
             assetsManager.getTexture(if (selectedDifficulty != Difficulties.KIDS) COIN else CANDY)
         val labelStyle = LabelStyle(font, Color.WHITE)
         stack.add(Image(coin))
-        val cost = Label(selectedDifficulty.revealLetterCost.toString(), labelStyle)
+        val cost = GameLabel(
+            selectedDifficulty.revealLetterCost.toString(),
+            labelStyle,
+            globalHandlers.androidInterface
+        )
         cost.setAlignment(Align.center)
         stack.add(cost)
         revealLetterButton.add(stack).size(coin.width.toFloat(), coin.height.toFloat())

@@ -28,7 +28,10 @@ import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 
-class GameStage(stretchViewport: StretchViewport, gameAssetManager: GameAssetManager) : Stage(
+class GameStage(
+    stretchViewport: StretchViewport,
+    gameAssetManager: GameAssetManager,
+) : Stage(
     stretchViewport,
     SpriteBatch(),
 ) {

@@ -24,6 +24,7 @@ import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SHARED_PREFER
 import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.golfgl.gdxgamesvcs.GpgsClient.RC_LEADERBOARD
 
 
@@ -166,6 +167,10 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
     override fun isConnected(): Boolean {
         return googleServicesHandler.isConnected()
+    }
+
+    override fun logCrashlytics(message: String) {
+        FirebaseCrashlytics.getInstance().log(message)
     }
 
     override fun onDestroy() {

@@ -38,7 +38,7 @@ class TopBarView(
     private lateinit var topPartTable: Table
     private lateinit var topPartTexture: Texture
     private lateinit var categoryBackgroundTexture: Texture
-    private var coinsLabelHandler = CoinsLabelHandler()
+    private var coinsLabelHandler = CoinsLabelHandler(globalHandlers.androidInterface)
 
     fun getCoinsIcon(): Image {
         return coinsLabelHandler.coinsIcon
@@ -103,9 +103,10 @@ class TopBarView(
         labelStyle.background = NinePatchDrawable(
             NinePatch(categoryBackgroundTexture, 10, 10, 10, 10)
         )
-        categoryLabel = Label(
+        categoryLabel = GameLabel(
             gameModel.currentTargetData.currentCategory,
-            labelStyle
+            labelStyle,
+            globalHandlers.androidInterface
         )
         categoryLabel.setAlignment(Align.center)
         add(categoryLabel).size(

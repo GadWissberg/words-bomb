@@ -28,4 +28,5 @@ interface AndroidInterface {
     fun displayLeaderboard(leaderboardsId: String)
     fun fetchChampion(difficulty: Difficulties, callback: OnChampionFetched)
     fun isConnected(): Boolean
+    fun logCrashlytics(message: String)
 }

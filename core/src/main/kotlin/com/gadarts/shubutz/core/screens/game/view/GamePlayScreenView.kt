@@ -214,7 +214,11 @@ class GamePlayScreenView(
 
     fun displayFailedPurchase(message: String) {
         val dialogView = Table()
-        dialogView.add(ViewUtils.createDialogLabel(message, globalHandlers.assetsManager))
+        dialogView.add(ViewUtils.createDialogLabel(
+            message,
+            globalHandlers.assetsManager,
+            globalHandlers.androidInterface
+        ))
         stage.addDialog(dialogView, "purchase_failed_dialog", globalHandlers.assetsManager)
     }
 
