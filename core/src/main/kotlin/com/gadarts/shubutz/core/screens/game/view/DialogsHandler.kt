@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Scaling
+import com.badlogic.gdx.utils.Timer
+import com.badlogic.gdx.utils.Timer.Task
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.SoundPlayer
@@ -40,43 +42,36 @@ class DialogsHandler(
         gamePlayScreen: GamePlayScreen,
     ) {
         val loadingAnimation = createLoadingAnimation()
-        val animationDialogLayout = Table()
-        animationDialogLayout.add(loadingAnimation).row()
-        stage.addDialog(animationDialogLayout, COINS_DIALOG_LOADING_NAME, assetsManager) {
-            gamePlayScreen.onOpenProductsMenu({
-                addCoinsDialog(it, gamePlayScreen)
-                stage.closeDialog(COINS_DIALOG_LOADING_NAME)
-            }, {
-                loadingAnimation.remove()
-                animationDialogLayout.add(
-                    ViewUtils.createDialogLabel(
-                        it,
-                        assetsManager,
-                        androidInterface
-                    )
-                )
-                animationDialogLayout.pack()
-                stage.closeDialog(COINS_DIALOG_LOADING_NAME)
-            })
-        }
-    }
-
-    private fun addCoinsDialog(
-        it: Map<String, Product>,
-        gamePlayScreen: GamePlayScreen
-    ) {
         val dialogLayout = Table()
-        val dialog = stage.addDialog(dialogLayout, COINS_DIALOG_NAME, assetsManager)
-        if (it.isNotEmpty()) {
-            addCoinsDialogComponents(dialogLayout, it, gamePlayScreen) {
-                effectsHandler.applyPartyEffect(
+        dialogLayout.add(loadingAnimation).row()
+        gamePlayScreen.onOpenProductsMenu({
+            Timer.schedule(object : Task() {
+                override fun run() {
+                    loadingAnimation.remove()
+                    if (it.isNotEmpty()) {
+                        addCoinsDialogComponents(dialogLayout, it, gamePlayScreen) {
+                            effectsHandler.applyPartyEffect(
+                                assetsManager,
+                                soundPlayer,
+                                stage
+                            )
+                        }
+                    }
+                    dialogLayout.pack()
+                }
+            }, 1F)
+        }, {
+            loadingAnimation.remove()
+            dialogLayout.add(
+                ViewUtils.createDialogLabel(
+                    it,
                     assetsManager,
-                    soundPlayer,
-                    stage
+                    androidInterface
                 )
-            }
-        }
-        dialog.pack()
+            )
+            dialogLayout.pack()
+        })
+        finalizeDialog(dialogLayout, COINS_DIALOG_NAME)
     }
 
     fun openCoinsPurchasedSuccessfully(
@@ -518,7 +513,6 @@ class DialogsHandler(
         private const val DIALOG_BUTTON_WIDTH = 200F
         private const val DIALOG_HEADER_PADDING_BOTTOM = 64F
         private const val COINS_DIALOG_NAME = "coins"
-        private const val COINS_DIALOG_LOADING_NAME = "loading_coins"
         private const val COINS_DIALOG_HEADER = "קבל עוד מטבעות"
         private const val COINS_DIALOG_DESCRIPTION =
             "לרשותך מס' אפשרויות להשיג\nעוד מטבעות.\nכל רכישה תסיר את הפרסומות למשך שבוע!"
