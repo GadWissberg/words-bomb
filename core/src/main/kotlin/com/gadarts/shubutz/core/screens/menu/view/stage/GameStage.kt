@@ -69,8 +69,8 @@ class GameStage(
         assetsManager: GameAssetManager,
         onCloseButtonClick: (() -> Unit)? = null,
         onDialogReady: (() -> Unit)? = null,
-    ) {
-        if (openDialogs.containsKey(name)) return
+    ): Table {
+        if (openDialogs.containsKey(name)) return openDialogs[name]!!
         val dialog = Table()
 
         dialog.addAction(
@@ -86,6 +86,7 @@ class GameStage(
         dialog.pack()
         dialog.setPosition(width / 2F - dialog.width / 2F, height / 2F - dialog.height / 2F)
         addActor(dialog)
+        return dialog
     }
 
     fun addButton(

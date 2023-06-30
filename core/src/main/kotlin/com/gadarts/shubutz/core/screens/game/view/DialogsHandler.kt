@@ -40,30 +40,43 @@ class DialogsHandler(
         gamePlayScreen: GamePlayScreen,
     ) {
         val loadingAnimation = createLoadingAnimation()
-        val layout = Table()
-        layout.add(loadingAnimation).row()
-        stage.addDialog(layout, COINS_DIALOG_LOADING_NAME, assetsManager) {
+        val animationDialogLayout = Table()
+        animationDialogLayout.add(loadingAnimation).row()
+        stage.addDialog(animationDialogLayout, COINS_DIALOG_LOADING_NAME, assetsManager) {
             gamePlayScreen.onOpenProductsMenu({
-                loadingAnimation.remove()
-                layout.remove()
-                stage.addDialog(layout, COINS_DIALOG_NAME, assetsManager)
-                if (it.isNotEmpty()) {
-                    addCoinsDialogComponents(layout, it, gamePlayScreen) {
-                        effectsHandler.applyPartyEffect(
-                            assetsManager,
-                            soundPlayer,
-                            stage
-                        )
-                    }
-                }
-                layout.pack()
+                addCoinsDialog(it, gamePlayScreen)
                 stage.closeDialog(COINS_DIALOG_LOADING_NAME)
             }, {
                 loadingAnimation.remove()
-                layout.add(ViewUtils.createDialogLabel(it, assetsManager, androidInterface))
-                layout.pack()
+                animationDialogLayout.add(
+                    ViewUtils.createDialogLabel(
+                        it,
+                        assetsManager,
+                        androidInterface
+                    )
+                )
+                animationDialogLayout.pack()
+                stage.closeDialog(COINS_DIALOG_LOADING_NAME)
             })
         }
+    }
+
+    private fun addCoinsDialog(
+        it: Map<String, Product>,
+        gamePlayScreen: GamePlayScreen
+    ) {
+        val dialogLayout = Table()
+        val dialog = stage.addDialog(dialogLayout, COINS_DIALOG_NAME, assetsManager)
+        if (it.isNotEmpty()) {
+            addCoinsDialogComponents(dialogLayout, it, gamePlayScreen) {
+                effectsHandler.applyPartyEffect(
+                    assetsManager,
+                    soundPlayer,
+                    stage
+                )
+            }
+        }
+        dialog.pack()
     }
 
     fun openCoinsPurchasedSuccessfully(
