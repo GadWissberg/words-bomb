@@ -305,7 +305,6 @@ class DialogsHandler(
                 )
             }
         }
-        addVideoSection(layout, onVideoDone, gamePlayScreen)
         placeDialogInTheMiddle(layout)
     }
 
