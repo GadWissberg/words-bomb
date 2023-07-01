@@ -48,7 +48,8 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     SCORE,
     ICON_HIGHSCORES,
     CHAMPION,
-    POPCORN;
+    POPCORN,
+    GOOGLE_PLAY;
 
     private var path: String =
         "textures/${(if (ninepatch) "$name.9" else name).lowercase(Locale.ROOT)}.png"

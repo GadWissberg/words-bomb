@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Timer
 import com.badlogic.gdx.utils.Timer.Task
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
+import com.gadarts.shubutz.core.GeneralUtils
 import com.gadarts.shubutz.core.SoundPlayer
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.InAppProducts
@@ -106,18 +107,13 @@ class DialogsHandler(
         bottomPadding: Float = DIALOG_DESCRIPTION_PADDING_BOTTOM
     ) {
         val style = Label.LabelStyle(assetsManager.getFont(FontsDefinitions.VARELA_40), Color.WHITE)
-        val text = GameLabel(fixHebrewDescription(description), style, androidInterface)
+        val text =
+            GameLabel(GeneralUtils.fixHebrewDescription(description), style, androidInterface)
         text.setAlignment(Align.right)
         dialog.add(text).pad(topPadding, 0F, bottomPadding, 0F).colspan(colSpan)
             .row()
     }
 
-    private fun fixHebrewDescription(text: String): CharSequence {
-        val reversed = text.reversed()
-        val result = java.lang.StringBuilder()
-        reversed.split("\n").forEach { result.insert(0, "\n").insert(0, it) }
-        return result.toString()
-    }
 
     private fun addHeaderToDialog(
         assetsManager: GameAssetManager,

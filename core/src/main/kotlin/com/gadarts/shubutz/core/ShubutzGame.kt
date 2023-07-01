@@ -68,8 +68,8 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     override fun goToMenu() {
         if (getScreen() is MenuScreenImpl) return
         screen?.dispose()
-        val menuScreenImpl = MenuScreenImpl(globalHandlers, android, this, stage)
-        setScreen(menuScreenImpl)
+        val screen = MenuScreenImpl(globalHandlers, android, this, stage)
+        setScreen(screen)
     }
 
     override fun goToPlayScreen(selectedDifficulty: Difficulties) {
@@ -92,6 +92,12 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         if (screen == null) return
 
         (screen as GameScreen).onLeaderboardClosed()
+    }
+
+    override fun restart() {
+        screen?.dispose()
+        val screen = MenuScreenImpl(globalHandlers, android, this, stage)
+        setScreen(screen)
     }
 
     fun onRewardForVideoAd(rewardAmount: Int) {

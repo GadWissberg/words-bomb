@@ -10,5 +10,6 @@ interface GameLifeCycleManager {
     fun onSuccessfulPurchase(products: MutableList<String>)
     fun onFailedPurchase(message: String)
     fun onLeaderboardClosed()
+    fun restart()
 
 }

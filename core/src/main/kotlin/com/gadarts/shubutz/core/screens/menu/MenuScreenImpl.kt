@@ -23,7 +23,6 @@ class MenuScreenImpl(
         androidInterface.versionName(),
         stage,
         this,
-        androidInterface,
     )
 
     override fun onSuccessfulPurchase(products: MutableList<String>) {
@@ -74,6 +73,10 @@ class MenuScreenImpl(
         if (gameLifeCycleManager.loadingDone) {
             menuScreenView.finishLoadingAnimationAndDisplayMenu(goToPlayScreenOnClick())
         }
+    }
+
+    override fun restart() {
+        gameLifeCycleManager.restart()
     }
 
     fun onGameReady() {

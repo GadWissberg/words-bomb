@@ -4,14 +4,19 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
-import com.gadarts.shubutz.core.AndroidInterface
+import com.badlogic.gdx.utils.Timer
+import com.badlogic.gdx.utils.Timer.Task
 import com.gadarts.shubutz.core.DebugSettings
+import com.gadarts.shubutz.core.GeneralUtils
 import com.gadarts.shubutz.core.model.assets.definitions.AtlasesDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
@@ -28,7 +33,6 @@ class MenuScreenView(
     private val versionName: String,
     private val stage: GameStage,
     private val menuScreen: MenuScreen,
-    private val androidInterface: AndroidInterface,
 ) : Disposable {
 
     private var mainMenuTable = Table()
@@ -37,7 +41,7 @@ class MenuScreenView(
         MainMenuScreenButtons(mainMenuTable, difficultySelectionTable, globalHandlers)
     private lateinit var logoTable: Table
     private lateinit var versionLabel: Label
-    var loadingAnimationRenderer = LoadingAnimationHandler(androidInterface)
+    var loadingAnimationRenderer = LoadingAnimationHandler(globalHandlers.androidInterface)
 
 
     fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: BeginGameAction) {
@@ -95,7 +99,7 @@ class MenuScreenView(
                     globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_35),
                     Color.BLACK
                 ),
-                androidInterface
+                globalHandlers.androidInterface
             )
             stage.addActor(versionLabel)
             stage.addActor(mainMenuTable)
@@ -118,15 +122,45 @@ class MenuScreenView(
 
 
     private fun addChampionsView() {
-        if (!androidInterface.isConnected()) return
-        mainMenuTable.add(
-            ChampionsView(
-                globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_35),
-                androidInterface,
-                globalHandlers.assetsManager.getTexture(TexturesDefinitions.ICON_HIGHSCORES),
-                globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING)
-            )
-        ).pad(CHAMPIONS_VIEW_PADDING).expandX().center()
+        if (globalHandlers.androidInterface.isConnected()) {
+            mainMenuTable.add(
+                ChampionsView(
+                    globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_35),
+                    globalHandlers.androidInterface,
+                    globalHandlers.assetsManager.getTexture(TexturesDefinitions.ICON_HIGHSCORES),
+                    globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING)
+                )
+            ).pad(CHAMPIONS_VIEW_PADDING).expandX().center()
+        } else {
+            addLoginButton()
+        }
+    }
+
+    private fun addLoginButton() {
+        val font = globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_40)
+        val style = Label.LabelStyle(font, Color.WHITE)
+        val text = GeneralUtils.fixHebrewDescription(LABEL_LOGIN)
+        val label = GameLabel(text, style, globalHandlers.androidInterface)
+        val loginButton =
+            Image(globalHandlers.assetsManager.getTexture(TexturesDefinitions.GOOGLE_PLAY))
+        val clickListener = object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                super.clicked(event, x, y)
+                val success = globalHandlers.androidInterface.login()
+                if (success) {
+                    Timer.schedule(object : Task() {
+                        override fun run() {
+                            menuScreen.restart()
+                        }
+                    }, 1F)
+                }
+            }
+        }
+        loginButton.addListener(clickListener)
+        mainMenuTable.add(loginButton).pad(CHAMPIONS_VIEW_PADDING).expandX().center().row()
+        label.setAlignment(Align.center)
+        label.addListener(clickListener)
+        mainMenuTable.add(label)
     }
 
     private fun initMenuTable(table: Table) {
@@ -199,6 +233,7 @@ class MenuScreenView(
 
     companion object {
         private const val LABEL_DIFFICULTY_SELECT = "בחר רמת קושי:"
+        private const val LABEL_LOGIN = "להשתתפות בטבלת האלופים\nהתחברו כאן!"
         private const val LOGO_PADDING_TOP = 300F
         private const val LOGO_PADDING_BOTTOM = 75F
         private const val CHAMPIONS_VIEW_PADDING = 64F

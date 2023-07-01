@@ -29,4 +29,5 @@ interface AndroidInterface {
     fun fetchChampion(difficulty: Difficulties, callback: OnChampionFetched)
     fun isConnected(): Boolean
     fun logCrashlytics(message: String)
+    fun login(): Boolean
 }

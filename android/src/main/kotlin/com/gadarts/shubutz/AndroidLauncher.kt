@@ -173,6 +173,14 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         FirebaseCrashlytics.getInstance().log(message)
     }
 
+    override fun login(): Boolean {
+        val success = googleServicesHandler.login(this)
+        if (!success) {
+            logCrashlytics("Failed to login to Google Games Service")
+        }
+        return success
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         runOnUiThread {

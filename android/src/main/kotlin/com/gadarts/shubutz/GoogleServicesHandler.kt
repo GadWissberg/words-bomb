@@ -1,8 +1,10 @@
 package com.gadarts.shubutz
 
+import android.app.Activity
 import android.util.Log
 import android.view.View
 import android.widget.RelativeLayout
+import android.widget.Toast
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.gadarts.shubutz.core.DebugSettings
@@ -32,7 +34,7 @@ class GoogleServicesHandler {
     fun onCreate(game: ShubutzGame, context: AndroidApplication) {
         purchaseHandler = PurchaseHandler(game, context)
         gsClient = GpgsClient().initialize(context, false)
-        signInToPlayServices()
+        signInToPlayServices(context)
     }
 
     fun addBannerAdLayout(context: AndroidApplication, layout: RelativeLayout) {
@@ -65,17 +67,21 @@ class GoogleServicesHandler {
     }
 
 
-    private fun signInToPlayServices() {
+    private fun signInToPlayServices(context: Activity): Boolean {
         gsClient.connect(true)
         val loggedIn = gsClient.isSessionActive
-        if (loggedIn) {
+        val result: Boolean = if (loggedIn) {
             Gdx.app.log("Play Services", "Signed in successfully")
+            true
         } else {
             val loginSucceeded = gsClient.logIn()
             if (!loginSucceeded) {
                 Gdx.app.error("Play Services", "Did not sign in")
+                Toast.makeText(context, "התחברות נכשלה", Toast.LENGTH_LONG).show()
             }
+            loginSucceeded
         }
+        return result
     }
 
     fun initializeInAppPurchases(
@@ -198,6 +204,10 @@ class GoogleServicesHandler {
             override fun onAdOpened() {
             }
         }
+    }
+
+    fun login(context: Activity): Boolean {
+        return signInToPlayServices(context)
     }
 
     companion object {
