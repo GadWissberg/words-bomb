@@ -116,3 +116,4 @@ Thumbs.db
 *.pepk
 android/src/debug/
 keys.txt
+*.pem

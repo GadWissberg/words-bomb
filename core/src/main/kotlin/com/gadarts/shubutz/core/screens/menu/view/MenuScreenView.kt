@@ -40,7 +40,7 @@ class MenuScreenView(
     private var mainMenuScreenButtons =
         MainMenuScreenButtons(mainMenuTable, difficultySelectionTable, globalHandlers)
     private lateinit var logoTable: Table
-    private lateinit var versionLabel: Label
+    private var versionLabel: GameLabel? = null
     var loadingAnimationRenderer = LoadingAnimationHandler(globalHandlers.androidInterface)
 
 
@@ -117,7 +117,7 @@ class MenuScreenView(
         mainMenuTable.remove()
         difficultySelectionTable.remove()
         mainMenuScreenButtons.clear()
-        versionLabel.remove()
+        versionLabel?.remove()
     }
 
 
