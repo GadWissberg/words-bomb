@@ -146,7 +146,7 @@ class GamePlayScreenImpl(
 
     override fun onQuitSession() {
         var sent = false
-        if (gameModel.score <= 0) {
+        if (gameModel.score > 0) {
             sent = android.submitScore(gameModel.score, gameModel.selectedDifficulty.leaderboardsId)
         }
         if (sent) {
