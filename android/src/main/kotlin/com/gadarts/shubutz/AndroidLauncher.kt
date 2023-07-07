@@ -48,7 +48,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         game = ShubutzGame(this)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         createLayout()
-        googleServicesHandler.onCreate(game, this)
+        googleServicesHandler.onCreate(game, this, )
     }
 
     override fun toast(msg: String) {
@@ -174,7 +174,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     }
 
     override fun login(): Boolean {
-        val success = googleServicesHandler.login(this)
+        val success = googleServicesHandler.login()
         if (!success) {
             logCrashlytics("Failed to login to Google Games Service")
         }

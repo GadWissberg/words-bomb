@@ -1,6 +1,5 @@
 package com.gadarts.shubutz
 
-import android.app.Activity
 import android.util.Log
 import android.view.View
 import android.widget.RelativeLayout
@@ -21,8 +20,10 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import de.golfgl.gdxgamesvcs.GameServiceException
 import de.golfgl.gdxgamesvcs.GpgsClient
+import de.golfgl.gdxgamesvcs.IGameServiceListener
 import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry
 
 class GoogleServicesHandler {
@@ -31,10 +32,44 @@ class GoogleServicesHandler {
     private lateinit var adView: AdView
     private lateinit var loadedAd: RewardedAd
     private lateinit var purchaseHandler: PurchaseHandler
+
     fun onCreate(game: ShubutzGame, context: AndroidApplication) {
         purchaseHandler = PurchaseHandler(game, context)
         gsClient = GpgsClient().initialize(context, false)
-        signInToPlayServices(context)
+        gsClient.setListener(object : IGameServiceListener {
+            override fun gsOnSessionActive() {
+
+            }
+
+            override fun gsOnSessionInactive() {
+            }
+
+            override fun gsShowErrorToUser(
+                et: IGameServiceListener.GsErrorType?,
+                msg: String?,
+                t: Throwable?
+            ) {
+                logGameServicesError(context, et, msg, t)
+            }
+
+        })
+        gsClient.connect(true)
+    }
+
+    private fun logGameServicesError(
+        context: AndroidApplication,
+        et: IGameServiceListener.GsErrorType?,
+        msg: String?,
+        t: Throwable?
+    ) {
+        Toast.makeText(context, "התחברות נכשלה", Toast.LENGTH_LONG).show()
+        val error =
+            "Failed to login to Google Games Service. ErrorType: $et, Message: $msg, Exception: $t"
+        Gdx.app.error(
+            GoogleServicesHandler::javaClass.name,
+            error
+        )
+        FirebaseCrashlytics.getInstance().log(error)
     }
 
     fun addBannerAdLayout(context: AndroidApplication, layout: RelativeLayout) {
@@ -62,24 +97,6 @@ class GoogleServicesHandler {
                 difficulty
             )
         } catch (_: Exception) {
-        }
-        return result
-    }
-
-
-    private fun signInToPlayServices(context: Activity): Boolean {
-        gsClient.connect(true)
-        val loggedIn = gsClient.isSessionActive
-        val result: Boolean = if (loggedIn) {
-            Gdx.app.log("Play Services", "Signed in successfully")
-            true
-        } else {
-            val loginSucceeded = gsClient.logIn()
-            if (!loginSucceeded) {
-                Gdx.app.error("Play Services", "Did not sign in")
-                Toast.makeText(context, "התחברות נכשלה", Toast.LENGTH_LONG).show()
-            }
-            loginSucceeded
         }
         return result
     }
@@ -206,8 +223,8 @@ class GoogleServicesHandler {
         }
     }
 
-    fun login(context: Activity): Boolean {
-        return signInToPlayServices(context)
+    fun login(): Boolean {
+        return gsClient.logIn()
     }
 
     companion object {
