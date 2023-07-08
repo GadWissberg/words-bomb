@@ -7,4 +7,12 @@
     <string name="package_name" translatable="false">com.gadarts.shubutz</string>
     <!--leaderboard רמת קושי - מתחיל-->
     <string name="leaderboard" translatable="false">CgkIwtDryJ4YEAIQAQ</string>
+    <!--leaderboard רמת קושי - בינוני-->
+    <string name="leaderboard_2" translatable="false">CgkIwtDryJ4YEAIQAw</string>
+    <!--leaderboard רמת קושי - מתקדם-->
+    <string name="leaderboard_3" translatable="false">CgkIwtDryJ4YEAIQBA</string>
+    <!--leaderboard רמת קושי - מומחה-->
+    <string name="leaderboard_4" translatable="false">CgkIwtDryJ4YEAIQBQ</string>
+    <!--leaderboard ילדים-->
+    <string name="leaderboard_5" translatable="false">CgkIwtDryJ4YEAIQBg</string>
 </resources>
