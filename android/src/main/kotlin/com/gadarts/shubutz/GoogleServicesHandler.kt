@@ -35,7 +35,7 @@ class GoogleServicesHandler {
 
     fun onCreate(game: ShubutzGame, context: AndroidApplication) {
         purchaseHandler = PurchaseHandler(game, context)
-        gsClient = GpgsClient().initialize(context, true)
+        gsClient = GpgsClient().initialize(context, false)
         gsClient.setListener(object : IGameServiceListener {
             override fun gsOnSessionActive() {
 

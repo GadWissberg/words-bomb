@@ -20,7 +20,7 @@ enum class Difficulties(
         tries = 6,
         winWorth = 1,
         perfectBonusEnabled = false,
-        leaderboardsId = "CgkItLjwycoZEAIQBA"
+        leaderboardsId = "CgkIwtDryJ4YEAIQAQ"
     ),
     INTERMEDIATE(
         displayName = "בינוני",
@@ -28,7 +28,7 @@ enum class Difficulties(
         tries = 5,
         winWorth = 2,
         minimumLength = 4,
-        leaderboardsId = "CgkItLjwycoZEAIQAw"
+        leaderboardsId = "CgkIwtDryJ4YEAIQAQ"
     ),
     ADVANCED(
         displayName = "מתקדם",
@@ -36,7 +36,7 @@ enum class Difficulties(
         tries = 4,
         winWorth = 3,
         minimumLength = 5,
-        leaderboardsId = "CgkItLjwycoZEAIQAg"
+        leaderboardsId = "CgkIwtDryJ4YEAIQAQ"
     ),
     EXPERT(
         displayName = "מומחה",
@@ -44,7 +44,7 @@ enum class Difficulties(
         tries = 3,
         winWorth = 4,
         minimumLength = 6,
-        leaderboardsId = "CgkItLjwycoZEAIQBg"
+        leaderboardsId = "CgkIwtDryJ4YEAIQAQ"
     ),
     KIDS(
         displayName = "ילדים",
@@ -54,7 +54,7 @@ enum class Difficulties(
         phrasesFileName = "phrases_kids",
         sharedPreferencesCoinsKey = "kids_coins",
         revealLetterCost = 5,
-        leaderboardsId = "CgkItLjwycoZEAIQBQ"
+        leaderboardsId = "CgkIwtDryJ4YEAIQAQ"
     );
 
 }
