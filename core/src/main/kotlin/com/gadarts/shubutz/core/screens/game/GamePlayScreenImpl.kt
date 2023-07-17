@@ -27,6 +27,7 @@ class GamePlayScreenImpl(
 ) : GameScreen(), GamePlayScreen {
 
 
+    private var roundsCounter = 0
     private val gameModel = createGameModel()
     private lateinit var gameLogicHandler: GameLogicHandler
     private lateinit var gamePlayScreenView: GamePlayScreenView
@@ -121,6 +122,10 @@ class GamePlayScreenImpl(
 
     override fun onScreenEmpty() {
         if (gameModel.currentTargetData.hiddenLettersIndices.isNotEmpty()) return
+        roundsCounter++
+        if (roundsCounter % REQUEST_AD_CYCLE_SIZE == 0) {
+            android.loadBannerAd()
+        }
         gameLogicHandler.beginRound(gameModel)
         gamePlayScreenView.initializeForGameBegin()
     }
@@ -231,6 +236,7 @@ class GamePlayScreenImpl(
     companion object {
         private const val INITIAL_COINS_VALUE = 32
         private const val ADS_DISABLE_LENGTH = 7 * 24 * 60 * 60 * 1000
+        private const val REQUEST_AD_CYCLE_SIZE = 3
     }
 
 

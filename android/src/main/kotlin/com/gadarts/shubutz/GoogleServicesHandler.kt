@@ -38,7 +38,6 @@ class GoogleServicesHandler {
         gsClient = GpgsClient().initialize(context, false)
         gsClient.setListener(object : IGameServiceListener {
             override fun gsOnSessionActive() {
-
             }
 
             override fun gsOnSessionInactive() {
@@ -53,7 +52,7 @@ class GoogleServicesHandler {
             }
 
         })
-        gsClient.connect(true)
+        login()
     }
 
     private fun logGameServicesError(

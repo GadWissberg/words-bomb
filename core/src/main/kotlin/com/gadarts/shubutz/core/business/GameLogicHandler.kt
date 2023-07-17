@@ -10,6 +10,7 @@ import com.gadarts.shubutz.core.model.GameModel.Companion.allowedLetters
 import com.gadarts.shubutz.core.model.Phrase
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import kotlin.math.max
+import kotlin.random.Random
 
 class GameLogicHandler(
     private val phrases: HashMap<String, ArrayList<Phrase>>,
@@ -91,7 +92,7 @@ class GameLogicHandler(
     }
 
     private fun chooseTarget(gameModel: GameModel) {
-        val categoryName = unusedPhrases.keys.random()
+        val categoryName = unusedPhrases.keys.random(Random(System.currentTimeMillis()))
         val category = unusedPhrases[categoryName]
         val selected = if (TEST_PHRASE.value.isNotEmpty()) TEST_PHRASE else category!!.random()
         gameModel.setNewPhrase(selected.value.reversed())
