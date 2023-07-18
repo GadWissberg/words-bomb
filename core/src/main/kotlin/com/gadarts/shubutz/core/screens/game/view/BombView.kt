@@ -42,10 +42,10 @@ class BombView(
         val bombTexture = assetsManager.getTexture(TexturesDefinitions.BOMB)
         bombComponent = BombComponent(
             bombTexture,
-            fireParticleEffectActor,
             assetsManager.getFont(FontsDefinitions.VARELA_320),
             gameModel.triesLeft,
-            globalHandlers.androidInterface
+            globalHandlers.androidInterface,
+            fireParticleEffectActor,
         )
         bombComponent.addAction(
             Actions.forever(

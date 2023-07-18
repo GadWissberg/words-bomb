@@ -14,10 +14,10 @@ import com.gadarts.shubutz.core.model.GameModel
 
 class BombComponent(
     texture: Texture,
-    private val particleEffectActor: ParticleEffectActor,
     font: BitmapFont,
     triesLeft: Int,
-    private val androidInterface: AndroidInterface
+    androidInterface: AndroidInterface,
+    private val particleEffectActor: ParticleEffectActor
 ) :
     Table() {
     private var label: GameLabel

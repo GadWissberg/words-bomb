@@ -20,7 +20,6 @@ import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GeneralUtils
 import com.gadarts.shubutz.core.SoundPlayer
-import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
@@ -118,7 +117,7 @@ class DialogsHandler(
     private fun addHeaderToDialog(
         assetsManager: GameAssetManager,
         popup: Table,
-        text: String,
+        text: CharSequence,
         colSpan: Int = 1
     ) {
         val font = assetsManager.getFont(FontsDefinitions.VARELA_80)
@@ -363,8 +362,8 @@ class DialogsHandler(
 
     private fun createDialogLayout(
         assetsManager: GameAssetManager,
-        header: String,
-        description: String
+        header: CharSequence,
+        description: String?
     ): Table {
         val layout = Table()
         addHeaderAndDescription(assetsManager, layout, header, description)
@@ -374,11 +373,13 @@ class DialogsHandler(
     private fun addHeaderAndDescription(
         assetsManager: GameAssetManager,
         layout: Table,
-        header: String,
-        description: String
+        header: CharSequence,
+        description: String?
     ) {
         addHeaderToDialog(assetsManager, layout, header, 2)
-        addDialogText(assetsManager, layout, description, 2)
+        if (description != null) {
+            addDialogText(assetsManager, layout, description, 2)
+        }
     }
 
     private fun addExitDialogButtons(
@@ -461,28 +462,36 @@ class DialogsHandler(
         placeDialogInTheMiddle(dialogView)
     }
 
-    fun openRevealWordDialog(onYes: () -> Unit, onNo: () -> Unit) {
+    fun openDialog(
+        header: CharSequence,
+        description: String? = null,
+        onYes: () -> Unit,
+        onNo: () -> Unit,
+        okButtonText: String = DIALOG_BUTTON_YES,
+        noButtonText: String = DIALOG_BUTTON_NO,
+        dialogName: String,
+    ) {
         val dialogView = createDialogLayout(
             assetsManager,
-            REVEAL_WORD_DIALOG_HEADER,
-            REVEAL_WORD_DIALOG_DESCRIPTION.format(GameModel.DISPLAY_TARGET_COST)
+            header,
+            description
         )
         addDialogButton(
             dialogLayout = dialogView,
             onClick = onYes,
-            text = DIALOG_BUTTON_OK,
-            dialogName = REVEAL_WORD_DIALOG_NAME,
+            text = okButtonText,
+            dialogName = dialogName,
             width = DIALOG_BUTTON_WIDTH,
             newRowAfter = false
         )
         addDialogButton(
             dialogLayout = dialogView,
             onClick = onNo,
-            text = DIALOG_BUTTON_NO,
-            dialogName = REVEAL_WORD_DIALOG_NAME,
+            text = noButtonText,
+            dialogName = dialogName,
             width = DIALOG_BUTTON_WIDTH
         )
-        finalizeDialog(dialogView, REVEAL_WORD_DIALOG_NAME, onNo)
+        finalizeDialog(dialogView, dialogName, onNo)
     }
 
     companion object {
@@ -492,16 +501,12 @@ class DialogsHandler(
         private const val COINS_PURCHASED_DIALOG_BUTTON_OK = "מעולה"
         private const val EXIT_DIALOG_NAME = "exit"
         private const val EXIT_DIALOG_HEADER = "חכה!"
-        private const val REVEAL_WORD_DIALOG_HEADER = "רוצה לדעת את המילה?"
-        private const val REVEAL_WORD_DIALOG_DESCRIPTION = "ניתן להציג את המילה עבור %s מטבעות"
-        private const val REVEAL_WORD_DIALOG_NAME = "help"
         private const val HELP_DIALOG_HEADER = "איך משחקים?"
         private const val HELP_DIALOG_DESCRIPTION =
             "בכל שלב תופיע מילה עם\nאותיות חסרות, עליכם לגלות את\nהמילה לפני שיגמרו מס' הניסיונות."
         private const val HELP_DIALOG_CREDITS =
             "גד וייסברג - תוכן, תכנות ועיצוב\nמעוז שחם - איסוף מילים עבור רמת ילדים\nכל הזכויות שמורות - 3202"
         private const val DIALOG_BUTTON_OK = "סבבה"
-        private const val DIALOG_BUTTON_NO = "לא תודה"
         private const val HELP_DIALOG_NAME = "help"
         private const val EXIT_DIALOG_DESCRIPTION = "אתה בטוח שאתה רוצה\nלסיים את המשחק?"
         private const val EXIT_DIALOG_BUTTON_OK = "כן"
@@ -520,6 +525,8 @@ class DialogsHandler(
         private const val DIALOG_DESCRIPTION_PADDING_BOTTOM = 64F
         private const val DIALOG_BUTTON_PADDING = 32F
         private const val FLASH_EFFECT_DURATION = 4F
+        private const val DIALOG_BUTTON_NO = "לא תודה"
+        private const val DIALOG_BUTTON_YES = "סבבה"
     }
 
 

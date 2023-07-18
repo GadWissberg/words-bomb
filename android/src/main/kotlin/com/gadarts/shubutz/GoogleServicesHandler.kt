@@ -55,22 +55,6 @@ class GoogleServicesHandler {
         login()
     }
 
-    private fun logGameServicesError(
-        context: AndroidApplication,
-        et: IGameServiceListener.GsErrorType?,
-        msg: String?,
-        t: Throwable?
-    ) {
-        Toast.makeText(context, "התחברות נכשלה", Toast.LENGTH_LONG).show()
-        val error =
-            "Failed to login to Google Games Service. ErrorType: $et, Message: $msg, Exception: $t"
-        Gdx.app.error(
-            GoogleServicesHandler::javaClass.name,
-            error
-        )
-        FirebaseCrashlytics.getInstance().log(error)
-    }
-
     fun addBannerAdLayout(context: AndroidApplication, layout: RelativeLayout) {
         adView = AdView(context)
         val adParams = RelativeLayout.LayoutParams(
@@ -86,19 +70,6 @@ class GoogleServicesHandler {
         defineBannerAdListener(adView)
     }
 
-
-    private fun tryToConvertEntry(first: ILeaderBoardEntry?, difficulty: Difficulties): Champion? {
-        var result: Champion? = null
-        try {
-            result = Champion(
-                first!!.userDisplayName,
-                first.formattedValue.toLong(),
-                difficulty
-            )
-        } catch (_: Exception) {
-        }
-        return result
-    }
 
     fun initializeInAppPurchases(
         onSuccess: (products: Map<String, Product>) -> Unit,
@@ -200,6 +171,10 @@ class GoogleServicesHandler {
         adView.destroy()
     }
 
+    fun login(): Boolean {
+        return gsClient.logIn()
+    }
+
     private fun defineBannerAdListener(adView: AdView) {
         adView.adListener = object : AdListener() {
             override fun onAdClicked() {
@@ -222,8 +197,34 @@ class GoogleServicesHandler {
         }
     }
 
-    fun login(): Boolean {
-        return gsClient.logIn()
+    private fun logGameServicesError(
+        context: AndroidApplication,
+        et: IGameServiceListener.GsErrorType?,
+        msg: String?,
+        t: Throwable?
+    ) {
+        Toast.makeText(context, "התחברות נכשלה", Toast.LENGTH_LONG).show()
+        val error =
+            "Failed to login to Google Games Service. ErrorType: $et, Message: $msg, Exception: $t"
+        Gdx.app.error(
+            GoogleServicesHandler::javaClass.name,
+            error
+        )
+        FirebaseCrashlytics.getInstance().log(error)
+    }
+
+
+    private fun tryToConvertEntry(first: ILeaderBoardEntry?, difficulty: Difficulties): Champion? {
+        var result: Champion? = null
+        try {
+            result = Champion(
+                first!!.userDisplayName,
+                first.formattedValue.toLong(),
+                difficulty
+            )
+        } catch (_: Exception) {
+        }
+        return result
     }
 
     companion object {

@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GameLifeCycleManager
+import com.gadarts.shubutz.core.GeneralUtils
 import com.gadarts.shubutz.core.business.GameLogicHandler
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
@@ -70,7 +71,6 @@ class GamePlayScreenImpl(
     }
 
     override fun onLeaderboardClosed() {
-        lifeCycleManager.goToMenu()
     }
 
     override fun show() {
@@ -223,20 +223,33 @@ class GamePlayScreenImpl(
                             globalHandlers.androidInterface.displayLeaderboard(
                                 gameModel.selectedDifficulty.leaderboardsId
                             )
-                            lifeCycleManager.goToMenu()
+                            openAnotherGameDialog()
                         }
                     } else {
                         globalHandlers.androidInterface.displayLeaderboard(gameModel.selectedDifficulty.leaderboardsId)
-                        lifeCycleManager.goToMenu()
+                        openAnotherGameDialog()
                     }
                 }
             })
+    }
+
+    private fun openAnotherGameDialog() {
+        globalHandlers.dialogsHandler.openDialog(
+            header = ANOTHER_GAME_DIALOG_HEADER,
+            description = ANOTHER_GAME_DIALOG_DESCRIPTION.format(gameModel.selectedDifficulty.displayName),
+            onYes = { lifeCycleManager.goToPlayScreen(gameModel.selectedDifficulty) },
+            onNo = { lifeCycleManager.goToMenu() },
+            dialogName = ANOTHER_GAME_DIALOG_NAME
+        )
     }
 
     companion object {
         private const val INITIAL_COINS_VALUE = 32
         private const val ADS_DISABLE_LENGTH = 7 * 24 * 60 * 60 * 1000
         private const val REQUEST_AD_CYCLE_SIZE = 3
+        private const val ANOTHER_GAME_DIALOG_HEADER = "נשחק שוב?"
+        private const val ANOTHER_GAME_DIALOG_DESCRIPTION = "עוד משחק\nברמת %s?"
+        private const val ANOTHER_GAME_DIALOG_NAME = "another_name"
     }
 
 

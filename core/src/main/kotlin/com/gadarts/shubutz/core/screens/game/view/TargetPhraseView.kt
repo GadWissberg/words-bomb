@@ -258,6 +258,22 @@ class TargetPhraseView(
         revealWordWithDelay: Boolean
     ) {
         gameModel.currentTargetData.hiddenLettersIndices.clear()
+        fadeOutAndClearTarget()
+        globalHandlers.stage.addAction(
+            Actions.delay(
+                if (revealWordWithDelay) REVEAL_WORD_ON_GAME_OVER_DELAY else 0F,
+                Actions.run {
+                    if (wordRevealFree) {
+                        addTargetWordLines(gameModel, assetsManager)
+                    } else {
+                        displayRevealWordDialog(globalHandlers, gamePlayScreen)
+                    }
+                    wordRevealFree = !wordRevealFree
+                })
+        )
+    }
+
+    private fun fadeOutAndClearTarget() {
         targetWordLines.forEach {
             it.addAction(
                 Actions.sequence(
@@ -269,21 +285,22 @@ class TargetPhraseView(
                     })
             )
         }
-        globalHandlers.stage.addAction(
-            Actions.delay(
-                if (revealWordWithDelay) REVEAL_WORD_ON_GAME_OVER_DELAY else 0F,
-                Actions.run {
-                    if (wordRevealFree) {
-                        addTargetWordLines(gameModel, assetsManager)
-                    } else {
-                        globalHandlers.dialogsHandler.openRevealWordDialog({
-                            gamePlayScreen.onClickedToRevealWordOnGameOver()
-                        }, {
-                            gamePlayScreen.onGameOverAnimationDone()
-                        })
-                    }
-                    wordRevealFree = !wordRevealFree
-                })
+    }
+
+    private fun displayRevealWordDialog(
+        globalHandlers: GlobalHandlers,
+        gamePlayScreen: GamePlayScreen
+    ) {
+        globalHandlers.dialogsHandler.openDialog(
+            header = REVEAL_WORD_DIALOG_HEADER,
+            description = REVEAL_WORD_DIALOG_DESCRIPTION.format(GameModel.DISPLAY_TARGET_COST),
+            onYes = {
+                gamePlayScreen.onClickedToRevealWordOnGameOver()
+            },
+            onNo = {
+                gamePlayScreen.onGameOverAnimationDone()
+            },
+            dialogName = REVEAL_WORD_DIALOG_NAME,
         )
     }
 
@@ -312,6 +329,8 @@ class TargetPhraseView(
         private const val WIN_DELAY = 2F
         private const val REVEAL_WORD_ON_GAME_OVER_DELAY = 4F
         private val auxVector = Vector2()
-
+        private const val REVEAL_WORD_DIALOG_HEADER = "רוצה לדעת את המילה?"
+        private const val REVEAL_WORD_DIALOG_DESCRIPTION = "ניתן להציג את המילה עבור %s מטבעות"
+        private const val REVEAL_WORD_DIALOG_NAME = "help"
     }
 }
