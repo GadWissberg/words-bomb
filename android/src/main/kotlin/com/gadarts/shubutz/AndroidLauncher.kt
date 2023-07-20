@@ -11,20 +11,28 @@ import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.Toast
 import com.android.billingclient.api.*
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.badlogic.gdx.utils.TimeUtils
+import com.gadarts.shubutz.core.AnalyticsEvents
+import com.gadarts.shubutz.core.AnalyticsEventsParams
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.Difficulties
+import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SHARED_PREFERENCES_DATA_NAME
 import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.ktx.Firebase
 import de.golfgl.gdxgamesvcs.GpgsClient.RC_LEADERBOARD
 
 
@@ -35,9 +43,10 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
     private lateinit var game: ShubutzGame
     private var versionName = "0.0.0"
     private lateinit var layout: RelativeLayout
-
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        firebaseAnalytics = Firebase.analytics
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         try {
             val pInfo = context.packageManager.getPackageInfoCompat(context.packageName, 0)
@@ -48,7 +57,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         game = ShubutzGame(this)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         createLayout()
-        googleServicesHandler.onCreate(game, this, )
+        googleServicesHandler.onCreate(game, this, firebaseAnalytics)
     }
 
     override fun toast(msg: String) {
@@ -136,6 +145,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         if (shouldLoadBannerAd()) {
             runOnUiThread {
                 googleServicesHandler.loadBannerAd()
+                logEvent(AnalyticsEvents.AD_REQUEST, null)
             }
         }
     }
@@ -173,12 +183,33 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         FirebaseCrashlytics.getInstance().log(message)
     }
 
-    override fun login(): Boolean {
-        val success = googleServicesHandler.login()
-        if (!success) {
-            logCrashlytics("Failed to login to Google Games Service")
+    override fun login() {
+        googleServicesHandler.login()
+    }
+
+    override fun logEvent(
+        event: String,
+        gameModel: GameModel?,
+        params: Map<String, String>?,
+    ) {
+        Gdx.app.log("Shubutz", "Logged event: $event")
+        firebaseAnalytics.logEvent(event) {
+            params?.forEach { (key, value) ->
+                param(key, value)
+            }
+            param(
+                AnalyticsEventsParams.PLAYER_NAME,
+                googleServicesHandler.getPlayerName().toString()
+            )
+            param(AnalyticsEventsParams.VERSION, versionName)
+            if (gameModel != null) {
+                param(AnalyticsEventsParams.COINS, gameModel.coins.toString())
+                param(
+                    AnalyticsEventsParams.CURRENT_PHRASE,
+                    gameModel.currentTargetData.currentPhrase.reversed()
+                )
+            }
         }
-        return success
     }
 
     override fun onDestroy() {

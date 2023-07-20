@@ -116,7 +116,7 @@ class ChampionsView(
         )
         nameLabel.setText(champion.name)
         scoreLabel.setText(
-            TEXT_SCORE.format(champion.score.toString()).reversed()
+            TEXT_SCORE.format(champion.score.toString().reversed()).reversed()
         )
         labelsTable.isVisible = true
         leftCup.isVisible = true

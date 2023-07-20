@@ -3,10 +3,11 @@ package com.gadarts.shubutz.core.screens.game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.utils.TimeUtils
+import com.gadarts.shubutz.core.AnalyticsEvents
+import com.gadarts.shubutz.core.AnalyticsEventsParams
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GameLifeCycleManager
-import com.gadarts.shubutz.core.GeneralUtils
 import com.gadarts.shubutz.core.business.GameLogicHandler
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
@@ -47,6 +48,11 @@ class GamePlayScreenImpl(
 
     override fun onSuccessfulPurchase(products: MutableList<String>) {
         products.forEach { product ->
+            android.logEvent(
+                AnalyticsEvents.PURCHASE_SUCCESSFUL,
+                gameModel,
+                mapOf(AnalyticsEventsParams.PACK_NAME to product)
+            )
             val filtered = InAppProducts.values().filter { it.name.lowercase() == product }
             if (filtered.isNotEmpty()) {
                 val amount = filtered.first().amount
@@ -62,6 +68,11 @@ class GamePlayScreenImpl(
     }
 
     override fun onFailedPurchase(message: String) {
+        android.logEvent(
+            AnalyticsEvents.PURCHASE_FAILED,
+            gameModel,
+            mapOf(AnalyticsEventsParams.ERROR_MESSAGE to message)
+        )
         gamePlayScreenView.displayFailedPurchase(message)
     }
 
@@ -80,6 +91,11 @@ class GamePlayScreenImpl(
             this
         )
         gameLogicHandler.beginGame(gameModel)
+        android.logEvent(
+            AnalyticsEvents.NEW_GAME,
+            gameModel,
+            mapOf(AnalyticsEventsParams.DIFFICULTY to gameModel.selectedDifficulty.displayName),
+        )
         gamePlayScreenView = createGamePlayScreenView()
         gamePlayScreenView.onShow()
         android.loadBannerAd()
@@ -138,6 +154,11 @@ class GamePlayScreenImpl(
     }
 
     override fun onPackPurchaseButtonClicked(selectedProduct: Product) {
+        android.logEvent(
+            AnalyticsEvents.CLICKED_PACK_BUTTON,
+            gameModel,
+            mapOf(AnalyticsEventsParams.PACK_NAME to selectedProduct.name)
+        )
         android.launchBillingFlow(selectedProduct)
     }
 
@@ -171,6 +192,7 @@ class GamePlayScreenImpl(
 
     override fun onShowVideoAdClicked(onAdCompleted: () -> Unit, onAdDismissed: () -> Unit) {
         Gdx.app.postRunnable {
+            android.logEvent(AnalyticsEvents.CLICKED_REWARD_BUTTON, gameModel)
             globalHandlers.androidInterface.displayRewardedAd(onAdCompleted, onAdDismissed)
         }
     }
@@ -187,20 +209,38 @@ class GamePlayScreenImpl(
         gamePlayScreenView.onFailedToRevealWordOnGameOver()
     }
 
+    override fun onBuyCoinsButtonClicked() {
+        android.logEvent(AnalyticsEvents.CLICKED_COINS_BUTTON, gameModel)
+    }
+
     override fun onIncorrectGuess(gameOver: Boolean) {
+        if (gameOver) {
+            android.logEvent(
+                AnalyticsEvents.GAME_OVER,
+                gameModel,
+                mapOf(AnalyticsEventsParams.SCORE to gameModel.score.toString())
+            )
+        }
         gamePlayScreenView.onIncorrectGuess(gameOver)
     }
 
     override fun onCorrectGuess(
         indices: List<Int>,
-        gameWin: Boolean,
+        roundWin: Boolean,
         coinsAmount: Int,
         perfectBonusAchieved: Boolean,
         prevScore: Long
     ) {
+        if (roundWin) {
+            android.logEvent(
+                AnalyticsEvents.ROUND_WIN,
+                gameModel,
+                mapOf(AnalyticsEventsParams.SCORE to gameModel.score.toString()),
+            )
+        }
         gamePlayScreenView.onCorrectGuess(
             indices,
-            gameWin,
+            roundWin,
             coinsAmount,
             perfectBonusAchieved,
             prevScore

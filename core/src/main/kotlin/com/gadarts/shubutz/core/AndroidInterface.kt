@@ -1,6 +1,7 @@
 package com.gadarts.shubutz.core
 
 import com.gadarts.shubutz.core.model.Difficulties
+import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
 
@@ -29,5 +30,6 @@ interface AndroidInterface {
     fun fetchChampion(difficulty: Difficulties, callback: OnChampionFetched)
     fun isConnected(): Boolean
     fun logCrashlytics(message: String)
-    fun login(): Boolean
+    fun login()
+    fun logEvent(event: String, gameModel: GameModel?, params: Map<String, String>? = null)
 }

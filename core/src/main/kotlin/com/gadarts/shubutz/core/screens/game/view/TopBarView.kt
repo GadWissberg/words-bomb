@@ -222,6 +222,7 @@ class TopBarView(
             coinsButton,
             globalHandlers.assetsManager
         ) {
+            gamePlayScreen.onBuyCoinsButtonClicked()
             globalHandlers.dialogsHandler.openBuyCoinsDialog(gamePlayScreen)
         }
         return coinsButton

@@ -146,14 +146,13 @@ class MenuScreenView(
         val clickListener = object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 super.clicked(event, x, y)
-                val success = globalHandlers.androidInterface.login()
-                if (success) {
-                    Timer.schedule(object : Task() {
-                        override fun run() {
-                            menuScreen.restart()
-                        }
-                    }, 1F)
-                }
+                globalHandlers.androidInterface.login()
+                menuScreen.onLoginClick()
+                Timer.schedule(object : Task() {
+                    override fun run() {
+                        menuScreen.restart()
+                    }
+                }, 1F)
             }
         }
         loginButton.addListener(clickListener)

@@ -2,6 +2,7 @@ package com.gadarts.shubutz.core.screens.menu
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.gadarts.shubutz.core.AnalyticsEvents
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.model.Difficulties
@@ -77,6 +78,10 @@ class MenuScreenImpl(
 
     override fun restart() {
         gameLifeCycleManager.restart()
+    }
+
+    override fun onLoginClick() {
+        androidInterface.logEvent(AnalyticsEvents.CLICKED_LOGIN_BUTTON, null)
     }
 
     fun onGameReady() {

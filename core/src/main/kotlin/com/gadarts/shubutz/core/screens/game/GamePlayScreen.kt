@@ -18,7 +18,7 @@ interface GamePlayScreen {
     fun onIncorrectGuess(gameOver: Boolean)
     fun onCorrectGuess(
         indices: List<Int>,
-        gameWin: Boolean,
+        roundWin: Boolean,
         coinsAmount: Int,
         perfectBonusAchieved: Boolean,
         prevScore: Long,
@@ -30,5 +30,6 @@ interface GamePlayScreen {
     fun onClickedToRevealWordOnGameOver()
     fun onRevealedWordOnGameOver(cost: Int)
     fun onFailedToRevealWordOnGameOver()
+    fun onBuyCoinsButtonClicked()
 
 }

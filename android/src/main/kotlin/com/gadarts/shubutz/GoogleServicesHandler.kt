@@ -6,6 +6,8 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
+import com.gadarts.shubutz.core.AnalyticsEvents
+import com.gadarts.shubutz.core.AnalyticsEventsParams
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
 import com.gadarts.shubutz.core.model.Difficulties
@@ -20,7 +22,8 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.logEvent
 import de.golfgl.gdxgamesvcs.GameServiceException
 import de.golfgl.gdxgamesvcs.GpgsClient
 import de.golfgl.gdxgamesvcs.IGameServiceListener
@@ -33,11 +36,18 @@ class GoogleServicesHandler {
     private lateinit var loadedAd: RewardedAd
     private lateinit var purchaseHandler: PurchaseHandler
 
-    fun onCreate(game: ShubutzGame, context: AndroidApplication) {
+    fun onCreate(
+        game: ShubutzGame,
+        context: AndroidApplication,
+        firebaseAnalytics: FirebaseAnalytics
+    ) {
         purchaseHandler = PurchaseHandler(game, context)
         gsClient = GpgsClient().initialize(context, false)
         gsClient.setListener(object : IGameServiceListener {
             override fun gsOnSessionActive() {
+                firebaseAnalytics.logEvent(AnalyticsEvents.LOGGED_IN) {
+                    param(AnalyticsEventsParams.PLAYER_NAME, gsClient.playerDisplayName)
+                }
             }
 
             override fun gsOnSessionInactive() {
@@ -48,7 +58,7 @@ class GoogleServicesHandler {
                 msg: String?,
                 t: Throwable?
             ) {
-                logGameServicesError(context, et, msg, t)
+                logGameServicesError(context, et, msg, t, firebaseAnalytics)
             }
 
         })
@@ -201,7 +211,8 @@ class GoogleServicesHandler {
         context: AndroidApplication,
         et: IGameServiceListener.GsErrorType?,
         msg: String?,
-        t: Throwable?
+        t: Throwable?,
+        firebaseAnalytics: FirebaseAnalytics
     ) {
         Toast.makeText(context, "התחברות נכשלה", Toast.LENGTH_LONG).show()
         val error =
@@ -210,7 +221,11 @@ class GoogleServicesHandler {
             GoogleServicesHandler::javaClass.name,
             error
         )
-        FirebaseCrashlytics.getInstance().log(error)
+        firebaseAnalytics.logEvent(AnalyticsEvents.LOG_IN_FAILED) {
+            param(AnalyticsEventsParams.PLAYER_NAME, gsClient.playerDisplayName)
+            param(AnalyticsEventsParams.ERROR_TYPE, et.toString())
+            param(AnalyticsEventsParams.ERROR_MESSAGE, msg.toString())
+        }
     }
 
 
@@ -225,6 +240,10 @@ class GoogleServicesHandler {
         } catch (_: Exception) {
         }
         return result
+    }
+
+    fun getPlayerName(): String? {
+        return gsClient.playerDisplayName
     }
 
     companion object {
