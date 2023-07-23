@@ -16,17 +16,20 @@ class ScoreView(
     androidInterface: AndroidInterface
 ) : Table() {
 
-    private val label =
+    private val scoreValueLabel =
         GameLabel(0.toString(), Label.LabelStyle(font, Color.WHITE), androidInterface)
+    private val scoreHeaderLabel =
+        GameLabel(LABEL_SCORE.reversed(), Label.LabelStyle(font, Color.WHITE), androidInterface)
 
     init {
         background = TextureRegionDrawable(texture)
-        add(label).pad(LABEL_PADDING_TOP, 0F, 0F, 0F)
+        add(scoreValueLabel).pad(LABEL_PADDING_TOP, 0F, 0F, 0F).row()
+        add(scoreHeaderLabel)
         pack()
     }
 
     private fun updateLabel(score: Long) {
-        label.setText(score.toString())
+        scoreValueLabel.setText(score.toString())
     }
 
     fun onGameWin(score: Long, prevScore: Long) {
@@ -44,7 +47,8 @@ class ScoreView(
     }
 
     companion object {
-        private const val LABEL_PADDING_TOP = 70F
+        private const val LABEL_PADDING_TOP = 170F
         private const val WIN_SIZE_FACTOR = 1.05F
+        private const val LABEL_SCORE = "ניקוד"
     }
 }

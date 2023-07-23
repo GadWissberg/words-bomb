@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Interpolation
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
@@ -25,7 +26,7 @@ class ChampionsView(
     highscoresIconTexture: Texture,
     loadingAtlas: TextureAtlas
 ) : Table() {
-    private var currentDisplayed = Difficulties.values().first()
+    private var currentDisplayed = randomDifficulty()
     private lateinit var scoreLabel: Label
     private lateinit var nameLabel: Label
     private lateinit var headerLabel: Label
@@ -91,15 +92,18 @@ class ChampionsView(
                     Actions.delay(INTERVAL),
                     Actions.fadeOut(1F, Interpolation.smooth2),
                     Actions.run {
-                        currentDisplayed =
-                            Difficulties.values()[(Difficulties.values()
-                                .indexOf(Difficulties.valueOf(currentDisplayed.name)) + 1) % (champions.size)]
+                        currentDisplayed = randomDifficulty()
                         displayCurrent(labelsTable, leftCup, rightCup)
                     },
                     Actions.fadeIn(1F, Interpolation.smooth2)
                 )
             )
         )
+    }
+
+    private fun randomDifficulty(): Difficulties {
+        val difficulties = Difficulties.values()
+        return difficulties[MathUtils.random(difficulties.size - 1)]
     }
 
 

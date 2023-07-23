@@ -454,7 +454,7 @@ class GamePlayScreenViewComponentsManager(
         const val REVEAL_BUTTON_POSITION_X = 800F
         const val REVEAL_BUTTON_POSITION_Y = 1112F
         const val SCORE_VIEW_POSITION_X = 850F
-        const val SCORE_VIEW_POSITION_Y = 1700F
+        const val SCORE_VIEW_POSITION_Y = 1600F
         val REVEAL_BUTTON_LABEL = "גלה אות".reversed()
     }
 }

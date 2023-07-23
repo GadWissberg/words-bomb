@@ -266,7 +266,6 @@ class GamePlayScreenImpl(
                             openAnotherGameDialog()
                         }
                     } else {
-                        globalHandlers.androidInterface.displayLeaderboard(gameModel.selectedDifficulty.leaderboardsId)
                         openAnotherGameDialog()
                     }
                 }
