@@ -169,7 +169,7 @@ class MainMenuScreenButtons(
     }
 
 
-    fun onLoadingAnimationDone() {
+    fun addSpecialButtons() {
         addSoundButton()
         addHelpButton()
     }

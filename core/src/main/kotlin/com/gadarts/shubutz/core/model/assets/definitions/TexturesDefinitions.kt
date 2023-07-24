@@ -42,6 +42,8 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     FLASH,
     BUTTON_CIRCLE_UP,
     BUTTON_CIRCLE_DOWN,
+    BUTTON_ARROW_UP,
+    BUTTON_ARROW_DOWN,
     KIDS,
     GPT,
     PERFECT,

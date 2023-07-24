@@ -90,7 +90,7 @@ class MenuScreenView(
             globalHandlers.soundPlayer
         )
         Gdx.app.postRunnable {
-            mainMenuScreenButtons.onLoadingAnimationDone()
+            mainMenuScreenButtons.addSpecialButtons()
             addMainMenuTable(beginGameAction)
             addDifficultySelectionTable(beginGameAction)
             versionLabel = GameLabel(
@@ -128,7 +128,9 @@ class MenuScreenView(
                     globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_35),
                     globalHandlers.androidInterface,
                     globalHandlers.assetsManager.getTexture(TexturesDefinitions.ICON_HIGHSCORES),
-                    globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING)
+                    globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING),
+                    globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_ARROW_UP),
+                    globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_ARROW_DOWN)
                 )
             ).pad(CHAMPIONS_VIEW_PADDING).expandX().center()
         } else {

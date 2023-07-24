@@ -8,11 +8,15 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
+import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.ShubutzGame.Companion.lastChampionsFetch
@@ -24,8 +28,15 @@ class ChampionsView(
     font: BitmapFont,
     private val androidInterface: AndroidInterface,
     highscoresIconTexture: Texture,
-    loadingAtlas: TextureAtlas
+    loadingAtlas: TextureAtlas,
+    buttonArrowTextureUp: Texture,
+    buttonArrowTextureDown: Texture
 ) : Table() {
+    private var rightCup: Image
+    private var leftCup: Image
+    private var stopAutoCycle: Boolean = false
+    private var rightArrow: Button
+    private var leftArrow: Button
     private var currentDisplayed = randomDifficulty()
     private lateinit var scoreLabel: Label
     private lateinit var nameLabel: Label
@@ -36,26 +47,84 @@ class ChampionsView(
         val loadingAnimation = LoadingAnimation(loadingAtlas.regions)
         stack.add(loadingAnimation)
         val viewTable = Table()
-        val leftCup = addCup(highscoresIconTexture, viewTable)
+        leftArrow =
+            addArrowButton(buttonArrowTextureUp, buttonArrowTextureDown, viewTable, stack, true)
+        leftCup = addCup(highscoresIconTexture, viewTable)
         val labelsTable = addLabels(font, viewTable)
-        val rightCup = addCup(highscoresIconTexture, viewTable)
+        rightCup = addCup(highscoresIconTexture, viewTable)
+        rightArrow = addArrowButton(
+            buttonArrowTextureUp,
+            buttonArrowTextureDown,
+            viewTable,
+            stack,
+        )
         stack.add(viewTable)
         add(stack)
         if (shouldUpdateCache()) {
-            lastChampionsFetch = TimeUtils.millis()
-            Difficulties.values().forEach {
-                androidInterface.fetchChampion(it, object : OnChampionFetched {
-                    override fun run(champion: Champion?) {
-                        if (parent != null && champion != null) {
-                            champions[it] = champion
-                            viewReady(loadingAnimation, labelsTable, leftCup, rightCup, stack)
-                        }
-                    }
-                })
-            }
+            updateView(loadingAnimation, labelsTable, leftCup, rightCup, stack)
         } else {
             viewReady(loadingAnimation, labelsTable, leftCup, rightCup, stack)
         }
+    }
+
+    private fun updateView(
+        loadingAnimation: LoadingAnimation,
+        labelsTable: Table,
+        leftCup: Image,
+        rightCup: Image,
+        stack: Stack
+    ) {
+        lastChampionsFetch = TimeUtils.millis()
+        Difficulties.values().forEach {
+            androidInterface.fetchChampion(it, object : OnChampionFetched {
+                override fun run(champion: Champion?) {
+                    if (parent != null && champion != null) {
+                        champions[it] = champion
+                        viewReady(loadingAnimation, labelsTable, leftCup, rightCup, stack)
+                    }
+                }
+            })
+        }
+    }
+
+    private fun addArrowButton(
+        arrowTexUp: Texture,
+        arrowTexDown: Texture,
+        viewTable: Table,
+        viewStack: Stack,
+        horizontalFlip: Boolean = false
+    ): Button {
+        val arrowButton =
+            Button(TextureRegionDrawable(arrowTexUp), TextureRegionDrawable(arrowTexDown))
+        arrowButton.isTransform = true
+        if (horizontalFlip) {
+            flipArrow(arrowButton, arrowTexUp)
+        }
+        arrowButton.isVisible = false
+        viewTable.add(arrowButton)
+        arrowButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                super.clicked(event, x, y)
+                if ((!stopAutoCycle && viewStack.hasActions()) || stopAutoCycle) {
+                    viewStack.clearActions()
+                    stopAutoCycle = true
+                    arrowButton.addAction(cycleDifficultySequence(Actions.run {
+                        currentDisplayed = Difficulties.values()[(Difficulties.values()
+                            .indexOf(Difficulties.valueOf(currentDisplayed.name)) + 1) % (champions.size)]
+                        displayCurrent(viewTable, leftCup, rightCup)
+                    }))
+                }
+            }
+        })
+        return arrowButton
+    }
+
+    private fun flipArrow(
+        arrowButton: Button,
+        arrowTexUp: Texture
+    ) {
+        arrowButton.setScale(-1F, 1F)
+        arrowButton.setOrigin(arrowTexUp.width.toFloat() / 2F, arrowButton.originY)
     }
 
     private fun shouldUpdateCache() =
@@ -66,7 +135,7 @@ class ChampionsView(
         labelsTable: Table,
         leftCup: Image,
         rightCup: Image,
-        stack: Stack
+        viewStack: Stack
     ) {
         if (champions.size == Difficulties.values().size) {
             loadingAnimation.remove()
@@ -75,31 +144,35 @@ class ChampionsView(
                 leftCup,
                 rightCup,
             )
-            beginCycle(stack, leftCup, rightCup, labelsTable)
+            beginCycle(viewStack, labelsTable)
         }
     }
 
     private fun beginCycle(
-        stack: Stack,
-        leftCup: Image,
-        rightCup: Image,
+        viewStack: Stack,
         labelsTable: Table
     ) {
-        stack.clearActions()
-        stack.addAction(
+        viewStack.clearActions()
+        viewStack.addAction(
             Actions.forever(
                 Actions.sequence(
                     Actions.delay(INTERVAL),
-                    Actions.fadeOut(1F, Interpolation.smooth2),
-                    Actions.run {
+                    cycleDifficultySequence(Actions.run {
                         currentDisplayed = randomDifficulty()
                         displayCurrent(labelsTable, leftCup, rightCup)
-                    },
-                    Actions.fadeIn(1F, Interpolation.smooth2)
+                    })
                 )
             )
         )
     }
+
+    private fun cycleDifficultySequence(
+        difficultySelection: RunnableAction,
+    ): SequenceAction? = Actions.sequence(
+        Actions.fadeOut(1F, Interpolation.smooth2),
+        difficultySelection,
+        Actions.fadeIn(1F, Interpolation.smooth2)
+    )
 
     private fun randomDifficulty(): Difficulties {
         val difficulties = Difficulties.values()
@@ -125,6 +198,8 @@ class ChampionsView(
         labelsTable.isVisible = true
         leftCup.isVisible = true
         rightCup.isVisible = true
+        rightArrow.isVisible = true
+        leftArrow.isVisible = true
         if (listeners.isEmpty) {
             addListener(object : ClickListener() {
                 override fun clicked(event: InputEvent?, x: Float, y: Float) {
