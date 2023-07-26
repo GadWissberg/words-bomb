@@ -184,10 +184,10 @@ class GameStage(
         val y = MathUtils.random(minY, maxY)
         cloud.setPosition(x, y)
         addActor(cloud)
-        animateCloud(cloud, screenWidth)
+        animateCloud(cloud)
     }
 
-    private fun animateCloud(cloud: Image, screenWidth: Float) {
+    private fun animateCloud(cloud: Image) {
         cloud.addAction(
             Actions.parallel(
                 Actions.forever(
@@ -209,7 +209,7 @@ class GameStage(
                 Actions.forever(
                     Actions.sequence(
                         Actions.moveTo(
-                            screenWidth - cloud.width,
+                            ShubutzGame.RESOLUTION_WIDTH.toFloat() - cloud.width,
                             cloud.y,
                             MathUtils.random(CLOUDS_MOVEMENT_DUR_MIN, CLOUDS_MOVEMENT_DUR_MAX),
                             Interpolation.bounceIn

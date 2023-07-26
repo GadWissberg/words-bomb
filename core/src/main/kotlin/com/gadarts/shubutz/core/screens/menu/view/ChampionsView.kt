@@ -1,6 +1,5 @@
 package com.gadarts.shubutz.core.screens.menu.view
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
@@ -12,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -21,7 +19,6 @@ import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.ShubutzGame.Companion.lastChampionsFetch
 import com.gadarts.shubutz.core.model.Difficulties
-import com.gadarts.shubutz.core.screens.game.view.GameLabel
 import com.gadarts.shubutz.core.screens.game.view.LoadingAnimation
 
 class ChampionsView(
@@ -34,13 +31,10 @@ class ChampionsView(
 ) : Table() {
     private var rightCup: Image
     private var leftCup: Image
-    private var stopAutoCycle: Boolean = false
     private var rightArrow: Button
     private var leftArrow: Button
     private var currentDisplayed = randomDifficulty()
-    private lateinit var scoreLabel: Label
-    private lateinit var nameLabel: Label
-    private lateinit var headerLabel: Label
+    private val labels = ChampionsViewLabels()
 
     init {
         val stack = Stack()
@@ -49,17 +43,12 @@ class ChampionsView(
         val viewTable = Table()
         leftArrow =
             addArrowButton(buttonArrowTextureUp, buttonArrowTextureDown, viewTable, stack, true)
-        leftCup = addCup(highscoresIconTexture, viewTable)
-        val labelsTable = addLabels(font, viewTable)
-        rightCup = addCup(highscoresIconTexture, viewTable)
-        rightArrow = addArrowButton(
-            buttonArrowTextureUp,
-            buttonArrowTextureDown,
-            viewTable,
-            stack,
-        )
-        stack.add(viewTable)
         add(stack)
+        leftCup = addCup(highscoresIconTexture, viewTable)
+        val labelsTable = labels.addLabels(font, viewTable, androidInterface)
+        rightCup = addCup(highscoresIconTexture, viewTable)
+        rightArrow = addArrowButton(buttonArrowTextureUp, buttonArrowTextureDown, viewTable, stack)
+        stack.add(viewTable)
         if (shouldUpdateCache()) {
             updateView(loadingAnimation, labelsTable, leftCup, rightCup, stack)
         } else {
@@ -90,7 +79,7 @@ class ChampionsView(
     private fun addArrowButton(
         arrowTexUp: Texture,
         arrowTexDown: Texture,
-        viewTable: Table,
+        labelsTable: Table,
         viewStack: Stack,
         horizontalFlip: Boolean = false
     ): Button {
@@ -101,19 +90,20 @@ class ChampionsView(
             flipArrow(arrowButton, arrowTexUp)
         }
         arrowButton.isVisible = false
-        viewTable.add(arrowButton)
+        add(arrowButton)
         arrowButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 super.clicked(event, x, y)
-                if ((!stopAutoCycle && viewStack.hasActions()) || stopAutoCycle) {
-                    viewStack.clearActions()
-                    stopAutoCycle = true
-                    arrowButton.addAction(cycleDifficultySequence(Actions.run {
-                        currentDisplayed = Difficulties.values()[(Difficulties.values()
-                            .indexOf(Difficulties.valueOf(currentDisplayed.name)) + 1) % (champions.size)]
-                        displayCurrent(viewTable, leftCup, rightCup)
-                    }))
-                }
+                viewStack.clearActions()
+                viewStack.color.a = 1F
+                val difficulties = Difficulties.values()
+                val indexOf = difficulties.indexOf(Difficulties.valueOf(currentDisplayed.name))
+                currentDisplayed = difficulties[if (horizontalFlip && indexOf == 0) {
+                    difficulties.size - 1
+                } else {
+                    (indexOf + (if (horizontalFlip) -1 else 1)) % (champions.size)
+                }]
+                displayCurrent(labelsTable, leftCup, rightCup)
             }
         })
         return arrowButton
@@ -188,20 +178,14 @@ class ChampionsView(
         if (!champions.containsKey(currentDisplayed)) return
 
         val champion = champions[currentDisplayed]
-        headerLabel.setText(
-            TEXT_HEADER.format(champion!!.difficulty.displayName).reversed()
-        )
-        nameLabel.setText(champion.name)
-        scoreLabel.setText(
-            TEXT_SCORE.format(champion.score.toString().reversed()).reversed()
-        )
+        labels.updateTexts(champion)
         labelsTable.isVisible = true
         leftCup.isVisible = true
         rightCup.isVisible = true
         rightArrow.isVisible = true
         leftArrow.isVisible = true
         if (listeners.isEmpty) {
-            addListener(object : ClickListener() {
+            labelsTable.addListener(object : ClickListener() {
                 override fun clicked(event: InputEvent?, x: Float, y: Float) {
                     super.clicked(event, x, y)
                     androidInterface.displayLeaderboard(currentDisplayed.leaderboardsId)
@@ -211,21 +195,6 @@ class ChampionsView(
         }
     }
 
-    private fun addLabels(font: BitmapFont, viewTable: Table): Table {
-        val labelsTable = Table()
-        val labelStyle = Label.LabelStyle(font, Color.WHITE)
-        headerLabel = GameLabel("רמה", labelStyle, androidInterface)
-        labelsTable.add(headerLabel).row()
-        nameLabel = GameLabel("שם", labelStyle, androidInterface)
-        labelsTable.add(nameLabel).row()
-        scoreLabel = GameLabel("10", labelStyle, androidInterface)
-        labelsTable.add(scoreLabel).row()
-        val fullTable = GameLabel(TEXT_CLICK_FOR_MORE.reversed(), labelStyle, androidInterface)
-        labelsTable.add(fullTable)
-        viewTable.add(labelsTable)
-        labelsTable.isVisible = false
-        return labelsTable
-    }
 
     private fun addCup(highscoresIconTexture: Texture, table: Table): Image {
         val cup = Image(highscoresIconTexture)
@@ -261,9 +230,6 @@ class ChampionsView(
     }
 
     companion object {
-        private const val TEXT_HEADER = "אלוף ברמת %s:"
-        private const val TEXT_SCORE = "עם %s נקודות!"
-        private const val TEXT_CLICK_FOR_MORE = "לחצו לטבלה המלאה..."
         private const val CUP_STEP_SIZE = 32F
         private const val INTERVAL = 5F
         private const val CACHE_TTL = 10 * 60 * 1000

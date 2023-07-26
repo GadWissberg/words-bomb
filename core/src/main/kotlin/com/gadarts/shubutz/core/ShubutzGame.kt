@@ -33,23 +33,6 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         android.initializeAds { gameReady() }
     }
 
-    private fun gameReady() {
-        if (screen == null) return
-
-        loadingDone = true
-        (screen as MenuScreenImpl).onGameReady()
-    }
-
-    private fun createStage(assetsManager: GameAssetManager) {
-        stage =
-            GameStage(
-                StretchViewport(RESOLUTION_WIDTH.toFloat(), RESOLUTION_HEIGHT.toFloat()),
-                assetsManager,
-            )
-        stage.setDebugInvisible(DebugSettings.SHOW_UI_BORDERS)
-        Gdx.input.inputProcessor = stage
-    }
-
     override fun setScreen(screen: Screen?) {
         stage.openDialogs.forEach { it.value.remove() }
         stage.openDialogs.clear()
@@ -58,12 +41,12 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         currentScreen?.dispose()
     }
 
-
     override fun dispose() {
         super.dispose()
         stage.dispose()
         globalHandlers.dispose()
     }
+
 
     override fun goToMenu() {
         if (getScreen() is MenuScreenImpl) return
@@ -104,6 +87,23 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         if (screen == null) return
 
         (screen as GameScreen).onRewardForVideoAd(rewardAmount)
+    }
+
+    private fun gameReady() {
+        if (screen == null) return
+
+        loadingDone = true
+        (screen as MenuScreenImpl).onGameReady()
+    }
+
+    private fun createStage(assetsManager: GameAssetManager) {
+        stage =
+            GameStage(
+                StretchViewport(RESOLUTION_WIDTH.toFloat(), RESOLUTION_HEIGHT.toFloat()),
+                assetsManager,
+            )
+        stage.setDebugInvisible(DebugSettings.SHOW_UI_BORDERS)
+        Gdx.input.inputProcessor = stage
     }
 
     private fun createGamePlayScreen(selectedDifficulty: Difficulties) =
