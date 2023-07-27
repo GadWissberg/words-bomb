@@ -171,15 +171,10 @@ class GamePlayScreenImpl(
     }
 
     override fun onQuitSession() {
-        var sent = false
         if (gameModel.score > 0) {
-            sent = android.submitScore(gameModel.score, gameModel.selectedDifficulty.leaderboardsId)
+            android.submitScore(gameModel.score, gameModel.selectedDifficulty.leaderboardsId)
         }
-        if (sent) {
-            android.displayLeaderboard(gameModel.selectedDifficulty.leaderboardsId)
-        } else {
-            lifeCycleManager.goToMenu()
-        }
+        lifeCycleManager.goToMenu()
     }
 
     override fun onLetterRevealFailedNotEnoughCoins() {
