@@ -9,7 +9,7 @@ import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.business.GameLogicHandler
-import com.gadarts.shubutz.core.model.Difficulties
+import com.gadarts.shubutz.core.model.GameModes
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
@@ -25,7 +25,7 @@ class GamePlayScreenImpl(
     private val lifeCycleManager: GameLifeCycleManager,
     private val android: AndroidInterface,
     private val stage: GameStage,
-    private val selectedDifficulty: Difficulties,
+    private val selectedDifficulty: GameModes,
 ) : GameScreen(), GamePlayScreen {
 
 
@@ -171,7 +171,7 @@ class GamePlayScreenImpl(
     }
 
     override fun onQuitSession() {
-        if (gameModel.score > 0) {
+        if (gameModel.score > 0 && gameModel.selectedDifficulty.leaderboardsId != null) {
             android.submitScore(gameModel.score, gameModel.selectedDifficulty.leaderboardsId)
         }
         lifeCycleManager.goToMenu()
@@ -247,16 +247,17 @@ class GamePlayScreenImpl(
             gameModel.selectedDifficulty,
             object : OnChampionFetched {
                 override fun run(champion: Champion?) {
-                    if (gameModel.score >= 0) {
+                    val hasLeaderboards = gameModel.selectedDifficulty.leaderboardsId != null
+                    if (gameModel.score >= 0 && hasLeaderboards) {
                         globalHandlers.androidInterface.submitScore(
                             gameModel.score,
-                            gameModel.selectedDifficulty.leaderboardsId
+                            gameModel.selectedDifficulty.leaderboardsId!!
                         )
                     }
-                    if (champion != null && champion.score < gameModel.score) {
+                    if (champion != null && champion.score < gameModel.score && hasLeaderboards) {
                         gamePlayScreenView.onChampion {
                             globalHandlers.androidInterface.displayLeaderboard(
-                                gameModel.selectedDifficulty.leaderboardsId
+                                gameModel.selectedDifficulty.leaderboardsId!!
                             )
                             openAnotherGameDialog()
                         }

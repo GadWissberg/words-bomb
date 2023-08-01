@@ -1,5 +1,5 @@
 package com.gadarts.shubutz.core.screens.menu.view
 
-import com.gadarts.shubutz.core.model.Difficulties
+import com.gadarts.shubutz.core.model.GameModes
 
-class Champion(val name: String, val score: Long, val difficulty: Difficulties)
+class Champion(val name: String, val score: Long, val gameMode: GameModes)
