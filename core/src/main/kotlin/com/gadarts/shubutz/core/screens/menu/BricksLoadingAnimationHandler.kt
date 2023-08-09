@@ -19,7 +19,7 @@ import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.view.GameLabel
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
 
-class LoadingAnimationHandler(private val androidInterface: AndroidInterface) {
+class BricksLoadingAnimationHandler(private val androidInterface: AndroidInterface) {
     var loadingAnimationFinished: Boolean = false
     private var brick1: MenuScreenView.BrickAnimation? = null
     private var brick2: MenuScreenView.BrickAnimation? = null
