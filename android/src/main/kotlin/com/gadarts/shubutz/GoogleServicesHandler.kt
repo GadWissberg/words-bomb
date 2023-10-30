@@ -158,9 +158,9 @@ class GoogleServicesHandler {
     }
 
     fun fetchChampion(difficulty: GameModes, callback: OnChampionFetched) {
-        if (difficulty.leaderboardsId == null) return callback.run(null)
+        val highscoresId = difficulty.getHighscoresId() ?: return callback.run(null)
 
-        val success = gsClient.fetchLeaderboardEntries(difficulty.leaderboardsId, 1, false) {
+        val success = gsClient.fetchLeaderboardEntries(highscoresId, 1, false) {
             if (it != null && !it.isEmpty) {
                 val first = it.first()
                 callback.run(
@@ -231,13 +231,13 @@ class GoogleServicesHandler {
     }
 
 
-    private fun tryToConvertEntry(first: ILeaderBoardEntry?, difficulty: GameModes): Champion? {
+    private fun tryToConvertEntry(first: ILeaderBoardEntry?, mode: GameModes): Champion? {
         var result: Champion? = null
         try {
             result = Champion(
                 first!!.userDisplayName,
                 first.formattedValue.toLong(),
-                difficulty
+                mode
             )
         } catch (_: Exception) {
         }

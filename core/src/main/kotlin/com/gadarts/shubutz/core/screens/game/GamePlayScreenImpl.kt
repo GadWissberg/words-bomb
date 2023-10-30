@@ -9,8 +9,8 @@ import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.business.GameLogicHandler
-import com.gadarts.shubutz.core.model.GameModes
 import com.gadarts.shubutz.core.model.GameModel
+import com.gadarts.shubutz.core.model.GameModes
 import com.gadarts.shubutz.core.model.InAppProducts
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.DISABLE_ADS_DUE_DATE
@@ -25,7 +25,7 @@ class GamePlayScreenImpl(
     private val lifeCycleManager: GameLifeCycleManager,
     private val android: AndroidInterface,
     private val stage: GameStage,
-    private val selectedDifficulty: GameModes,
+    private val selectedMode: GameModes,
 ) : GameScreen(), GamePlayScreen {
 
 
@@ -34,16 +34,17 @@ class GamePlayScreenImpl(
     private lateinit var gameLogicHandler: GameLogicHandler
     private lateinit var gamePlayScreenView: GamePlayScreenView
 
+    @Suppress("KotlinConstantConditions")
     private fun createGameModel(): GameModel {
         val coins: Int = if (DebugSettings.FORCE_NUMBER_OF_COINS >= 0) {
             DebugSettings.FORCE_NUMBER_OF_COINS
         } else {
             android.getSharedPreferencesIntValue(
-                selectedDifficulty.sharedPreferencesCoinsKey,
+                selectedMode.getSharedPrefCoinsKey(),
                 INITIAL_COINS_VALUE
             )
         }
-        return GameModel(coins, selectedDifficulty)
+        return GameModel(coins, selectedMode)
     }
 
     override fun onSuccessfulPurchase(products: MutableList<String>) {
@@ -86,7 +87,7 @@ class GamePlayScreenImpl(
 
     override fun show() {
         gameLogicHandler = GameLogicHandler(
-            globalHandlers.assetsManager.phrases[selectedDifficulty.phrasesFileName]!!,
+            globalHandlers.assetsManager.phrases[selectedMode.getContentFileName()]!!,
             android,
             this
         )
@@ -94,7 +95,7 @@ class GamePlayScreenImpl(
         android.logEvent(
             AnalyticsEvents.NEW_GAME,
             gameModel,
-            mapOf(AnalyticsEventsParams.DIFFICULTY to gameModel.selectedDifficulty.displayName),
+            mapOf(AnalyticsEventsParams.DIFFICULTY to gameModel.selectedMode.getModeDisplayName()),
         )
         gamePlayScreenView = createGamePlayScreenView()
         gamePlayScreenView.onShow()
@@ -171,8 +172,9 @@ class GamePlayScreenImpl(
     }
 
     override fun onQuitSession() {
-        if (gameModel.score > 0 && gameModel.selectedDifficulty.leaderboardsId != null) {
-            android.submitScore(gameModel.score, gameModel.selectedDifficulty.leaderboardsId)
+        val leaderboardsId = gameModel.selectedMode.getHighscoresId()
+        if (gameModel.score > 0 && leaderboardsId != null) {
+            android.submitScore(gameModel.score, leaderboardsId)
         }
         lifeCycleManager.goToMenu()
     }
@@ -244,20 +246,21 @@ class GamePlayScreenImpl(
 
     override fun onGameOverAnimationDone() {
         globalHandlers.androidInterface.fetchChampion(
-            gameModel.selectedDifficulty,
+            gameModel.selectedMode,
             object : OnChampionFetched {
                 override fun run(champion: Champion?) {
-                    val hasLeaderboards = gameModel.selectedDifficulty.leaderboardsId != null
+                    val leaderboardsId = gameModel.selectedMode.getHighscoresId()
+                    val hasLeaderboards = leaderboardsId != null
                     if (gameModel.score >= 0 && hasLeaderboards) {
                         globalHandlers.androidInterface.submitScore(
                             gameModel.score,
-                            gameModel.selectedDifficulty.leaderboardsId!!
+                            leaderboardsId!!
                         )
                     }
                     if (champion != null && champion.score < gameModel.score && hasLeaderboards) {
                         gamePlayScreenView.onChampion {
                             globalHandlers.androidInterface.displayLeaderboard(
-                                gameModel.selectedDifficulty.leaderboardsId!!
+                                leaderboardsId!!
                             )
                             openAnotherGameDialog()
                         }
@@ -271,8 +274,8 @@ class GamePlayScreenImpl(
     private fun openAnotherGameDialog() {
         globalHandlers.dialogsHandler.openDialog(
             header = ANOTHER_GAME_DIALOG_HEADER,
-            description = ANOTHER_GAME_DIALOG_DESCRIPTION.format(gameModel.selectedDifficulty.displayName),
-            onYes = { lifeCycleManager.goToPlayScreen(gameModel.selectedDifficulty) },
+            description = ANOTHER_GAME_DIALOG_DESCRIPTION.format(gameModel.selectedMode.getModeDisplayName()),
+            onYes = { lifeCycleManager.goToPlayScreen(gameModel.selectedMode) },
             onNo = { lifeCycleManager.goToMenu() },
             dialogName = ANOTHER_GAME_DIALOG_NAME
         )

@@ -20,8 +20,8 @@ import com.gadarts.shubutz.core.AnalyticsEventsParams
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
-import com.gadarts.shubutz.core.model.GameModes
 import com.gadarts.shubutz.core.model.GameModel
+import com.gadarts.shubutz.core.model.GameModes
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SHARED_PREFERENCES_DATA_NAME
@@ -164,15 +164,15 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         googleServicesHandler.displayLeaderboard(leaderboardsId)
     }
 
+    override fun fetchChampion(mode: GameModes, callback: OnChampionFetched) {
+        googleServicesHandler.fetchChampion(mode, callback)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_LEADERBOARD) {
             game.onLeaderboardClosed()
         }
-    }
-
-    override fun fetchChampion(difficulty: GameModes, callback: OnChampionFetched) {
-        googleServicesHandler.fetchChampion(difficulty, callback)
     }
 
     override fun isConnected(): Boolean {

@@ -15,8 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.ShubutzGame
-import com.gadarts.shubutz.core.model.GameModes
+import com.gadarts.shubutz.core.model.BombGameModes
 import com.gadarts.shubutz.core.model.GameModel
+import com.gadarts.shubutz.core.model.GameModes
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
@@ -54,7 +55,7 @@ class GamePlayScreenViewComponentsManager(
             TargetPhraseView(letterSize, font80, globalHandlers.soundPlayer, am)
         targetPhraseView.calculateMaxBricksPerLine(am)
         optionsView = OptionsView(stage, globalHandlers.soundPlayer, am, gameModel)
-        addRevealLetterButton(am, stage, gameModel.selectedDifficulty)
+        addRevealLetterButton(am, stage, gameModel.selectedMode)
         addScoreView()
     }
 
@@ -71,12 +72,12 @@ class GamePlayScreenViewComponentsManager(
     private fun addRevealLetterButton(
         assetsManager: GameAssetManager,
         stage: GameStage,
-        selectedDifficulty: GameModes,
+        selectedMode: GameModes,
     ) {
         val font = assetsManager.getFont(FontsDefinitions.VARELA_40)
         val up = assetsManager.getTexture(BUTTON_CIRCLE_UP)
         revealLetterButton = createRevealButton(up, assetsManager, font)
-        insertContentInRevealButton(revealLetterButton, up, assetsManager, font, selectedDifficulty)
+        insertContentInRevealButton(revealLetterButton, up, assetsManager, font, selectedMode)
         revealLetterButton.setPosition(REVEAL_BUTTON_POSITION_X, REVEAL_BUTTON_POSITION_Y)
         stage.addActor(revealLetterButton)
         revealLetterButton.addListener(object : ClickListener() {
@@ -114,7 +115,7 @@ class GamePlayScreenViewComponentsManager(
         up: Texture,
         assetsManager: GameAssetManager,
         font: BitmapFont,
-        selectedDifficulty: GameModes
+        selectedMode: GameModes
     ) {
         revealLetterButton.clearChildren()
         revealLetterButton.removeActor(revealLetterButton.image)
@@ -125,11 +126,11 @@ class GamePlayScreenViewComponentsManager(
         revealLetterButton.add(Image(eye)).size(eye.width.toFloat(), eye.height.toFloat()).row()
         val stack = Stack()
         val coin =
-            assetsManager.getTexture(if (selectedDifficulty != GameModes.KIDS) COIN else CANDY)
+            assetsManager.getTexture(if (selectedMode != BombGameModes.KIDS) COIN else CANDY)
         val labelStyle = LabelStyle(font, Color.WHITE)
         stack.add(Image(coin))
         val cost = GameLabel(
-            selectedDifficulty.revealLetterCost.toString(),
+            selectedMode.getRevealSingleLetterCost().toString(),
             labelStyle,
             globalHandlers.androidInterface
         )
@@ -189,7 +190,7 @@ class GamePlayScreenViewComponentsManager(
         stage: GameStage
     ) {
         val coinTexture =
-            globalHandlers.assetsManager.getTexture(if (gameModel.selectedDifficulty != GameModes.KIDS) COIN else CANDY)
+            globalHandlers.assetsManager.getTexture(if (gameModel.selectedMode != BombGameModes.KIDS) COIN else CANDY)
         val startPosition = bombView.bombComponent.localToStageCoordinates(Vector2())
         startPosition.x += bombView.bombComponent.width / 2F - coinTexture.width / 2F
         startPosition.y += bombView.bombComponent.width / 2F - coinTexture.width / 2F
@@ -198,7 +199,7 @@ class GamePlayScreenViewComponentsManager(
             stage,
             coinTexture,
             startPosition,
-            gameModel.selectedDifficulty.winWorth,
+            gameModel.selectedMode.getWinWorthCoins(),
             targetPosition
         )
     }
@@ -267,7 +268,7 @@ class GamePlayScreenViewComponentsManager(
     fun onIncorrectGuess(gameModel: GameModel) {
         bombView.onIncorrectGuess(gameModel)
         optionsView.onIncorrectGuess()
-        if (gameModel.helpAvailable && (gameModel.selectedDifficulty.tries - gameModel.triesLeft > 1) && !revealLetterButton.isVisible) {
+        if (gameModel.helpAvailable && (gameModel.selectedMode.getNumberOfTries() - gameModel.triesLeft > 1) && !revealLetterButton.isVisible) {
             revealLetterButton.addAction(
                 Actions.sequence(
                     Actions.visible(true),

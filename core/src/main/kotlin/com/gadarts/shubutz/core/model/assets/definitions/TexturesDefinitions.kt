@@ -45,7 +45,6 @@ enum class TexturesDefinitions(ninepatch: Boolean = false) : AssetDefinition<Tex
     BUTTON_ARROW_UP,
     BUTTON_ARROW_DOWN,
     KIDS,
-    GPT,
     PERFECT,
     SCORE,
     ICON_HIGHSCORES,
