@@ -13,9 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
@@ -33,9 +33,8 @@ import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.game.view.GameLabel
-import com.gadarts.shubutz.core.screens.game.view.LoadingAnimation
 import com.gadarts.shubutz.core.screens.menu.BeginGameAction
-import com.gadarts.shubutz.core.screens.menu.BricksLoadingAnimationHandler
+import com.gadarts.shubutz.core.screens.menu.LoadingAnimationHandler
 import com.gadarts.shubutz.core.screens.menu.MenuScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
@@ -51,7 +50,7 @@ class MenuScreenView(
     private var gptTable = Table()
     private lateinit var logoTable: Table
     private var versionLabel: GameLabel? = null
-    var loadingAnimationRenderer = BricksLoadingAnimationHandler(globalHandlers.androidInterface)
+    var loadingAnimationRenderer = LoadingAnimationHandler(globalHandlers.androidInterface)
 
     private val regularGameModes = listOf(
         GameModes.BEGINNER,
@@ -315,27 +314,7 @@ class MenuScreenView(
 
     private fun addGptTable() {
         initMenuTable(gptTable)
-        val gptContentTable = Table()
-        initMenuTable(gptContentTable)
-        addMenuLabel(gptContentTable, LABEL_GPT_ENTER)
-        addTextField(gptContentTable)
-        val keyFrames = globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING).regions
-        val loadingAnimation = LoadingAnimation(keyFrames)
-        loadingAnimation.isVisible = false
-        addButton(
-            gptContentTable,
-            LABEL_GPT_BEGIN_GAME,
-            160,
-            globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_40),
-        ) {
-            loadingAnimation.isVisible = true
-        }
-        addBackButton(gptContentTable)
-        val stack = Stack(gptContentTable, loadingAnimation)
-        gptTable.add(stack)
-    }
-
-    private fun addTextField(gptContentTable: Table) {
+        addMenuLabel(gptTable, LABEL_GPT_ENTER)
         val textField = GameTextField(createTextFieldStyle())
         textField.alignment = Align.center
         textField.setTextFieldListener { _, c ->
@@ -346,11 +325,12 @@ class MenuScreenView(
             }
             textField.refreshHebrew()
         }
-        gptContentTable.add(textField)
+        gptTable.add(textField)
             .expandX()
             .width(stage.width - GPT_TEXT_FIELD_PADDING * 2F)
             .pad(GPT_TEXT_FIELD_PADDING)
             .row()
+        addBackButton(gptTable)
     }
 
     private fun createTextFieldStyle() = TextField.TextFieldStyle(
@@ -494,15 +474,14 @@ class MenuScreenView(
         private const val LABEL_DIFFICULTY_SELECT = "בחרו רמת קושי:"
         private const val LABEL_GPT_ENTER = "הקישו כל קטגוריה:"
         private const val LABEL_LOGIN = "להשתתפות בטבלת האלופים\nהתחברו כאן!"
-        private const val LABEL_BACK = "חזרה"
-        private const val LABEL_BEGIN_GAME = "משחק חדש"
-        private const val LABEL_GPT_BEGIN_GAME = "התחל"
         private const val LOGO_PADDING_TOP = 300F
         private const val LOGO_PADDING_BOTTOM = 75F
         private const val CHAMPIONS_VIEW_PADDING = 64F
         private const val ROUND_BUTTON_PADDING_HOR = 30F
         private const val ROUND_BUTTON_PADDING_VER = 60F
         private const val FADE_ANIMATION_DURATION = 0.3F
+        private const val LABEL_BACK = "חזרה"
+        private const val LABEL_BEGIN_GAME = "משחק חדש"
         private const val GPT_TEXT_FIELD_PADDING = 40F
         private val hebrewRegex = Regex("[א-ת ]+")
 
