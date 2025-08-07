@@ -2,31 +2,21 @@ package com.gadarts.shubutz.core.screens.menu.view
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.NinePatch
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextField
-import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Timer
 import com.badlogic.gdx.utils.Timer.Task
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GeneralUtils
-import com.gadarts.shubutz.core.model.GameModes
-import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 import com.gadarts.shubutz.core.model.assets.definitions.AtlasesDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
@@ -47,200 +37,12 @@ class MenuScreenView(
 
     private var mainMenuTable = Table()
     private var difficultySelectionTable = Table()
-    private var gptTable = Table()
+    private var mainMenuScreenButtons =
+        MainMenuScreenButtons(mainMenuTable, difficultySelectionTable, globalHandlers)
     private lateinit var logoTable: Table
     private var versionLabel: GameLabel? = null
     var loadingAnimationRenderer = LoadingAnimationHandler(globalHandlers.androidInterface)
 
-    private val regularGameModes = listOf(
-        GameModes.BEGINNER,
-        GameModes.INTERMEDIATE,
-        GameModes.ADVANCED,
-        GameModes.EXPERT
-    )
-    private var soundButton: ImageButton? = null
-    private var helpButton: ImageButton? = null
-    private fun addRoundButton(
-        up: TexturesDefinitions,
-        x: Float,
-        y: Float,
-        clickListener: ClickListener,
-        checked: TexturesDefinitions? = null,
-    ): ImageButton {
-        val imageButton = createButton(up, checked)
-        imageButton.setPosition(x, y)
-        imageButton.addListener(clickListener)
-        globalHandlers.stage.addActor(imageButton)
-        return imageButton
-    }
-
-    private fun soundToggle(globalHandlers: GlobalHandlers) {
-        globalHandlers.soundPlayer.enabled = !globalHandlers.soundPlayer.enabled
-        globalHandlers.soundPlayer.playSound(globalHandlers.assetsManager.getSound(SoundsDefinitions.BUTTON))
-        globalHandlers.androidInterface.saveSharedPreferencesBooleanValue(
-            SharedPreferencesKeys.SOUND_ENABLED,
-            globalHandlers.soundPlayer.enabled
-        )
-    }
-
-    private fun createButton(
-        imageUp: TexturesDefinitions,
-        imageChecked: TexturesDefinitions? = null
-    ): ImageButton {
-        val texture = globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_UP)
-        val style = ImageButton.ImageButtonStyle(
-            TextureRegionDrawable(texture),
-            TextureRegionDrawable(globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_DOWN)),
-            null,
-            TextureRegionDrawable(globalHandlers.assetsManager.getTexture(imageUp)),
-            null,
-            if (imageChecked != null) TextureRegionDrawable(
-                globalHandlers.assetsManager.getTexture(
-                    imageChecked
-                )
-            ) else null,
-        )
-        return ImageButton(style)
-    }
-
-    private fun fadeInTable(table: Table) {
-        table.addAction(
-            Actions.sequence(
-                Actions.alpha(0F),
-                Actions.run { table.isVisible = true },
-                Actions.fadeIn(FADE_ANIMATION_DURATION)
-            )
-        )
-    }
-
-    private fun fadeOutTable(table: Table) {
-        table.addAction(
-            Actions.sequence(
-                Actions.fadeOut(FADE_ANIMATION_DURATION),
-                Actions.run { table.isVisible = false })
-        )
-    }
-
-    private fun addButton(
-        table: Table,
-        label: String? = null,
-        topPadding: Int = GameStage.BUTTON_PADDING,
-        font: BitmapFont = globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
-        scale: Float = 1F,
-        image: Texture? = null,
-        onClick: Runnable
-    ) {
-        globalHandlers.stage.addButton(
-            table,
-            object : ClickListener() {
-                override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                    super.clicked(event, x, y)
-                    onClick.run()
-                    globalHandlers.soundPlayer.playSound(
-                        globalHandlers.assetsManager.getSound(
-                            SoundsDefinitions.BUTTON
-                        )
-                    )
-                }
-            },
-            label?.reversed(),
-            span = 2,
-            up = globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_UP),
-            down = globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_DOWN),
-            bitmapFont = font,
-            topPadding = topPadding,
-            scale = scale,
-            image = image
-        )
-    }
-
-    private fun addSoundButton() {
-        val imageButton = addRoundButton(
-            TexturesDefinitions.ICON_SOUND_OFF,
-            globalHandlers.stage.width - globalHandlers.assetsManager.getTexture(TexturesDefinitions.BUTTON_CIRCLE_UP).width - ROUND_BUTTON_PADDING_HOR,
-            ROUND_BUTTON_PADDING_VER,
-            object : ClickListener() {
-                override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                    super.clicked(event, x, y)
-                    soundToggle(globalHandlers)
-                }
-            },
-            TexturesDefinitions.ICON_SOUND_ON,
-        )
-        imageButton.isChecked = globalHandlers.soundPlayer.enabled
-        soundButton = imageButton
-    }
-
-    private fun addHelpButton() {
-        helpButton = addRoundButton(TexturesDefinitions.ICON_HELP,
-            ROUND_BUTTON_PADDING_HOR,
-            ROUND_BUTTON_PADDING_VER,
-            object : ClickListener() {
-                override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                    super.clicked(event, x, y)
-                    globalHandlers.dialogsHandler.openHelpDialog()
-                }
-            })
-    }
-
-    fun clear() {
-        soundButton?.remove()
-        helpButton?.remove()
-    }
-
-
-    private fun addBackButton(table: Table) {
-        addButton(
-            table,
-            LABEL_BACK,
-            160,
-            globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_40),
-            scale = 0.5F
-        ) {
-            fadeOutTable(table)
-            fadeInTable(mainMenuTable)
-        }
-    }
-
-
-    private fun addSpecialButtons() {
-        addSoundButton()
-        addHelpButton()
-    }
-
-    private fun fillMainMenuTable(beginGameAction: BeginGameAction) {
-        addButton(
-            table = mainMenuTable,
-            label = LABEL_BEGIN_GAME,
-            font = globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80)
-        ) {
-            fadeOutTable(mainMenuTable)
-            fadeInTable(difficultySelectionTable)
-        }
-        addButton(
-            table = mainMenuTable,
-            image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.KIDS)
-        ) {
-            beginGameAction.begin(GameModes.KIDS)
-        }
-        addButton(
-            table = mainMenuTable,
-            image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.GPT)
-        ) {
-            fadeOutTable(mainMenuTable)
-            fadeInTable(gptTable)
-        }
-    }
-
-    private fun fillDifficultySelectionTable(beginGameAction: BeginGameAction) {
-        GameModes.values().filter { regularGameModes.contains(it) }.forEach {
-            addButton(
-                difficultySelectionTable,
-                it.displayName,
-            ) { beginGameAction.begin(it) }
-        }
-        addBackButton(difficultySelectionTable)
-    }
 
     fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: BeginGameAction) {
         if (!loadingDone) {
@@ -259,14 +61,14 @@ class MenuScreenView(
     private fun addMainMenuTable(beginGameAction: BeginGameAction) {
         initMenuTable(mainMenuTable)
         addLogo()
-        fillMainMenuTable(beginGameAction)
+        mainMenuScreenButtons.fillMainMenuTable(beginGameAction)
         addChampionsView()
     }
 
-    private fun addMenuLabel(table: Table, text: String) {
-        table.add(
+    private fun addDifficultySelectionLabel() {
+        difficultySelectionTable.add(
             GameLabel(
-                text.reversed(),
+                LABEL_DIFFICULTY_SELECT.reversed(),
                 Label.LabelStyle(
                     globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80),
                     Color.WHITE
@@ -278,8 +80,8 @@ class MenuScreenView(
 
     private fun addDifficultySelectionTable(beginGameAction: BeginGameAction) {
         initMenuTable(difficultySelectionTable)
-        addMenuLabel(difficultySelectionTable, LABEL_DIFFICULTY_SELECT)
-        fillDifficultySelectionTable(beginGameAction)
+        addDifficultySelectionLabel()
+        mainMenuScreenButtons.fillDifficultySelectionTable(beginGameAction)
     }
 
     fun finishLoadingAnimationAndDisplayMenu(beginGameAction: BeginGameAction) {
@@ -288,10 +90,9 @@ class MenuScreenView(
             globalHandlers.soundPlayer
         )
         Gdx.app.postRunnable {
-            addSpecialButtons()
+            mainMenuScreenButtons.addSpecialButtons()
             addMainMenuTable(beginGameAction)
             addDifficultySelectionTable(beginGameAction)
-            addGptTable()
             versionLabel = GameLabel(
                 "v$versionName",
                 Label.LabelStyle(
@@ -301,50 +102,11 @@ class MenuScreenView(
                 globalHandlers.androidInterface
             )
             stage.addActor(versionLabel)
-            addMenuTable(true, mainMenuTable)
-            addMenuTable(false, difficultySelectionTable)
-            addMenuTable(false, gptTable)
+            stage.addActor(mainMenuTable)
+            difficultySelectionTable.isVisible = false
+            stage.addActor(difficultySelectionTable)
         }
     }
-
-    private fun addMenuTable(visible: Boolean, table: Table) {
-        stage.addActor(table)
-        table.isVisible = visible
-    }
-
-    private fun addGptTable() {
-        initMenuTable(gptTable)
-        addMenuLabel(gptTable, LABEL_GPT_ENTER)
-        val textField = GameTextField(createTextFieldStyle())
-        textField.alignment = Align.center
-        textField.setTextFieldListener { _, c ->
-            if (c != 8.toChar()) {
-                if (!c.toString().matches(hebrewRegex)) {
-                    textField.text = textField.text.filter { it.toString().matches(hebrewRegex) }
-                }
-            }
-            textField.refreshHebrew()
-        }
-        gptTable.add(textField)
-            .expandX()
-            .width(stage.width - GPT_TEXT_FIELD_PADDING * 2F)
-            .pad(GPT_TEXT_FIELD_PADDING)
-            .row()
-        addBackButton(gptTable)
-    }
-
-    private fun createTextFieldStyle() = TextField.TextFieldStyle(
-        globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_40),
-        Color.WHITE,
-        TextureRegionDrawable(globalHandlers.assetsManager.getTexture(TexturesDefinitions.TEXT_CURSOR)),
-        null,
-        NinePatchDrawable(
-            NinePatch(
-                globalHandlers.assetsManager.getTexture(TexturesDefinitions.POPUP_BUTTON_DOWN),
-                25, 25, 25, 25
-            )
-        )
-    )
 
     override fun dispose() {
 
@@ -354,7 +116,7 @@ class MenuScreenView(
         mainMenuTable.clear()
         mainMenuTable.remove()
         difficultySelectionTable.remove()
-        clear()
+        mainMenuScreenButtons.clear()
         versionLabel?.remove()
     }
 
@@ -471,20 +233,11 @@ class MenuScreenView(
     }
 
     companion object {
-        private const val LABEL_DIFFICULTY_SELECT = "בחרו רמת קושי:"
-        private const val LABEL_GPT_ENTER = "הקישו כל קטגוריה:"
+        private const val LABEL_DIFFICULTY_SELECT = "בחר רמת קושי:"
         private const val LABEL_LOGIN = "להשתתפות בטבלת האלופים\nהתחברו כאן!"
         private const val LOGO_PADDING_TOP = 300F
         private const val LOGO_PADDING_BOTTOM = 75F
         private const val CHAMPIONS_VIEW_PADDING = 64F
-        private const val ROUND_BUTTON_PADDING_HOR = 30F
-        private const val ROUND_BUTTON_PADDING_VER = 60F
-        private const val FADE_ANIMATION_DURATION = 0.3F
-        private const val LABEL_BACK = "חזרה"
-        private const val LABEL_BEGIN_GAME = "משחק חדש"
-        private const val GPT_TEXT_FIELD_PADDING = 40F
-        private val hebrewRegex = Regex("[א-ת ]+")
-
     }
 
 }
