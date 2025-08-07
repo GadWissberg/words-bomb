@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Queue
 import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.AndroidInterface
-import com.gadarts.shubutz.core.model.GameModes
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
@@ -67,7 +67,7 @@ class CoinsLabelHandler(private val androidInterface: AndroidInterface) {
         )
         table.add(coinsLabel).pad(0F, 0F, 0F, COINS_LABEL_PADDING_RIGHT)
         val icon =
-            if (gameModel.selectedDifficulty != GameModes.KIDS) TexturesDefinitions.COINS_ICON else TexturesDefinitions.CANDY
+            if (gameModel.selectedDifficulty != Difficulties.KIDS) TexturesDefinitions.COINS_ICON else TexturesDefinitions.CANDY
         coinsIcon = Image(assetsManager.getTexture(icon))
         table.add(coinsIcon)
             .size(

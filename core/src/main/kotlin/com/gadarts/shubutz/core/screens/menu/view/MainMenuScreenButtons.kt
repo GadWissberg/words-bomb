@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import com.gadarts.shubutz.core.model.GameModes
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
@@ -23,12 +23,6 @@ class MainMenuScreenButtons(
     private val globalHandlers: GlobalHandlers,
 ) {
 
-    private val regularGameModes = listOf(
-        GameModes.BEGINNER,
-        GameModes.INTERMEDIATE,
-        GameModes.ADVANCED,
-        GameModes.EXPERT
-    )
     private var soundButton: ImageButton? = null
     private var helpButton: ImageButton? = null
 
@@ -193,18 +187,12 @@ class MainMenuScreenButtons(
             table = mainMenuTable,
             image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.KIDS)
         ) {
-            beginGameAction.begin(GameModes.KIDS)
-        }
-        addButton(
-            table = mainMenuTable,
-            image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.GPT)
-        ) {
-            beginGameAction.begin(GameModes.KIDS)
+            beginGameAction.begin(Difficulties.KIDS)
         }
     }
 
     fun fillDifficultySelectionTable(beginGameAction: BeginGameAction) {
-        GameModes.values().filter { regularGameModes.contains(it) }.forEach {
+        Difficulties.values().filter { it != Difficulties.KIDS }.forEach {
             addButton(
                 difficultySelectionTable,
                 it.displayName,

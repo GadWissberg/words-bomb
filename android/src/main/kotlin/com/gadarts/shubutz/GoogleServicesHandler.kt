@@ -10,7 +10,7 @@ import com.gadarts.shubutz.core.AnalyticsEvents
 import com.gadarts.shubutz.core.AnalyticsEventsParams
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
-import com.gadarts.shubutz.core.model.GameModes
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.screens.menu.view.Champion
 import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
@@ -157,9 +157,7 @@ class GoogleServicesHandler {
         }
     }
 
-    fun fetchChampion(difficulty: GameModes, callback: OnChampionFetched) {
-        if (difficulty.leaderboardsId == null) return callback.run(null)
-
+    fun fetchChampion(difficulty: Difficulties, callback: OnChampionFetched) {
         val success = gsClient.fetchLeaderboardEntries(difficulty.leaderboardsId, 1, false) {
             if (it != null && !it.isEmpty) {
                 val first = it.first()
@@ -231,7 +229,7 @@ class GoogleServicesHandler {
     }
 
 
-    private fun tryToConvertEntry(first: ILeaderBoardEntry?, difficulty: GameModes): Champion? {
+    private fun tryToConvertEntry(first: ILeaderBoardEntry?, difficulty: Difficulties): Champion? {
         var result: Champion? = null
         try {
             result = Champion(

@@ -2,7 +2,7 @@ package com.gadarts.shubutz.core.model
 
 import com.gadarts.shubutz.core.DebugSettings
 
-class GameModel(var coins: Int, val selectedDifficulty: GameModes) {
+class GameModel(var coins: Int, val selectedDifficulty: Difficulties) {
 
     var helpAvailable: Boolean = true
     var triesLeft =

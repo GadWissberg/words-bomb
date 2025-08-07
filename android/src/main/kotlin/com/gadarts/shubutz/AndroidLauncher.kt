@@ -20,7 +20,7 @@ import com.gadarts.shubutz.core.AnalyticsEventsParams
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
-import com.gadarts.shubutz.core.model.GameModes
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
@@ -171,7 +171,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         }
     }
 
-    override fun fetchChampion(difficulty: GameModes, callback: OnChampionFetched) {
+    override fun fetchChampion(difficulty: Difficulties, callback: OnChampionFetched) {
         googleServicesHandler.fetchChampion(difficulty, callback)
     }
 

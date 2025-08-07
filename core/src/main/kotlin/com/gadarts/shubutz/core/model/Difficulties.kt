@@ -1,16 +1,16 @@
 package com.gadarts.shubutz.core.model
 
-enum class GameModes(
+enum class Difficulties(
     val displayName: String,
     val lettersToHideFactor: Float,
     val tries: Int,
     val winWorth: Int,
     val minimumLength: Int = 2,
-    val phrasesFileName: String? = "phrases",
+    val phrasesFileName: String = "phrases",
     val sharedPreferencesCoinsKey: String = "regular_coins",
     val revealLetterCost: Int = 9,
     val perfectBonusEnabled: Boolean = true,
-    val leaderboardsId: String? = null
+    val leaderboardsId: String
 ) {
 
 
@@ -55,13 +55,6 @@ enum class GameModes(
         sharedPreferencesCoinsKey = "kids_coins",
         revealLetterCost = 5,
         leaderboardsId = "CgkIwtDryJ4YEAIQBg"
-    ),
-    GPT(
-        displayName = "ChatGPT",
-        lettersToHideFactor = 0.6F,
-        tries = 8,
-        winWorth = 1,
-        phrasesFileName = null,
     );
 
 }

@@ -18,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.TimeUtils
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.ShubutzGame.Companion.lastChampionsFetch
-import com.gadarts.shubutz.core.model.GameModes
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.screens.game.view.LoadingAnimation
 
 class ChampionsView(
@@ -64,7 +64,7 @@ class ChampionsView(
         stack: Stack
     ) {
         lastChampionsFetch = TimeUtils.millis()
-        GameModes.values().forEach {
+        Difficulties.values().forEach {
             androidInterface.fetchChampion(it, object : OnChampionFetched {
                 override fun run(champion: Champion?) {
                     if (parent != null && champion != null) {
@@ -96,8 +96,8 @@ class ChampionsView(
                 super.clicked(event, x, y)
                 viewStack.clearActions()
                 viewStack.color.a = 1F
-                val difficulties = GameModes.values()
-                val indexOf = difficulties.indexOf(GameModes.valueOf(currentDisplayed.name))
+                val difficulties = Difficulties.values()
+                val indexOf = difficulties.indexOf(Difficulties.valueOf(currentDisplayed.name))
                 currentDisplayed = difficulties[if (horizontalFlip && indexOf == 0) {
                     difficulties.size - 1
                 } else {
@@ -118,7 +118,7 @@ class ChampionsView(
     }
 
     private fun shouldUpdateCache() =
-        champions.size < GameModes.values().size || TimeUtils.timeSinceMillis(lastChampionsFetch) >= CACHE_TTL
+        champions.size < Difficulties.values().size || TimeUtils.timeSinceMillis(lastChampionsFetch) >= CACHE_TTL
 
     private fun viewReady(
         loadingAnimation: LoadingAnimation,
@@ -127,7 +127,7 @@ class ChampionsView(
         rightCup: Image,
         viewStack: Stack
     ) {
-        if (champions.size == GameModes.values().filter { it.leaderboardsId != null }.size) {
+        if (champions.size == Difficulties.values().size) {
             loadingAnimation.remove()
             displayCurrent(
                 labelsTable,
@@ -164,8 +164,8 @@ class ChampionsView(
         Actions.fadeIn(1F, Interpolation.smooth2)
     )
 
-    private fun randomDifficulty(): GameModes {
-        val difficulties = GameModes.values()
+    private fun randomDifficulty(): Difficulties {
+        val difficulties = Difficulties.values()
         return difficulties[MathUtils.random(difficulties.size - 1)]
     }
 
@@ -188,7 +188,7 @@ class ChampionsView(
             labelsTable.addListener(object : ClickListener() {
                 override fun clicked(event: InputEvent?, x: Float, y: Float) {
                     super.clicked(event, x, y)
-                    currentDisplayed.leaderboardsId?.let { androidInterface.displayLeaderboard(it) }
+                    androidInterface.displayLeaderboard(currentDisplayed.leaderboardsId)
                 }
             }
             )
@@ -233,7 +233,7 @@ class ChampionsView(
         private const val CUP_STEP_SIZE = 32F
         private const val INTERVAL = 5F
         private const val CACHE_TTL = 10 * 60 * 1000
-        private val champions = HashMap<GameModes, Champion>()
+        private val champions = HashMap<Difficulties, Champion>()
     }
 }
 

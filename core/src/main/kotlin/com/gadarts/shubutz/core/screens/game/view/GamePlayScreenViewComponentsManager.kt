@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.ShubutzGame
-import com.gadarts.shubutz.core.model.GameModes
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
@@ -71,7 +71,7 @@ class GamePlayScreenViewComponentsManager(
     private fun addRevealLetterButton(
         assetsManager: GameAssetManager,
         stage: GameStage,
-        selectedDifficulty: GameModes,
+        selectedDifficulty: Difficulties,
     ) {
         val font = assetsManager.getFont(FontsDefinitions.VARELA_40)
         val up = assetsManager.getTexture(BUTTON_CIRCLE_UP)
@@ -114,7 +114,7 @@ class GamePlayScreenViewComponentsManager(
         up: Texture,
         assetsManager: GameAssetManager,
         font: BitmapFont,
-        selectedDifficulty: GameModes
+        selectedDifficulty: Difficulties
     ) {
         revealLetterButton.clearChildren()
         revealLetterButton.removeActor(revealLetterButton.image)
@@ -125,7 +125,7 @@ class GamePlayScreenViewComponentsManager(
         revealLetterButton.add(Image(eye)).size(eye.width.toFloat(), eye.height.toFloat()).row()
         val stack = Stack()
         val coin =
-            assetsManager.getTexture(if (selectedDifficulty != GameModes.KIDS) COIN else CANDY)
+            assetsManager.getTexture(if (selectedDifficulty != Difficulties.KIDS) COIN else CANDY)
         val labelStyle = LabelStyle(font, Color.WHITE)
         stack.add(Image(coin))
         val cost = GameLabel(
@@ -189,7 +189,7 @@ class GamePlayScreenViewComponentsManager(
         stage: GameStage
     ) {
         val coinTexture =
-            globalHandlers.assetsManager.getTexture(if (gameModel.selectedDifficulty != GameModes.KIDS) COIN else CANDY)
+            globalHandlers.assetsManager.getTexture(if (gameModel.selectedDifficulty != Difficulties.KIDS) COIN else CANDY)
         val startPosition = bombView.bombComponent.localToStageCoordinates(Vector2())
         startPosition.x += bombView.bombComponent.width / 2F - coinTexture.width / 2F
         startPosition.y += bombView.bombComponent.width / 2F - coinTexture.width / 2F

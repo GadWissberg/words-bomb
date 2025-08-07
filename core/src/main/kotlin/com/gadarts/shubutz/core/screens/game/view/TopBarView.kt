@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
-import com.gadarts.shubutz.core.model.GameModes
+import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
@@ -211,9 +211,9 @@ class TopBarView(
 
     private fun createBuyCoinsButton(): ImageButton {
         val up =
-            if (gameModel.selectedDifficulty != GameModes.KIDS) COINS_BUTTON_UP else CANDY_BUTTON_UP
+            if (gameModel.selectedDifficulty != Difficulties.KIDS) COINS_BUTTON_UP else CANDY_BUTTON_UP
         val down =
-            if (gameModel.selectedDifficulty != GameModes.KIDS) COINS_BUTTON_DOWN else CANDY_BUTTON_DOWN
+            if (gameModel.selectedDifficulty != Difficulties.KIDS) COINS_BUTTON_DOWN else CANDY_BUTTON_DOWN
         val coinsButton = ImageButton(
             TextureRegionDrawable(globalHandlers.assetsManager.getTexture(up)),
             TextureRegionDrawable(globalHandlers.assetsManager.getTexture(down))

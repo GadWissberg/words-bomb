@@ -1,12 +1,12 @@
 package com.gadarts.shubutz.core
 
-import com.gadarts.shubutz.core.model.GameModes
+import com.gadarts.shubutz.core.model.Difficulties
 
 interface GameLifeCycleManager {
     var loadingDone: Boolean
 
     fun goToMenu()
-    fun goToPlayScreen(selectedDifficulty: GameModes)
+    fun goToPlayScreen(selectedDifficulty: Difficulties)
     fun onSuccessfulPurchase(products: MutableList<String>)
     fun onFailedPurchase(message: String)
     fun onLeaderboardClosed()
