@@ -33,7 +33,7 @@ class ChampionsViewLabels {
         if (champion == null) return
 
         headerLabel?.setText(
-            TEXT_HEADER.format(champion.gameMode.getModeDisplayName()).reversed()
+            TEXT_HEADER.format(champion.gameMode.displayName).reversed()
         )
         nameLabel?.setText(champion.name)
         scoreLabel?.setText(

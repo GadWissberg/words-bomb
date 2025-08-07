@@ -5,8 +5,7 @@ import com.badlogic.gdx.Input
 import com.gadarts.shubutz.core.AnalyticsEvents
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.GameLifeCycleManager
-import com.gadarts.shubutz.core.model.BombGameModes
-import com.gadarts.shubutz.core.model.WordleGameModes
+import com.gadarts.shubutz.core.model.GameModes
 import com.gadarts.shubutz.core.screens.GameScreen
 import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.menu.view.MenuScreenView
@@ -92,12 +91,8 @@ class MenuScreenImpl(
     }
 
     private fun goToPlayScreenOnClick() = object : BeginGameAction {
-        override fun beginBombGame(selectedDifficulty: BombGameModes) {
+        override fun begin(selectedDifficulty: GameModes) {
             gameLifeCycleManager.goToPlayScreen(selectedDifficulty)
-        }
-
-        override fun beginWordleGame() {
-            gameLifeCycleManager.goToPlayScreen(WordleGameModes())
         }
     }
 

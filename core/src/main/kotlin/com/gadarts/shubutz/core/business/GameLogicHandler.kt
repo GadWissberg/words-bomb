@@ -24,19 +24,18 @@ class GameLogicHandler(
         unusedPhrases = phrases
         unusedPhrases.forEach {
             unusedPhrases[it.key] = ArrayList(it.value.filter { p ->
-                p.value.length >= gameModel.selectedMode.getPhraseMinimumLength()
+                p.value.length >= gameModel.selectedDifficulty.minimumLength
             })
         }
         beginRound(gameModel)
     }
 
-    @Suppress("KotlinConstantConditions")
     fun beginRound(gameModel: GameModel) {
         if (unusedPhrases.isEmpty()) {
             unusedPhrases = phrases
         }
         gameModel.triesLeft =
-            if (DebugSettings.NUMBER_OF_TRIES > 0) DebugSettings.NUMBER_OF_TRIES else gameModel.selectedMode.getNumberOfTries()
+            if (DebugSettings.NUMBER_OF_TRIES > 0) DebugSettings.NUMBER_OF_TRIES else gameModel.selectedDifficulty.tries
         chooseTarget(gameModel)
         decideHiddenLetters(gameModel)
         gameModel.options = allowedLetters.toMutableList()
@@ -66,7 +65,7 @@ class GameLogicHandler(
         var perfectBonus = false
         var scoreWin = 0
         if (gameWin) {
-            coinsAmount = gameModel.selectedMode.getWinWorthCoins()
+            coinsAmount = gameModel.selectedDifficulty.winWorth
             perfectBonus = isPerfectBonus(gameModel)
             coinsAmount += if (perfectBonus) max(coinsAmount / 2, 1) else 0
             scoreWin = if (perfectBonus) 2 else 1
@@ -78,7 +77,7 @@ class GameLogicHandler(
     }
 
     private fun isPerfectBonus(gameModel: GameModel): Boolean {
-        return gameModel.selectedMode.getPerfectBonusAllowed() && gameModel.selectedMode.getNumberOfTries() == gameModel.triesLeft
+        return gameModel.selectedDifficulty.perfectBonusEnabled && gameModel.selectedDifficulty.tries == gameModel.triesLeft
     }
 
     private fun addCoinsValueAndSave(
@@ -87,7 +86,7 @@ class GameLogicHandler(
     ) {
         gameModel.coins += coinsAmount
         androidInterface.saveSharedPreferencesIntValue(
-            gameModel.selectedMode.getSharedPrefCoinsKey(),
+            gameModel.selectedDifficulty.sharedPreferencesCoinsKey,
             gameModel.coins
         )
     }
@@ -113,7 +112,7 @@ class GameLogicHandler(
         }
         model.currentTargetData.hiddenLettersIndices = indices.shuffled()
             .toMutableList()
-            .drop((model.currentTargetData.currentPhrase.length - model.currentTargetData.currentPhrase.length * model.selectedMode.getHideFactor()).toInt())
+            .drop((model.currentTargetData.currentPhrase.length - model.currentTargetData.currentPhrase.length * model.selectedDifficulty.lettersToHideFactor).toInt())
             .toMutableList()
     }
 
@@ -123,7 +122,7 @@ class GameLogicHandler(
 
     fun onRevealLetterButtonClicked(gameModel: GameModel): Boolean {
         var result = false
-        if (gameModel.coins - gameModel.selectedMode.getRevealSingleLetterCost() >= 0) {
+        if (gameModel.coins - gameModel.selectedDifficulty.revealLetterCost >= 0) {
             if (gameModel.currentTargetData.hiddenLettersIndices.isNotEmpty()) {
                 revealLetter(gameModel)
                 result = true
@@ -135,14 +134,13 @@ class GameLogicHandler(
     }
 
     private fun revealLetter(gameModel: GameModel) {
-        val revealLetterCost = gameModel.selectedMode.getRevealSingleLetterCost()
-        addCoinsValueAndSave(gameModel, -revealLetterCost)
+        addCoinsValueAndSave(gameModel, -gameModel.selectedDifficulty.revealLetterCost)
         val letter =
             gameModel.currentTargetData.currentPhrase[gameModel.currentTargetData.hiddenLettersIndices.random()]
         gameModel.helpAvailable = false
         gamePlayScreen.onLetterRevealed(
             suffixLettersReverse[letter] ?: letter,
-            revealLetterCost
+            gameModel.selectedDifficulty.revealLetterCost
         )
     }
 

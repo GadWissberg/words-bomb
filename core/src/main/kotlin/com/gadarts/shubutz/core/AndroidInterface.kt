@@ -1,7 +1,7 @@
 package com.gadarts.shubutz.core
 
-import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.GameModes
+import com.gadarts.shubutz.core.model.GameModel
 import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
 
@@ -27,7 +27,7 @@ interface AndroidInterface {
     fun hideBannerAd()
     fun submitScore(score: Long, leaderboardsId: String): Boolean
     fun displayLeaderboard(leaderboardsId: String)
-    fun fetchChampion(mode: GameModes, callback: OnChampionFetched)
+    fun fetchChampion(difficulty: GameModes, callback: OnChampionFetched)
     fun isConnected(): Boolean
     fun logCrashlytics(message: String)
     fun login()

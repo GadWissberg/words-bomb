@@ -55,6 +55,10 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         setScreen(screen)
     }
 
+    override fun goToPlayScreen(selectedDifficulty: GameModes) {
+        setScreen(createGamePlayScreen(selectedDifficulty))
+    }
+
     override fun onSuccessfulPurchase(products: MutableList<String>) {
         if (screen == null) return
 
@@ -77,10 +81,6 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         screen?.dispose()
         val screen = MenuScreenImpl(globalHandlers, android, this, stage)
         setScreen(screen)
-    }
-
-    override fun goToPlayScreen(mode: GameModes) {
-        setScreen(createGamePlayScreen(mode))
     }
 
     fun onRewardForVideoAd(rewardAmount: Int) {
@@ -106,13 +106,13 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         Gdx.input.inputProcessor = stage
     }
 
-    private fun createGamePlayScreen(gameMode: GameModes) =
+    private fun createGamePlayScreen(selectedDifficulty: GameModes) =
         GamePlayScreenImpl(
             globalHandlers,
             this,
             this.android,
             stage,
-            gameMode,
+            selectedDifficulty,
         )
 
     companion object {

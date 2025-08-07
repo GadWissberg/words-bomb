@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -24,7 +25,7 @@ import com.badlogic.gdx.utils.Timer
 import com.badlogic.gdx.utils.Timer.Task
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GeneralUtils
-import com.gadarts.shubutz.core.model.BombGameModes
+import com.gadarts.shubutz.core.model.GameModes
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 import com.gadarts.shubutz.core.model.assets.definitions.AtlasesDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
@@ -32,6 +33,7 @@ import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.game.view.GameLabel
+import com.gadarts.shubutz.core.screens.game.view.LoadingAnimation
 import com.gadarts.shubutz.core.screens.menu.BeginGameAction
 import com.gadarts.shubutz.core.screens.menu.BricksLoadingAnimationHandler
 import com.gadarts.shubutz.core.screens.menu.MenuScreen
@@ -45,22 +47,20 @@ class MenuScreenView(
 ) : Disposable {
 
     private var mainMenuTable = Table()
-    private var bombMenuTable = Table()
     private var difficultySelectionTable = Table()
-    private var wordleMenuTable = Table()
+    private var gptTable = Table()
     private lateinit var logoTable: Table
     private var versionLabel: GameLabel? = null
     var loadingAnimationRenderer = BricksLoadingAnimationHandler(globalHandlers.androidInterface)
 
-    private val bombRegularBombGameModes = listOf(
-        BombGameModes.BEGINNER,
-        BombGameModes.INTERMEDIATE,
-        BombGameModes.ADVANCED,
-        BombGameModes.EXPERT
+    private val regularGameModes = listOf(
+        GameModes.BEGINNER,
+        GameModes.INTERMEDIATE,
+        GameModes.ADVANCED,
+        GameModes.EXPERT
     )
     private var soundButton: ImageButton? = null
     private var helpButton: ImageButton? = null
-
     private fun addRoundButton(
         up: TexturesDefinitions,
         x: Float,
@@ -190,16 +190,16 @@ class MenuScreenView(
     }
 
 
-    private fun addBackButton(currentTable: Table, destinationTable: Table) {
+    private fun addBackButton(table: Table) {
         addButton(
-            currentTable,
+            table,
             LABEL_BACK,
             160,
             globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_40),
             scale = 0.5F
         ) {
-            fadeOutTable(currentTable)
-            fadeInTable(destinationTable)
+            fadeOutTable(table)
+            fadeInTable(mainMenuTable)
         }
     }
 
@@ -209,33 +209,38 @@ class MenuScreenView(
         addHelpButton()
     }
 
-    private fun fillMainMenuTable() {
+    private fun fillMainMenuTable(beginGameAction: BeginGameAction) {
         addButton(
             table = mainMenuTable,
-            label = LABEL_BOMB_PLAY,
+            label = LABEL_BEGIN_GAME,
             font = globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80)
         ) {
             fadeOutTable(mainMenuTable)
-            fadeInTable(bombMenuTable)
+            fadeInTable(difficultySelectionTable)
         }
         addButton(
             table = mainMenuTable,
-            label = LABEL_WORDLE_PLAY,
-            font = globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80)
+            image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.KIDS)
+        ) {
+            beginGameAction.begin(GameModes.KIDS)
+        }
+        addButton(
+            table = mainMenuTable,
+            image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.GPT)
         ) {
             fadeOutTable(mainMenuTable)
-            fadeInTable(wordleMenuTable)
+            fadeInTable(gptTable)
         }
     }
 
     private fun fillDifficultySelectionTable(beginGameAction: BeginGameAction) {
-        BombGameModes.values().filter { bombRegularBombGameModes.contains(it) }.forEach {
+        GameModes.values().filter { regularGameModes.contains(it) }.forEach {
             addButton(
                 difficultySelectionTable,
                 it.displayName,
-            ) { beginGameAction.beginBombGame(it) }
+            ) { beginGameAction.begin(it) }
         }
-        addBackButton(difficultySelectionTable, bombMenuTable)
+        addBackButton(difficultySelectionTable)
     }
 
     fun onShow(loadingDone: Boolean, goToPlayScreenOnClick: BeginGameAction) {
@@ -252,10 +257,11 @@ class MenuScreenView(
         loadingAnimationRenderer.render(menuScreen)
     }
 
-    private fun addMainMenuTable() {
+    private fun addMainMenuTable(beginGameAction: BeginGameAction) {
         initMenuTable(mainMenuTable)
         addLogo()
-        fillMainMenuTable()
+        fillMainMenuTable(beginGameAction)
+        addChampionsView()
     }
 
     private fun addMenuLabel(table: Table, text: String) {
@@ -271,37 +277,22 @@ class MenuScreenView(
         ).pad(20F).row()
     }
 
-    private fun addBombDifficultySelectionTable(beginGameAction: BeginGameAction) {
+    private fun addDifficultySelectionTable(beginGameAction: BeginGameAction) {
         initMenuTable(difficultySelectionTable)
-        addMenuLabel(difficultySelectionTable, LABEL_BOMB_DIFFICULTY_SELECT)
+        addMenuLabel(difficultySelectionTable, LABEL_DIFFICULTY_SELECT)
         fillDifficultySelectionTable(beginGameAction)
     }
 
-    private fun addWordleTable(beginBombGameAction: BeginGameAction) {
-        initMenuTable(wordleMenuTable)
-        addMenuLabel(wordleMenuTable, LABEL_WORDLE_SELECT_MODE)
-        addButton(
-            wordleMenuTable,
-            LABEL_WORDLE_SINGLE,
-        ) { beginBombGameAction.beginWordleGame() }
-        addButton(
-            wordleMenuTable,
-            LABEL_WORDLE_MULTI,
-        ) { }
-        addBackButton(wordleMenuTable, mainMenuTable)
-    }
-
-    fun finishLoadingAnimationAndDisplayMenu(beginBombGameAction: BeginGameAction) {
+    fun finishLoadingAnimationAndDisplayMenu(beginGameAction: BeginGameAction) {
         loadingAnimationRenderer.flyOutBricks(
             globalHandlers.assetsManager.getSound(SoundsDefinitions.FLYBY),
             globalHandlers.soundPlayer
         )
         Gdx.app.postRunnable {
             addSpecialButtons()
-            addMainMenuTable()
-            addBombMenuTable(beginBombGameAction)
-            addBombDifficultySelectionTable(beginBombGameAction)
-            addWordleTable(beginBombGameAction)
+            addMainMenuTable(beginGameAction)
+            addDifficultySelectionTable(beginGameAction)
+            addGptTable()
             versionLabel = GameLabel(
                 "v$versionName",
                 Label.LabelStyle(
@@ -312,35 +303,36 @@ class MenuScreenView(
             )
             stage.addActor(versionLabel)
             addMenuTable(true, mainMenuTable)
-            addMenuTable(false, bombMenuTable)
-            addMenuTable(false, wordleMenuTable)
             addMenuTable(false, difficultySelectionTable)
+            addMenuTable(false, gptTable)
         }
-    }
-
-    private fun addBombMenuTable(beginGameAction: BeginGameAction) {
-        initMenuTable(bombMenuTable)
-        addButton(
-            table = bombMenuTable,
-            label = LABEL_BEGIN_GAME,
-            font = globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_80)
-        ) {
-            fadeOutTable(bombMenuTable)
-            fadeInTable(difficultySelectionTable)
-        }
-        addButton(
-            table = bombMenuTable,
-            image = globalHandlers.assetsManager.getTexture(TexturesDefinitions.KIDS)
-        ) {
-            beginGameAction.beginBombGame(BombGameModes.KIDS)
-        }
-        addBackButton(bombMenuTable, mainMenuTable)
-        addChampionsView()
     }
 
     private fun addMenuTable(visible: Boolean, table: Table) {
         stage.addActor(table)
         table.isVisible = visible
+    }
+
+    private fun addGptTable() {
+        initMenuTable(gptTable)
+        val gptContentTable = Table()
+        initMenuTable(gptContentTable)
+        addMenuLabel(gptContentTable, LABEL_GPT_ENTER)
+        addTextField(gptContentTable)
+        val keyFrames = globalHandlers.assetsManager.getAtlas(AtlasesDefinitions.LOADING).regions
+        val loadingAnimation = LoadingAnimation(keyFrames)
+        loadingAnimation.isVisible = false
+        addButton(
+            gptContentTable,
+            LABEL_GPT_BEGIN_GAME,
+            160,
+            globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_40),
+        ) {
+            loadingAnimation.isVisible = true
+        }
+        addBackButton(gptContentTable)
+        val stack = Stack(gptContentTable, loadingAnimation)
+        gptTable.add(stack)
     }
 
     private fun addTextField(gptContentTable: Table) {
@@ -379,8 +371,8 @@ class MenuScreenView(
     }
 
     fun clearScreen() {
-        bombMenuTable.clear()
-        bombMenuTable.remove()
+        mainMenuTable.clear()
+        mainMenuTable.remove()
         difficultySelectionTable.remove()
         clear()
         versionLabel?.remove()
@@ -389,7 +381,7 @@ class MenuScreenView(
 
     private fun addChampionsView() {
         if (globalHandlers.androidInterface.isConnected()) {
-            bombMenuTable.add(
+            mainMenuTable.add(
                 ChampionsView(
                     globalHandlers.assetsManager.getFont(FontsDefinitions.VARELA_35),
                     globalHandlers.androidInterface,
@@ -424,10 +416,10 @@ class MenuScreenView(
             }
         }
         loginButton.addListener(clickListener)
-        bombMenuTable.add(loginButton).pad(CHAMPIONS_VIEW_PADDING).expandX().center().row()
+        mainMenuTable.add(loginButton).pad(CHAMPIONS_VIEW_PADDING).expandX().center().row()
         label.setAlignment(Align.center)
         label.addListener(clickListener)
-        bombMenuTable.add(label)
+        mainMenuTable.add(label)
     }
 
     private fun initMenuTable(table: Table) {
@@ -499,15 +491,12 @@ class MenuScreenView(
     }
 
     companion object {
+        private const val LABEL_DIFFICULTY_SELECT = "בחרו רמת קושי:"
+        private const val LABEL_GPT_ENTER = "הקישו כל קטגוריה:"
         private const val LABEL_LOGIN = "להשתתפות בטבלת האלופים\nהתחברו כאן!"
         private const val LABEL_BACK = "חזרה"
         private const val LABEL_BEGIN_GAME = "משחק חדש"
-        private const val LABEL_WORDLE_SELECT_MODE = "בחרו מצב משחק:"
-        private const val LABEL_WORDLE_SINGLE = "יחיד"
-        private const val LABEL_WORDLE_MULTI = "נגד חבר"
-        private const val LABEL_WORDLE_PLAY = "וורדל"
-        private const val LABEL_BOMB_DIFFICULTY_SELECT = "בחרו רמת קושי:"
-        private const val LABEL_BOMB_PLAY = "גלה את המילה"
+        private const val LABEL_GPT_BEGIN_GAME = "התחל"
         private const val LOGO_PADDING_TOP = 300F
         private const val LOGO_PADDING_BOTTOM = 75F
         private const val CHAMPIONS_VIEW_PADDING = 64F
