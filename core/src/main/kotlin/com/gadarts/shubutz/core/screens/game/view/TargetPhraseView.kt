@@ -298,7 +298,7 @@ class TargetPhraseView(
                 gamePlayScreen.onClickedToRevealWordOnGameOver()
             },
             onNo = {
-                gamePlayScreen.onGameOverAnimationDone()
+
             },
             dialogName = REVEAL_WORD_DIALOG_NAME,
         )

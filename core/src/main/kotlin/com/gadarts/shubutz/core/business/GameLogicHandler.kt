@@ -1,6 +1,5 @@
 package com.gadarts.shubutz.core.business
 
-import com.badlogic.gdx.Gdx
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.DebugSettings.TEST_PHRASE
@@ -116,19 +115,11 @@ class GameLogicHandler(
             .toMutableList()
     }
 
-    fun onPurchasedCoins(gameModel: GameModel, amount: Int) {
-        addCoinsValueAndSave(gameModel, amount)
-    }
-
     fun onRevealLetterButtonClicked(gameModel: GameModel): Boolean {
         var result = false
-        if (gameModel.coins - gameModel.selectedDifficulty.revealLetterCost >= 0) {
-            if (gameModel.currentTargetData.hiddenLettersIndices.isNotEmpty()) {
-                revealLetter(gameModel)
-                result = true
-            }
-        } else {
-            gamePlayScreen.onLetterRevealFailedNotEnoughCoins()
+        if (gameModel.currentTargetData.hiddenLettersIndices.isNotEmpty()) {
+            revealLetter(gameModel)
+            result = true
         }
         return result
     }
@@ -144,23 +135,9 @@ class GameLogicHandler(
         )
     }
 
-    fun onRewardForVideoAd(rewardAmount: Int, gameModel: GameModel) {
-        addCoinsValueAndSave(gameModel, rewardAmount)
-    }
-
-    fun onBuyCoinsDialogOpened(onLoaded: () -> Unit) {
-        Gdx.app.postRunnable {
-            androidInterface.loadVideoAd(onLoaded)
-        }
-    }
-
     fun onClickedToRevealWordOnGameOver(gameModel: GameModel) {
-        if (gameModel.coins >= DISPLAY_TARGET_COST) {
-            addCoinsValueAndSave(gameModel, -DISPLAY_TARGET_COST)
-            gamePlayScreen.onRevealedWordOnGameOver(DISPLAY_TARGET_COST)
-        } else {
-            gamePlayScreen.onFailedToRevealWordOnGameOver()
-        }
+        addCoinsValueAndSave(gameModel, -DISPLAY_TARGET_COST)
+        gamePlayScreen.onRevealedWordOnGameOver(DISPLAY_TARGET_COST)
     }
 
     companion object {

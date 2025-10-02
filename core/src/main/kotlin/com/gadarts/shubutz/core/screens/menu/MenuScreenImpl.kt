@@ -2,7 +2,6 @@ package com.gadarts.shubutz.core.screens.menu
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.gadarts.shubutz.core.AnalyticsEvents
 import com.gadarts.shubutz.core.AndroidInterface
 import com.gadarts.shubutz.core.GameLifeCycleManager
 import com.gadarts.shubutz.core.model.Difficulties
@@ -13,7 +12,7 @@ import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
 
 class MenuScreenImpl(
     globalHandlers: GlobalHandlers,
-    private val androidInterface: AndroidInterface,
+    androidInterface: AndroidInterface,
     private val gameLifeCycleManager: GameLifeCycleManager,
     stage: GameStage,
 ) :
@@ -26,24 +25,8 @@ class MenuScreenImpl(
         this,
     )
 
-    override fun onSuccessfulPurchase(products: MutableList<String>) {
-
-    }
-
-    override fun onFailedPurchase(message: String) {
-
-    }
-
-    override fun onRewardForVideoAd(rewardAmount: Int) {
-    }
-
-    override fun onLeaderboardClosed() {
-
-    }
-
     override fun show() {
         menuScreenView.onShow(gameLifeCycleManager.loadingDone, goToPlayScreenOnClick())
-        androidInterface.hideBannerAd()
     }
 
     override fun render(delta: Float) {
@@ -78,10 +61,6 @@ class MenuScreenImpl(
 
     override fun restart() {
         gameLifeCycleManager.restart()
-    }
-
-    override fun onLoginClick() {
-        androidInterface.logEvent(AnalyticsEvents.CLICKED_LOGIN_BUTTON, null)
     }
 
     fun onGameReady() {

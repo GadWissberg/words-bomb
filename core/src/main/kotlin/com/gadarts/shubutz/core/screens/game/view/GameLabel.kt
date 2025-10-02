@@ -13,7 +13,6 @@ class GameLabel(
         try {
             super.draw(batch, parentAlpha)
         } catch (e: Exception) {
-            androidInterface.logCrashlytics("Failed to render label - text: ${text}, error: $e")
         }
     }
 }

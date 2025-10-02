@@ -1,6 +1,5 @@
 package com.gadarts.shubutz
 
-import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
@@ -10,43 +9,23 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.Toast
-import com.android.billingclient.api.*
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
-import com.badlogic.gdx.utils.TimeUtils
-import com.gadarts.shubutz.core.AnalyticsEvents
-import com.gadarts.shubutz.core.AnalyticsEventsParams
 import com.gadarts.shubutz.core.AndroidInterface
-import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.ShubutzGame
-import com.gadarts.shubutz.core.model.Difficulties
-import com.gadarts.shubutz.core.model.GameModel
-import com.gadarts.shubutz.core.model.Product
-import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys
 import com.gadarts.shubutz.core.model.assets.SharedPreferencesKeys.SHARED_PREFERENCES_DATA_NAME
-import com.gadarts.shubutz.core.screens.menu.view.OnChampionFetched
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.analytics.ktx.logEvent
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.ktx.Firebase
-import de.golfgl.gdxgamesvcs.GpgsClient.RC_LEADERBOARD
+import com.google.firebase.FirebaseApp
 
 
 class AndroidLauncher : AndroidApplication(), AndroidInterface {
 
 
-    private val googleServicesHandler = GoogleServicesHandler()
     private lateinit var game: ShubutzGame
     private var versionName = "0.0.0"
     private lateinit var layout: RelativeLayout
-    private lateinit var firebaseAnalytics: FirebaseAnalytics
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        firebaseAnalytics = Firebase.analytics
+        FirebaseApp.initializeApp(context)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         try {
             val pInfo = context.packageManager.getPackageInfoCompat(context.packageName, 0)
@@ -57,7 +36,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         game = ShubutzGame(this)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         createLayout()
-        googleServicesHandler.onCreate(game, this, firebaseAnalytics)
     }
 
     override fun toast(msg: String) {
@@ -106,119 +84,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         editor.apply()
     }
 
-    override fun initializeInAppPurchases(
-        onSuccess: (products: Map<String, Product>) -> Unit,
-        onFailure: (message: String) -> Unit
-    ) {
-        googleServicesHandler.initializeInAppPurchases(onSuccess, onFailure)
-    }
-
-    override fun launchBillingFlow(selectedProduct: Product) {
-        googleServicesHandler.launchBillingFlow(selectedProduct)
-    }
-
-    override fun initializeAds(onFinish: () -> Unit) {
-        val requestConfiguration = MobileAds.getRequestConfiguration()
-            .toBuilder()
-            .setTagForChildDirectedTreatment(
-                RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE
-            )
-            .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
-            .build()
-        MobileAds.setRequestConfiguration(requestConfiguration)
-        MobileAds.initialize(this) { onFinish.invoke() }
-    }
-
-    override fun loadVideoAd(onLoaded: () -> Unit) {
-        runOnUiThread {
-            googleServicesHandler.loadVideoAd(onLoaded, this)
-        }
-    }
-
-    override fun displayRewardedAd(onAdCompleted: () -> Unit, onAdDismissed: () -> Unit) {
-        runOnUiThread {
-            googleServicesHandler.displayRewardedAd(onAdCompleted, onAdDismissed, this, game)
-        }
-    }
-
-    override fun loadBannerAd() {
-        if (shouldLoadBannerAd()) {
-            runOnUiThread {
-                googleServicesHandler.loadBannerAd()
-                logEvent(AnalyticsEvents.AD_REQUEST, null)
-            }
-        }
-    }
-
-    override fun hideBannerAd() {
-        runOnUiThread {
-            googleServicesHandler.hideBannerAd()
-        }
-    }
-
-    override fun submitScore(score: Long, leaderboardsId: String): Boolean {
-        return googleServicesHandler.submitScore(score, leaderboardsId)
-    }
-
-    override fun displayLeaderboard(leaderboardsId: String) {
-        googleServicesHandler.displayLeaderboard(leaderboardsId)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_LEADERBOARD) {
-            game.onLeaderboardClosed()
-        }
-    }
-
-    override fun fetchChampion(difficulty: Difficulties, callback: OnChampionFetched) {
-        googleServicesHandler.fetchChampion(difficulty, callback)
-    }
-
-    override fun isConnected(): Boolean {
-        return googleServicesHandler.isConnected()
-    }
-
-    override fun logCrashlytics(message: String) {
-        FirebaseCrashlytics.getInstance().log(message)
-    }
-
-    override fun login() {
-        googleServicesHandler.login()
-    }
-
-    override fun logEvent(
-        event: String,
-        gameModel: GameModel?,
-        params: Map<String, String>?,
-    ) {
-        Gdx.app.log("Shubutz", "Logged event: $event")
-        firebaseAnalytics.logEvent(event) {
-            params?.forEach { (key, value) ->
-                param(key, value)
-            }
-            param(
-                AnalyticsEventsParams.PLAYER_NAME,
-                googleServicesHandler.getPlayerName().toString()
-            )
-            param(AnalyticsEventsParams.VERSION, versionName)
-            if (gameModel != null) {
-                param(AnalyticsEventsParams.COINS, gameModel.coins.toString())
-                param(
-                    AnalyticsEventsParams.CURRENT_PHRASE,
-                    gameModel.currentTargetData.currentPhrase.reversed()
-                )
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        runOnUiThread {
-            googleServicesHandler.onDestroy()
-        }
-    }
-
     private fun createAndroidApplicationConfig(): AndroidApplicationConfiguration {
         val config = AndroidApplicationConfiguration()
         config.numSamples = 2
@@ -240,7 +105,6 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
             )
             window.clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN)
         }
-        googleServicesHandler.addBannerAdLayout(this, layout)
     }
 
     private fun PackageManager.getPackageInfoCompat(
@@ -252,10 +116,4 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         } else {
             @Suppress("DEPRECATION") getPackageInfo(packageName, flags)
         }
-
-    private fun shouldLoadBannerAd() =
-        DebugSettings.ALWAYS_DISPLAY_BANNER_ADS || getSharedPreferencesLongValue(
-            SharedPreferencesKeys.DISABLE_ADS_DUE_DATE,
-            0
-        ) < TimeUtils.millis()
 }

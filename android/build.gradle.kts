@@ -1,13 +1,23 @@
 plugins {
     id("com.android.application")
-    id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     kotlin("android")
 }
 
+// Force a single kotlin stdlib version across all configurations
+configurations.all {
+    resolutionStrategy {
+        force(
+            "org.jetbrains.kotlin:kotlin-stdlib:1.8.22",
+            "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22",
+            "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22"
+        )
+    }
+}
+
 android {
     buildToolsVersion = "30.0.3"
-    compileSdk = 33
+    compileSdk = 34
     sourceSets {
         named("main") {
             res.srcDir("res")
@@ -19,7 +29,7 @@ android {
         val appVersion: String by project
         applicationId = "com.gadarts.shubutz"
         minSdk = 22
-        targetSdk = 33
+        targetSdk = 35
         versionCode = appVersion.split('.').joinToString("") { it.padStart(2, '0') }.toInt()
         versionName = appVersion
     }
@@ -55,11 +65,8 @@ dependencies {
     implementation(project(":core"))
 
     implementation(kotlin("stdlib"))
-
+    implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
-    implementation("com.android.billingclient:billing:6.0.1")
-    implementation("com.google.android.gms:play-services-ads:22.2.0")
-    implementation("de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:1.1.0")
     implementation("pl.mk5.gdx-fireapp:gdx-fireapp-android:$gdxFireappVersion")
     implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
     implementation("com.google.firebase:firebase-analytics-ktx")

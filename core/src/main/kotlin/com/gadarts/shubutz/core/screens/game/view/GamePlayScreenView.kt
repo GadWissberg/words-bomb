@@ -35,7 +35,6 @@ class GamePlayScreenView(
             globalHandlers,
             gamePlayScreen,
             stage,
-            gameModel,
         )
     private lateinit var uiTable: Table
     private var font80: BitmapFont =
@@ -102,12 +101,10 @@ class GamePlayScreenView(
     fun onCorrectGuess(
         indices: List<Int>,
         gameWin: Boolean,
-        coinsAmount: Int,
         perfectBonusAchieved: Boolean,
         prevScore: Long
     ) {
         gamePlayScreenViewComponentsManager.onCorrectGuess(
-            coinsAmount,
             perfectBonusAchieved,
             gameWin,
             gameModel,
@@ -151,7 +148,6 @@ class GamePlayScreenView(
         val actions = Actions.parallel(sequence, Actions.fadeOut(1F, smoother))
         if (gameWin) {
             sequence.addAction(Actions.run { roundWin(stage) })
-            gamePlayScreenViewComponentsManager.onGameWin()
         }
         brick.addAction(actions)
     }
@@ -164,7 +160,6 @@ class GamePlayScreenView(
     private fun roundWin(stage: GameStage) {
         gamePlayScreenViewComponentsManager.onRoundWin(
             stage,
-            gameModel
         ) { clearScreen() }
     }
 
@@ -192,69 +187,24 @@ class GamePlayScreenView(
     }
 
     private fun displayTargetAndFinishGame() {
-        if (GameModel.wordRevealFree) {
-            stage.addAction(
-                Actions.delay(
-                    GAME_OVER_DURATION,
-                    Actions.run { gamePlayScreen.onGameOverAnimationDone() })
-            )
-        }
         gamePlayScreenViewComponentsManager.gameOver(stage, gameModel)
     }
 
-    fun onPurchasedCoins(amount: Int) {
-        gamePlayScreenViewComponentsManager.onPurchasedCoins(amount)
-        globalHandlers.effectsHandler.applyPartyEffect(
-            globalHandlers.assetsManager,
-            globalHandlers.soundPlayer,
-            stage
-        )
-    }
-
-
-    fun displayFailedPurchase(message: String) {
-        val dialogView = Table()
-        dialogView.add(ViewUtils.createDialogLabel(
-            message,
-            globalHandlers.assetsManager,
-            globalHandlers.androidInterface
-        ))
-        stage.addDialog(dialogView, "purchase_failed_dialog", globalHandlers.assetsManager)
-    }
-
-    fun onLetterRevealed(letter: Char, cost: Int) {
-        gamePlayScreenViewComponentsManager.onLetterRevealed(letter, cost)
-    }
-
-    fun onLetterRevealFailedNotEnoughCoins() {
-        gamePlayScreenViewComponentsManager.onLetterRevealFailedNotEnoughCoins()
-    }
-
-    fun onRewardForVideoAd(rewardAmount: Int) {
-        gamePlayScreenViewComponentsManager.onRewardForVideoAd(rewardAmount)
+    fun onLetterRevealed(letter: Char) {
+        gamePlayScreenViewComponentsManager.onLetterRevealed(letter)
     }
 
     fun onPhysicalBackClicked() {
         gamePlayScreenViewComponentsManager.onPhysicalBackClicked()
     }
 
-    fun onChampion(post: () -> Unit) {
-        gamePlayScreenViewComponentsManager.onChampion(post)
-    }
-
-    fun onRevealedWordOnGameOver(cost: Int) {
+    fun onRevealedWordOnGameOver() {
         globalHandlers.stage.closeAllDialogs()
-        gamePlayScreenViewComponentsManager.displayCoinsConsumed(cost)
         displayTargetAndFinishGame()
-    }
-
-    fun onFailedToRevealWordOnGameOver() {
-        globalHandlers.dialogsHandler.openBuyCoinsDialog(gamePlayScreen)
     }
 
     companion object {
         private const val BRICK_SUCCESS_ANIMATION_DURATION = 1F
-        private const val GAME_OVER_DURATION = 8F
         private val auxVector = Vector2()
     }
 }

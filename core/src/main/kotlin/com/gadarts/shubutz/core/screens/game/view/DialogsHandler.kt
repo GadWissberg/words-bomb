@@ -1,78 +1,28 @@
 package com.gadarts.shubutz.core.screens.game.view
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.math.Interpolation
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Button
-import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Stack
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
-import com.badlogic.gdx.utils.Scaling
-import com.badlogic.gdx.utils.Timer
-import com.badlogic.gdx.utils.Timer.Task
 import com.gadarts.shubutz.core.AndroidInterface
-import com.gadarts.shubutz.core.DebugSettings
 import com.gadarts.shubutz.core.GeneralUtils
 import com.gadarts.shubutz.core.SoundPlayer
-import com.gadarts.shubutz.core.model.InAppProducts
-import com.gadarts.shubutz.core.model.Product
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.model.assets.definitions.AtlasesDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.FontsDefinitions
 import com.gadarts.shubutz.core.model.assets.definitions.SoundsDefinitions
-import com.gadarts.shubutz.core.model.assets.definitions.TexturesDefinitions
 import com.gadarts.shubutz.core.screens.game.GamePlayScreen
 import com.gadarts.shubutz.core.screens.menu.view.stage.GameStage
-import java.util.Locale
 
 class DialogsHandler(
     private val assetsManager: GameAssetManager,
-    private val effectsHandler: EffectsHandler,
     private val stage: GameStage,
     private val soundPlayer: SoundPlayer,
     private val androidInterface: AndroidInterface
 ) {
-    fun openBuyCoinsDialog(
-        gamePlayScreen: GamePlayScreen,
-    ) {
-        val loadingAnimation = createLoadingAnimation()
-        val dialogLayout = Table()
-        dialogLayout.add(loadingAnimation).row()
-        gamePlayScreen.onOpenProductsMenu({
-            Timer.schedule(object : Task() {
-                override fun run() {
-                    loadingAnimation.remove()
-                    if (it.isNotEmpty()) {
-                        addCoinsDialogComponents(dialogLayout, it, gamePlayScreen) {
-                            effectsHandler.applyPartyEffect(
-                                assetsManager,
-                                soundPlayer,
-                                stage
-                            )
-                        }
-                    }
-                    dialogLayout.pack()
-                }
-            }, 1F)
-        }, {
-            loadingAnimation.remove()
-            dialogLayout.add(
-                ViewUtils.createDialogLabel(
-                    it,
-                    assetsManager,
-                    androidInterface
-                )
-            )
-            dialogLayout.pack()
-        })
-        finalizeDialog(dialogLayout, COINS_DIALOG_NAME)
-    }
 
     fun openCoinsPurchasedSuccessfully(
         assetsManager: GameAssetManager,
@@ -128,77 +78,6 @@ class DialogsHandler(
             .row()
     }
 
-    private fun addPackButton(
-        dialog: Table,
-        product: Product?,
-        definition: InAppProducts,
-        gameAssetManager: GameAssetManager,
-        gamePlayScreen: GamePlayScreen,
-    ) {
-        val button = addDialogButton(
-            dialogLayout = dialog,
-            onClick = {
-                if (product != null) {
-                    gamePlayScreen.onPackPurchaseButtonClicked(product)
-                }
-            },
-            text = definition.label.format(definition.amount.toString().reversed()),
-            dialogName = COINS_DIALOG_NAME
-        )
-        button.debug = DebugSettings.SHOW_UI_BORDERS
-        val stack = Stack()
-        button.add(stack).row()
-        addLabelToPackButton(product, button)
-        addFlashEffect(definition, stack, gameAssetManager)
-        animatePackButton(definition, addPurchaseIcon(definition, stack, gameAssetManager))
-    }
-
-    private fun addLabelToPackButton(
-        product: Product?,
-        button: ImageTextButton
-    ) {
-        val label = GameLabel(
-            product?.formattedPrice ?: "",
-            Label.LabelStyle(
-                assetsManager.getFont(FontsDefinitions.VARELA_35),
-                Color.WHITE
-            ),
-            androidInterface
-        )
-        label.setAlignment(Align.center)
-        button.add(
-            label
-        ).colspan(2).center()
-    }
-
-    private fun animatePackButton(
-        definition: InAppProducts,
-        image: Image
-    ) {
-        if (definition.applyAnimation) {
-            image.addAction(
-                Actions.forever(
-                    Actions.sequence(
-                        Actions.delay(MathUtils.random(3F, 5F)),
-                        Actions.sizeBy(
-                            20F,
-                            20F,
-                            1F,
-                            Interpolation.swingIn
-                        ),
-                        Actions.sizeBy(
-                            -20F,
-                            -20F,
-                            1F,
-                            Interpolation.swingIn
-                        ),
-                        Actions.delay(2F)
-                    ),
-                )
-            )
-        }
-    }
-
     private fun addDialogButton(
         dialogLayout: Table,
         onClick: (() -> Unit)? = null,
@@ -217,38 +96,6 @@ class DialogsHandler(
             cell.row()
         }
         return button
-    }
-
-    private fun addPurchaseIcon(
-        definition: InAppProducts,
-        stack: Stack,
-        gameAssetManager: GameAssetManager
-    ): Image {
-        val image = Image(gameAssetManager.getTexture(definition.icon))
-        image.setScaling(Scaling.none)
-        stack.add(image)
-        return image
-    }
-
-    private fun addFlashEffect(
-        definition: InAppProducts,
-        stack: Stack,
-        gameAssetManager: GameAssetManager
-    ) {
-        if (definition.flashEffect) {
-            val texture = gameAssetManager.getTexture(TexturesDefinitions.FLASH)
-            val flash = FlashEffect(texture)
-            stack.add(flash)
-            flash.setOrigin(texture.width / 2F, texture.height / 2F)
-            flash.addAction(
-                Actions.forever(
-                    Actions.rotateBy(
-                        360F,
-                        FLASH_EFFECT_DURATION
-                    )
-                )
-            )
-        }
     }
 
 
@@ -278,86 +125,6 @@ class DialogsHandler(
                 )
             }
         })
-    }
-
-    private fun addCoinsDialogComponents(
-        layout: Table,
-        products: Map<String, Product>,
-        gamePlayScreen: GamePlayScreen,
-        onVideoDone: () -> Unit,
-    ) {
-        addHeaderToDialog(assetsManager, layout, COINS_DIALOG_HEADER)
-        addDialogText(assetsManager, layout, COINS_DIALOG_DESCRIPTION)
-        InAppProducts.values().forEach {
-            val id = it.name.lowercase(Locale.ROOT)
-            if (products.containsKey(id)) {
-                addPackButton(
-                    dialog = layout,
-                    product = products[id],
-                    definition = it,
-                    gameAssetManager = assetsManager,
-                    gamePlayScreen = gamePlayScreen
-                )
-            }
-        }
-        addVideoSection(layout, onVideoDone, gamePlayScreen)
-        placeDialogInTheMiddle(layout)
-    }
-
-    private fun addVideoSection(
-        layout: Table,
-        onVideoDone: () -> Unit,
-        gamePlayScreen: GamePlayScreen,
-    ) {
-        val stack = Stack()
-        val table = Table()
-        addDialogText(
-            assetsManager = assetsManager,
-            dialog = table,
-            description = COINS_DIALOG_DESCRIPTION_2,
-            topPadding = COINS_DIALOG_DESCRIPTION_2_TOP_PADDING,
-            bottomPadding = 0F
-        )
-        addVideoButton(table, onVideoDone, gamePlayScreen)
-        table.isVisible = false
-        stack.add(table)
-        val loadingAnimation = createLoadingAnimation()
-        stack.add(loadingAnimation)
-        layout.add(stack)
-        gamePlayScreen.onBuyCoinsDialogOpened {
-            table.isVisible = true
-            loadingAnimation.isVisible = false
-        }
-    }
-
-    private fun addVideoButton(
-        layout: Table,
-        onAdCompleted: () -> Unit,
-        gamePlayScreen: GamePlayScreen,
-    ) {
-        val button = addDialogButton(
-            dialogLayout = layout,
-            text = COINS_DIALOG_BUTTON_VIDEO,
-            dialogName = COINS_DIALOG_NAME,
-            topPadding = 0F,
-            onClick = {
-                gamePlayScreen.onShowVideoAdClicked({
-                    onAdCompleted.invoke()
-                    layout.isVisible = false
-                }, {
-                    layout.isVisible = false
-                })
-            }
-        )
-        val image = Image(assetsManager.getTexture(TexturesDefinitions.POPCORN))
-        image.setScaling(Scaling.none)
-        val cell = button.add(image).pad(COINS_DIALOG_BUTTON_VIDEO_ICON_PADDING)
-        cell.size(cell.prefWidth, COINS_DIALOG_BUTTON_VIDEO_PADDING)
-    }
-
-    private fun createLoadingAnimation(): LoadingAnimation {
-        val keyFrames = assetsManager.getAtlas(AtlasesDefinitions.LOADING).regions
-        return LoadingAnimation(keyFrames)
     }
 
     private fun createDialogLayout(
@@ -514,17 +281,8 @@ class DialogsHandler(
         private const val DIALOG_BUTTON_WIDTH = 200F
         private const val DIALOG_HEADER_PADDING_BOTTOM = 64F
         private const val COINS_DIALOG_NAME = "coins"
-        private const val COINS_DIALOG_HEADER = "קבל עוד מטבעות"
-        private const val COINS_DIALOG_DESCRIPTION =
-            "לרשותך מס' אפשרויות להשיג\nעוד מטבעות.\nכל רכישה תסיר את הפרסומות למשך שבוע!"
-        private const val COINS_DIALOG_DESCRIPTION_2 = "או צפייה בסרטון פרסומת עבור 4 מטבעות:"
-        private const val COINS_DIALOG_DESCRIPTION_2_TOP_PADDING = 40F
-        private const val COINS_DIALOG_BUTTON_VIDEO = "לחץ לצפייה בסרטון פרסומת"
-        private const val COINS_DIALOG_BUTTON_VIDEO_PADDING = 128F
-        private const val COINS_DIALOG_BUTTON_VIDEO_ICON_PADDING = 20F
         private const val DIALOG_DESCRIPTION_PADDING_BOTTOM = 64F
         private const val DIALOG_BUTTON_PADDING = 32F
-        private const val FLASH_EFFECT_DURATION = 4F
         private const val DIALOG_BUTTON_NO = "לא תודה"
         private const val DIALOG_BUTTON_YES = "סבבה"
     }

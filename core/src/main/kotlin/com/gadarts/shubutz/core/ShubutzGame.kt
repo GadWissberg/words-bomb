@@ -7,7 +7,6 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.gadarts.shubutz.core.model.Difficulties
 import com.gadarts.shubutz.core.model.assets.GameAssetManager
-import com.gadarts.shubutz.core.screens.GameScreen
 import com.gadarts.shubutz.core.screens.game.GamePlayScreenImpl
 import com.gadarts.shubutz.core.screens.game.GlobalHandlers
 import com.gadarts.shubutz.core.screens.menu.MenuScreenImpl
@@ -30,7 +29,7 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         createStage(assetsManager)
         globalHandlers = GlobalHandlers(android, stage, assetsManager)
         goToMenu()
-        android.initializeAds { gameReady() }
+        gameReady()
     }
 
     override fun setScreen(screen: Screen?) {
@@ -59,34 +58,10 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
         setScreen(createGamePlayScreen(selectedDifficulty))
     }
 
-    override fun onSuccessfulPurchase(products: MutableList<String>) {
-        if (screen == null) return
-
-        (screen as GameScreen).onSuccessfulPurchase(products)
-    }
-
-    override fun onFailedPurchase(message: String) {
-        if (screen == null) return
-
-        (screen as GameScreen).onFailedPurchase(message)
-    }
-
-    override fun onLeaderboardClosed() {
-        if (screen == null) return
-
-        (screen as GameScreen).onLeaderboardClosed()
-    }
-
     override fun restart() {
         screen?.dispose()
         val screen = MenuScreenImpl(globalHandlers, android, this, stage)
         setScreen(screen)
-    }
-
-    fun onRewardForVideoAd(rewardAmount: Int) {
-        if (screen == null) return
-
-        (screen as GameScreen).onRewardForVideoAd(rewardAmount)
     }
 
     private fun gameReady() {
@@ -118,6 +93,5 @@ class ShubutzGame(private val android: AndroidInterface) : Game(), GameLifeCycle
     companion object {
         const val RESOLUTION_WIDTH = 1080
         const val RESOLUTION_HEIGHT = 2400
-        var lastChampionsFetch = 0L
     }
 }
