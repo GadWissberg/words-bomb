@@ -17,7 +17,7 @@ configurations.all {
 
 android {
     buildToolsVersion = "30.0.3"
-    compileSdk = 34
+    compileSdk = 35
     sourceSets {
         named("main") {
             res.srcDir("res")

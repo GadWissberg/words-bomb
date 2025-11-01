@@ -29,7 +29,7 @@ class AndroidLauncher : AndroidApplication(), AndroidInterface {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         try {
             val pInfo = context.packageManager.getPackageInfoCompat(context.packageName, 0)
-            versionName = pInfo.versionName
+            versionName = pInfo.versionName ?: "0.0.0"
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }
